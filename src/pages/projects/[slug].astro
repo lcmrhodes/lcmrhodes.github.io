@@ -1,0 +1,78 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import '../../styles/global.css';
+
+export async function getStaticPaths() {
+	const projects = await getCollection('projects');
+
+	return projects.map((project) => ({
+		params: { slug: project.id },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+
+const laneLabels = {
+	visualization: 'Visualisation & Storytelling',
+	product: 'Recommendation & Product Systems',
+	research: 'Research & Health Systems',
+};
+---
+
+<Layout title={`${project.data.title} | Luke Rhodes`} description={project.data.summary}>
+	<main class="detail-shell">
+		<a class="back-link" href="/#work">← Back to homepage</a>
+
+		<section class="detail-hero">
+			<p class="eyebrow">{laneLabels[project.data.lane]}</p>
+			<h1>{project.data.title}</h1>
+			<p class="detail-summary">{project.data.summary}</p>
+
+			<div class="detail-meta">
+				<span>{project.data.role}</span>
+				<span>{project.data.year}</span>
+				<span>{project.data.visibility === 'private' ? 'Private project' : 'Public work'}</span>
+			</div>
+
+			<div class="detail-actions">
+				{project.data.liveUrl && (
+					<a href={project.data.liveUrl} target="_blank" rel="noreferrer">Open live site</a>
+				)}
+				{project.data.repoUrl && (
+					<a href={project.data.repoUrl} target="_blank" rel="noreferrer">View repository</a>
+				)}
+			</div>
+
+			{project.data.disclaimer && <p class="detail-disclaimer">{project.data.disclaimer}</p>}
+		</section>
+
+		<section class="detail-grid">
+			<aside class="detail-sidebar">
+				<div class="sidebar-card">
+					<h2>Stack</h2>
+					<div class="tag-list">
+						{project.data.stack.map((item) => (
+							<span>{item}</span>
+						))}
+					</div>
+				</div>
+
+				<div class="sidebar-card">
+					<h2>Highlights</h2>
+					<ul>
+						{project.data.highlights.map((highlight) => (
+							<li>{highlight}</li>
+						))}
+					</ul>
+				</div>
+			</aside>
+
+			<article class="detail-content prose-shell">
+				<Content />
+			</article>
+		</section>
+	</main>
+</Layout>

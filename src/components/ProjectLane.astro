@@ -1,0 +1,49 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+	title: string;
+	subtitle: string;
+	projects: CollectionEntry<'projects'>[];
+}
+
+const { title, subtitle, projects } = Astro.props;
+---
+
+<section class="lane-section">
+	<div class="lane-header">
+		<h3>{title}</h3>
+		<p>{subtitle}</p>
+	</div>
+
+	<div class="lane-rail" role="list" aria-label={title}>
+		{projects.map((project) => (
+			<article class="project-card" role="listitem">
+				<div class="project-meta">
+					<span>{project.data.year}</span>
+					<span>{project.data.visibility === 'private' ? 'Private project' : 'Public work'}</span>
+				</div>
+				<h4>{project.data.title}</h4>
+				<p>{project.data.summary}</p>
+
+				<div class="tag-list">
+					{project.data.stack.slice(0, 4).map((tag) => (
+						<span>{tag}</span>
+					))}
+				</div>
+
+				{project.data.disclaimer && <p class="disclaimer-inline">{project.data.disclaimer}</p>}
+
+				<div class="card-actions">
+					<a href={`/projects/${project.id}/`}>Case study</a>
+					{project.data.liveUrl && (
+						<a href={project.data.liveUrl} target="_blank" rel="noreferrer">Live</a>
+					)}
+					{project.data.repoUrl && (
+						<a href={project.data.repoUrl} target="_blank" rel="noreferrer">Repo</a>
+					)}
+				</div>
+			</article>
+		))}
+	</div>
+</section>
