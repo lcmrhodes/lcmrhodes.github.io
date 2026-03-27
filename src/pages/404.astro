@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+import '../styles/global.css';
+---
+
+<Layout title="Page not found | Luke Rhodes" description="The page you requested does not exist.">
+	<main class="detail-shell not-found-shell">
+		<section class="detail-hero">
+			<p class="eyebrow">404</p>
+			<h1>That page isn’t here.</h1>
+			<p class="detail-summary">
+				The route may have moved, or the link may simply be wrong. The homepage is still the
+				best place to orient yourself.
+			</p>
+			<div class="detail-actions">
+				<a href="/">Go to homepage</a>
+				<a href="/#work">Jump to selected work</a>
+			</div>
+		</section>
+	</main>
+</Layout>

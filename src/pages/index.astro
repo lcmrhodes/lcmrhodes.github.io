@@ -1,0 +1,283 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+import ProjectLane from '../components/ProjectLane.astro';
+import '../styles/global.css';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.rank - b.data.rank);
+
+const lanes = [
+	{
+		key: 'visualization',
+		title: 'Visualisation & Storytelling',
+		subtitle: 'Interactive work that turns data, systems, and relationships into something people can actually feel.',
+	},
+	{
+		key: 'product',
+		title: 'Recommendation & Product Systems',
+		subtitle: 'Interfaces and tools where user flow, taste, and decision logic matter as much as implementation.',
+	},
+	{
+		key: 'research',
+		title: 'Research & Health Systems',
+		subtitle: 'Modeling, APIs, and decision-support tooling built for serious operational or analytical contexts.',
+	},
+];
+
+const laneProjects = lanes.map((lane) => ({
+	...lane,
+	projects: projects.filter((project) => project.data.lane === lane.key),
+}));
+
+const heroPhrases = [
+	'build interactive visualisations that make complex systems legible.',
+	'design recommendation tools with editorial, product-minded interfaces.',
+	'turn research software into something robust, usable, and deployable.',
+	'work across TypeScript, Astro, Next.js, R, Python, and C++.',
+];
+
+const proofItems = [
+	{
+		title: 'MORU',
+		label: 'Research Consultant',
+		body: 'Building deployment-ready pediatric triage and decision-support tooling for low-resource health contexts.',
+	},
+	{
+		title: 'University of Oxford',
+		label: 'MSc, Modelling for Global Health',
+		body: 'Distinction-level training in modeling, applied health analysis, and research systems.',
+	},
+	{
+		title: 'UCL',
+		label: 'Population Health & Data Science',
+		body: 'Population Health degree plus dashboard and reporting work for the UCL Institute of Education.',
+	},
+	{
+		title: 'Population Health Sciences Magazine',
+		label: 'Graphical Design Editor',
+		body: 'Directed visual strategy and design delivery across print and digital publication work.',
+	},
+];
+
+const featuredProjects = projects.filter((project) => project.data.featured);
+---
+
+<Layout
+	title="Luke Rhodes | Visualisation, Product, and Research Software"
+	description="Interactive visualisations, recommendation tools, and research software by Luke Rhodes."
+>
+	<main class="page-shell">
+		<button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+
+		<section class="panel hero-panel" id="hero">
+			<div class="ambient ambient-one"></div>
+			<div class="hero-grid section-frame">
+				<div class="hero-copy">
+					<p class="eyebrow">lcmrhodes.github.io</p>
+					<h1>Luke Rhodes</h1>
+					<p class="hero-role">Visualisation, product, and research software.</p>
+					<p class="hero-summary">
+						I build interactive visualisations, recommendation tools, and research systems
+						that make complicated ideas easier to explore, trust, and use.
+					</p>
+					<div class="hero-links">
+						<a href="https://github.com/lcmrhodes">GitHub</a>
+						<a href="https://www.linkedin.com/in/lukecmrhodes">LinkedIn</a>
+						<a href="/Luke_Rhodes_CV_2025.docx">CV</a>
+						<a href="mailto:lcmrhodes98@gmail.com">Email</a>
+					</div>
+				</div>
+
+				<div class="hero-aside">
+					<div class="terminal-window">
+						<div class="terminal-head">
+							<div class="traffic-lights" aria-hidden="true">
+								<span></span>
+								<span></span>
+								<span></span>
+							</div>
+							<span>skills.txt</span>
+						</div>
+						<div class="terminal-body">
+							<p class="terminal-line">
+								<span class="terminal-prompt">&gt;</span>
+								<span>I </span>
+								<span id="typed-phrase"></span>
+								<span class="terminal-caret" aria-hidden="true"></span>
+							</p>
+						</div>
+					</div>
+
+					<nav class="hero-nav">
+						<a href="#about">About</a>
+						<a href="#work">Work</a>
+						<a href="#proof">Proof</a>
+						<a href="#contact">Contact</a>
+					</nav>
+				</div>
+			</div>
+			<script is:inline define:vars={{ heroPhrases }}>
+				const typedPhrase = document.getElementById('typed-phrase');
+				if (typedPhrase) {
+					let phraseIndex = 0;
+					let characterIndex = 0;
+					let deleting = false;
+
+					const tick = () => {
+						const phrase = heroPhrases[phraseIndex];
+						typedPhrase.textContent = deleting
+							? phrase.slice(0, characterIndex--)
+							: phrase.slice(0, characterIndex++);
+
+						const finishedTyping = !deleting && characterIndex > phrase.length;
+						const finishedDeleting = deleting && characterIndex < 0;
+
+						if (finishedTyping) {
+							deleting = true;
+							setTimeout(tick, 1200);
+							return;
+						}
+
+						if (finishedDeleting) {
+							deleting = false;
+							phraseIndex = (phraseIndex + 1) % heroPhrases.length;
+						}
+
+						setTimeout(tick, deleting ? 28 : 54);
+					};
+
+					tick();
+				}
+			</script>
+		</section>
+
+		<section class="panel about-panel" id="about">
+			<div class="ambient ambient-two"></div>
+			<div class="section-frame about-grid">
+				<div class="section-intro">
+					<p class="eyebrow">About</p>
+					<h2>Understand. Build. Translate.</h2>
+					<p>
+						I like work that sits between explanation and execution: data that needs to be
+						understood, systems that need to be made usable, and products that should feel
+						intelligent rather than merely functional.
+					</p>
+				</div>
+
+				<div class="about-copy">
+					<p>
+						My background moves between population health, modeling, design, and product-like
+						web work. That mix shows up in how I build: visual explanations when complexity
+						is the problem, polished interfaces when adoption is the problem, and robust
+						research or API tooling when trust is the problem.
+					</p>
+					<p>
+						Right now that includes interactive visualisation, fragrance recommendation
+						products, and pediatric decision-support systems. I care about clarity, visual
+						hierarchy, and giving serious work an interface people can actually navigate.
+					</p>
+					<ul class="about-points">
+						<li>TypeScript, Astro, Next.js, D3, Framer Motion</li>
+						<li>R, Python, C++, modeling, APIs, and analytics workflows</li>
+						<li>Editorial design instincts shaped by publication and visual strategy work</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+
+		<section class="panel work-panel" id="work">
+			<div class="ambient ambient-three"></div>
+			<div class="section-frame work-stack">
+				<div class="section-intro section-intro-wide">
+					<p class="eyebrow">Selected work</p>
+					<h2>The projects at the core of the site.</h2>
+					<p>
+						The homepage groups work by capability rather than chronology. The flagship trio
+						is <strong>WeddingNetwork</strong>, <strong>ScentSense</strong>, and
+						<strong>Sepsis Flow</strong>, with supporting projects giving the rest of the
+						context.
+					</p>
+				</div>
+
+				<div class="featured-strip" aria-label="Flagship projects">
+					{featuredProjects.map((project) => (
+						<article class="featured-card">
+							<p class="featured-label">{project.data.lane}</p>
+							<h3>{project.data.title}</h3>
+							<p>{project.data.summary}</p>
+							<div class="featured-links">
+								<a href={`/projects/${project.id}/`}>Read case study</a>
+								{project.data.liveUrl && (
+									<a href={project.data.liveUrl} target="_blank" rel="noreferrer">Live</a>
+								)}
+							</div>
+						</article>
+					))}
+				</div>
+
+				{laneProjects.map((lane) => (
+					<ProjectLane
+						title={lane.title}
+						subtitle={lane.subtitle}
+						projects={lane.projects}
+					/>
+				))}
+			</div>
+		</section>
+
+		<section class="panel proof-panel" id="proof">
+			<div class="section-frame proof-grid">
+				<div class="section-intro section-intro-wide">
+					<p class="eyebrow">Proof & affiliations</p>
+					<h2>Selected context, not a logo wall.</h2>
+					<p>
+						For now this section stays text-first. It anchors the work in real institutions,
+						roles, and outputs without pretending the site needs testimonial theatre before it
+						has earned it.
+					</p>
+				</div>
+
+				<div class="proof-cards">
+					{proofItems.map((item) => (
+						<article class="proof-card">
+							<p class="proof-title">{item.title}</p>
+							<h3>{item.label}</h3>
+							<p>{item.body}</p>
+						</article>
+					))}
+				</div>
+			</div>
+		</section>
+
+		<section class="panel contact-panel" id="contact">
+			<div class="section-frame contact-grid">
+				<div class="section-intro">
+					<p class="eyebrow">Contact</p>
+					<h2>Want to work on something thoughtful?</h2>
+					<p>
+						If the project sits anywhere near visual explanation, product framing, or serious
+						research tooling, I’m interested.
+					</p>
+				</div>
+
+				<div class="contact-card">
+					<a href="mailto:lcmrhodes98@gmail.com">lcmrhodes98@gmail.com</a>
+					<a href="https://github.com/lcmrhodes">github.com/lcmrhodes</a>
+					<a href="https://www.linkedin.com/in/lukecmrhodes">linkedin.com/in/lukecmrhodes</a>
+					<a href="/Luke_Rhodes_CV_2025.docx">Download CV</a>
+				</div>
+			</div>
+		</section>
+
+		<footer class="site-footer">
+			<p>
+				© 2026 Luke Rhodes. Structural inspiration from
+				<a href="https://ncsdecoopman.github.io">Nicolas Decoopman</a>, with additional
+				reference from
+				<a href="https://github.com/emmabostian/developer-portfolios?tab=readme-ov-file">
+					Emma Bostian’s portfolio bank
+				</a>.
+			</p>
+		</footer>
+	</main>
+</Layout>

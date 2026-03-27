@@ -1,0 +1,280 @@
+- main [ref=e2]:
+  - button "Dark mode" [ref=e3] [cursor=pointer]
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - paragraph [ref=e7]: lcmrhodes.github.io
+      - heading "Luke Rhodes" [level=1] [ref=e8]
+      - paragraph [ref=e9]: Visualisation, product, and research software.
+      - paragraph [ref=e10]: I build interactive visualisations, recommendation tools, and research systems that make complicated ideas easier to explore, trust, and use.
+      - generic [ref=e11]:
+        - link "GitHub" [ref=e12] [cursor=pointer]:
+          - /url: https://github.com/lcmrhodes
+        - link "LinkedIn" [ref=e13] [cursor=pointer]:
+          - /url: https://www.linkedin.com/in/lukecmrhodes
+        - link "CV" [ref=e14] [cursor=pointer]:
+          - /url: /Luke_Rhodes_CV_2025.docx
+        - link "Email" [ref=e15] [cursor=pointer]:
+          - /url: mailto:lcmrhodes98@gmail.com
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e23]: skills.txt
+        - paragraph [ref=e25]: "> I buil"
+      - navigation [ref=e26]:
+        - link "About" [ref=e27] [cursor=pointer]:
+          - /url: "#about"
+        - link "Work" [ref=e28] [cursor=pointer]:
+          - /url: "#work"
+        - link "Proof" [ref=e29] [cursor=pointer]:
+          - /url: "#proof"
+        - link "Contact" [ref=e30] [cursor=pointer]:
+          - /url: "#contact"
+  - generic [ref=e32]:
+    - generic [ref=e33]:
+      - paragraph [ref=e34]: About
+      - heading "Understand. Build. Translate." [level=2] [ref=e35]
+      - paragraph [ref=e36]: "I like work that sits between explanation and execution: data that needs to be understood, systems that need to be made usable, and products that should feel intelligent rather than merely functional."
+    - generic [ref=e37]:
+      - paragraph [ref=e38]: "My background moves between population health, modeling, design, and product-like web work. That mix shows up in how I build: visual explanations when complexity is the problem, polished interfaces when adoption is the problem, and robust research or API tooling when trust is the problem."
+      - paragraph [ref=e39]: Right now that includes interactive visualisation, fragrance recommendation products, and pediatric decision-support systems. I care about clarity, visual hierarchy, and giving serious work an interface people can actually navigate.
+      - list [ref=e40]:
+        - listitem [ref=e41]: TypeScript, Astro, Next.js, D3, Framer Motion
+        - listitem [ref=e42]: R, Python, C++, modeling, APIs, and analytics workflows
+        - listitem [ref=e43]: Editorial design instincts shaped by publication and visual strategy work
+  - generic [ref=e45]:
+    - generic [ref=e46]:
+      - paragraph [ref=e47]: Selected work
+      - heading "The projects at the core of the site." [level=2] [ref=e48]
+      - paragraph [ref=e49]:
+        - text: The homepage groups work by capability rather than chronology. The flagship trio is
+        - strong [ref=e50]: WeddingNetwork
+        - text: ","
+        - strong [ref=e51]: ScentSense
+        - text: ", and"
+        - strong [ref=e52]: Sepsis Flow
+        - text: ", with supporting projects giving the rest of the context."
+    - generic "Flagship projects" [ref=e53]:
+      - article [ref=e54]:
+        - paragraph [ref=e55]: visualization
+        - heading "WeddingNetwork" [level=3] [ref=e56]
+        - paragraph [ref=e57]: Interactive network visualisation built as the digital counterpart to personalised wedding invitations.
+        - generic [ref=e58]:
+          - link "Read case study" [ref=e59] [cursor=pointer]:
+            - /url: /projects/wedding-network/
+          - link "Live" [ref=e60] [cursor=pointer]:
+            - /url: https://wedding-network.vercel.app
+      - article [ref=e61]:
+        - paragraph [ref=e62]: product
+        - heading "ScentSense" [level=3] [ref=e63]
+        - paragraph [ref=e64]: Perfume recommendation site with an editorial interface and a taste-profile-driven recommendation engine.
+        - generic [ref=e65]:
+          - link "Read case study" [ref=e66] [cursor=pointer]:
+            - /url: /projects/scentsense/
+          - link "Live" [ref=e67] [cursor=pointer]:
+            - /url: https://myscenttaste.vercel.app
+      - article [ref=e68]:
+        - paragraph [ref=e69]: research
+        - heading "Sepsis Flow" [level=3] [ref=e70]
+        - paragraph [ref=e71]: Multi-service research platform for pediatric treatment-intensity prediction, with APIs, orchestration, and a hosted evaluation interface.
+        - generic [ref=e72]:
+          - link "Read case study" [ref=e73] [cursor=pointer]:
+            - /url: /projects/sepsis-flow/
+          - link "Live" [ref=e74] [cursor=pointer]:
+            - /url: https://sepsis-flow-web-app.onrender.com
+    - generic [ref=e75]:
+      - generic [ref=e76]:
+        - heading "Visualisation & Storytelling" [level=3] [ref=e77]
+        - paragraph [ref=e78]: Interactive work that turns data, systems, and relationships into something people can actually feel.
+      - list "Visualisation & Storytelling" [ref=e79]:
+        - listitem [ref=e80]:
+          - generic [ref=e81]:
+            - generic [ref=e82]: "2026"
+            - generic [ref=e83]: Public work
+          - heading "WeddingNetwork" [level=4] [ref=e84]
+          - paragraph [ref=e85]: Interactive network visualisation built as the digital counterpart to personalised wedding invitations.
+          - generic [ref=e86]:
+            - generic [ref=e87]: Next.js
+            - generic [ref=e88]: TypeScript
+            - generic [ref=e89]: D3
+            - generic [ref=e90]: Framer Motion
+          - generic [ref=e91]:
+            - link "Case study" [ref=e92] [cursor=pointer]:
+              - /url: /projects/wedding-network/
+            - link "Live" [ref=e93] [cursor=pointer]:
+              - /url: https://wedding-network.vercel.app
+            - link "Repo" [ref=e94] [cursor=pointer]:
+              - /url: https://github.com/lcmrhodes/WeddingNetwork
+        - listitem [ref=e95]:
+          - generic [ref=e96]:
+            - generic [ref=e97]: "2024"
+            - generic [ref=e98]: Public work
+          - heading "Spatial Analysis of Gambling-Related Harm" [level=4] [ref=e99]
+          - paragraph [ref=e100]: Spatial public-health analysis combining mapped vulnerability indices, census data, and regression methods.
+          - generic [ref=e101]:
+            - generic [ref=e102]: R
+            - generic [ref=e103]: Spatial analysis
+            - generic [ref=e104]: Census data
+            - generic [ref=e105]: Regression
+          - link "Case study" [ref=e107] [cursor=pointer]:
+            - /url: /projects/spatial-gambling/
+        - listitem [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e110]: "2024"
+            - generic [ref=e111]: Public work
+          - heading "Population Health Sciences Magazine" [level=4] [ref=e112]
+          - paragraph [ref=e113]: Editorial and visual design work balancing clarity, complexity, and publication-quality storytelling.
+          - generic [ref=e114]:
+            - generic [ref=e115]: Editorial design
+            - generic [ref=e116]: Adobe Creative Suite
+            - generic [ref=e117]: Visual strategy
+            - generic [ref=e118]: Publication systems
+          - link "Case study" [ref=e120] [cursor=pointer]:
+            - /url: /projects/phs-magazine/
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - heading "Recommendation & Product Systems" [level=3] [ref=e123]
+        - paragraph [ref=e124]: Interfaces and tools where user flow, taste, and decision logic matter as much as implementation.
+      - list "Recommendation & Product Systems" [ref=e125]:
+        - listitem [ref=e126]:
+          - generic [ref=e127]:
+            - generic [ref=e128]: "2026"
+            - generic [ref=e129]: Private project
+          - heading "ScentSense" [level=4] [ref=e130]
+          - paragraph [ref=e131]: Perfume recommendation site with an editorial interface and a taste-profile-driven recommendation engine.
+          - generic [ref=e132]:
+            - generic [ref=e133]: Next.js
+            - generic [ref=e134]: TypeScript
+            - generic [ref=e135]: Recommendation logic
+            - generic [ref=e136]: Tailwind CSS
+          - generic [ref=e137]:
+            - link "Case study" [ref=e138] [cursor=pointer]:
+              - /url: /projects/scentsense/
+            - link "Live" [ref=e139] [cursor=pointer]:
+              - /url: https://myscenttaste.vercel.app
+        - listitem [ref=e140]:
+          - generic [ref=e141]:
+            - generic [ref=e142]: "2023"
+            - generic [ref=e143]: Public work
+          - heading "UCL Admissions Dashboard" [level=4] [ref=e144]
+          - paragraph [ref=e145]: Reporting workflow and dashboard work for admissions and survey tracking at the UCL Institute of Education.
+          - generic [ref=e146]:
+            - generic [ref=e147]: SharePoint
+            - generic [ref=e148]: Dashboard design
+            - generic [ref=e149]: Reporting automation
+            - generic [ref=e150]: Workflow thinking
+          - link "Case study" [ref=e152] [cursor=pointer]:
+            - /url: /projects/admissions-dashboard/
+    - generic [ref=e153]:
+      - generic [ref=e154]:
+        - heading "Research & Health Systems" [level=3] [ref=e155]
+        - paragraph [ref=e156]: Modeling, APIs, and decision-support tooling built for serious operational or analytical contexts.
+      - list "Research & Health Systems" [ref=e157]:
+        - listitem [ref=e158]:
+          - generic [ref=e159]:
+            - generic [ref=e160]: "2026"
+            - generic [ref=e161]: Public work
+          - heading "Sepsis Flow" [level=4] [ref=e162]
+          - paragraph [ref=e163]: Multi-service research platform for pediatric treatment-intensity prediction, with APIs, orchestration, and a hosted evaluation interface.
+          - generic [ref=e164]:
+            - generic [ref=e165]: R
+            - generic [ref=e166]: Plumber
+            - generic [ref=e167]: Orchestration
+            - generic [ref=e168]: Render
+          - paragraph [ref=e169]: Unpublished and not yet peer reviewed as of March 27, 2026. Research prototype only.
+          - generic [ref=e170]:
+            - link "Case study" [ref=e171] [cursor=pointer]:
+              - /url: /projects/sepsis-flow/
+            - link "Live" [ref=e172] [cursor=pointer]:
+              - /url: https://sepsis-flow-web-app.onrender.com
+            - link "Repo" [ref=e173] [cursor=pointer]:
+              - /url: https://github.com/lcmrhodes/sepsis-flow-platform
+        - listitem [ref=e174]:
+          - generic [ref=e175]:
+            - generic [ref=e176]: "2025"
+            - generic [ref=e177]: Public work
+          - heading "Sepsis Spotter API" [level=4] [ref=e178]
+          - paragraph [ref=e179]: Research API in R and Plumber serving pediatric febrile-illness severity modeling workflows.
+          - generic [ref=e180]:
+            - generic [ref=e181]: R
+            - generic [ref=e182]: Plumber
+            - generic [ref=e183]: Docker
+            - generic [ref=e184]: API design
+          - generic [ref=e185]:
+            - link "Case study" [ref=e186] [cursor=pointer]:
+              - /url: /projects/sepsis-spotter-api/
+            - link "Live" [ref=e187] [cursor=pointer]:
+              - /url: https://sepsis-spotter-beta.onrender.com
+            - link "Repo" [ref=e188] [cursor=pointer]:
+              - /url: https://github.com/lcmrhodes/sepsis-spotter-api
+        - listitem [ref=e189]:
+          - generic [ref=e190]:
+            - generic [ref=e191]: "2025"
+            - generic [ref=e192]: Public work
+          - heading "Spot Sepsis Cascade" [level=4] [ref=e193]
+          - paragraph [ref=e194]: Two-stage machine learning cascade with research tooling and a Shiny-based interactive workflow.
+          - generic [ref=e195]:
+            - generic [ref=e196]: R
+            - generic [ref=e197]: Shiny
+            - generic [ref=e198]: Machine learning
+            - generic [ref=e199]: Research workflow
+          - generic [ref=e200]:
+            - link "Case study" [ref=e201] [cursor=pointer]:
+              - /url: /projects/spot-sepsis-cascade/
+            - link "Repo" [ref=e202] [cursor=pointer]:
+              - /url: https://github.com/lcmrhodes/spot-sepsis-cascade
+        - listitem [ref=e203]:
+          - generic [ref=e204]:
+            - generic [ref=e205]: "2024"
+            - generic [ref=e206]: Public work
+          - heading "Outbreak IBM" [level=4] [ref=e207]
+          - paragraph [ref=e208]: Individual-based outbreak simulation in C++ with intervention toggles, batch runs, and analysis scripts.
+          - generic [ref=e209]:
+            - generic [ref=e210]: C++
+            - generic [ref=e211]: R
+            - generic [ref=e212]: Simulation
+            - generic [ref=e213]: Public health modeling
+          - link "Case study" [ref=e215] [cursor=pointer]:
+            - /url: /projects/outbreak-ibm/
+  - generic [ref=e217]:
+    - generic [ref=e218]:
+      - paragraph [ref=e219]: Proof & affiliations
+      - heading "Selected context, not a logo wall." [level=2] [ref=e220]
+      - paragraph [ref=e221]: For now this section stays text-first. It anchors the work in real institutions, roles, and outputs without pretending the site needs testimonial theatre before it has earned it.
+    - generic [ref=e222]:
+      - article [ref=e223]:
+        - paragraph [ref=e224]: MORU
+        - heading "Research Consultant" [level=3] [ref=e225]
+        - paragraph [ref=e226]: Building deployment-ready pediatric triage and decision-support tooling for low-resource health contexts.
+      - article [ref=e227]:
+        - paragraph [ref=e228]: University of Oxford
+        - heading "MSc, Modelling for Global Health" [level=3] [ref=e229]
+        - paragraph [ref=e230]: Distinction-level training in modeling, applied health analysis, and research systems.
+      - article [ref=e231]:
+        - paragraph [ref=e232]: UCL
+        - heading "Population Health & Data Science" [level=3] [ref=e233]
+        - paragraph [ref=e234]: Population Health degree plus dashboard and reporting work for the UCL Institute of Education.
+      - article [ref=e235]:
+        - paragraph [ref=e236]: Population Health Sciences Magazine
+        - heading "Graphical Design Editor" [level=3] [ref=e237]
+        - paragraph [ref=e238]: Directed visual strategy and design delivery across print and digital publication work.
+  - generic [ref=e240]:
+    - generic [ref=e241]:
+      - paragraph [ref=e242]: Contact
+      - heading "Want to work on something thoughtful?" [level=2] [ref=e243]
+      - paragraph [ref=e244]: If the project sits anywhere near visual explanation, product framing, or serious research tooling, I’m interested.
+    - generic [ref=e245]:
+      - link "lcmrhodes98@gmail.com" [ref=e246] [cursor=pointer]:
+        - /url: mailto:lcmrhodes98@gmail.com
+      - link "github.com/lcmrhodes" [ref=e247] [cursor=pointer]:
+        - /url: https://github.com/lcmrhodes
+      - link "linkedin.com/in/lukecmrhodes" [ref=e248] [cursor=pointer]:
+        - /url: https://www.linkedin.com/in/lukecmrhodes
+      - link "Download CV" [ref=e249] [cursor=pointer]:
+        - /url: /Luke_Rhodes_CV_2025.docx
+  - paragraph [ref=e251]:
+    - text: © 2026 Luke Rhodes. Structural inspiration from
+    - link "Nicolas Decoopman" [ref=e252] [cursor=pointer]:
+      - /url: https://ncsdecoopman.github.io
+    - text: ", with additional reference from"
+    - link "Emma Bostian’s portfolio bank" [ref=e253] [cursor=pointer]:
+      - /url: https://github.com/emmabostian/developer-portfolios?tab=readme-ov-file
+    - text: .
