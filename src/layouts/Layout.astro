@@ -43,23 +43,5 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 	</head>
 	<body>
 		<slot />
-		<script is:inline>
-			const toggle = document.querySelector('[data-theme-toggle]');
-			if (toggle) {
-				const syncLabel = () => {
-					toggle.textContent =
-						document.documentElement.dataset.theme === 'dark' ? 'Light mode' : 'Dark mode';
-				};
-
-				syncLabel();
-				toggle.addEventListener('click', () => {
-					const nextTheme =
-						document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-					document.documentElement.dataset.theme = nextTheme;
-					localStorage.setItem('theme', nextTheme);
-					syncLabel();
-				});
-			}
-		</script>
 	</body>
 </html>

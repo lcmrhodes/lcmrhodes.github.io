@@ -4,6 +4,8 @@ import { getCollection } from 'astro:content';
 import ProjectLane from '../components/ProjectLane.astro';
 import '../styles/global.css';
 
+const tabs = ['about', 'work', 'gallery', 'proof', 'contact'];
+
 const projects = (await getCollection('projects')).sort((a, b) => a.data.rank - b.data.rank);
 
 const lanes = [
@@ -79,27 +81,50 @@ const galleryItems = [
 		<!-- ── Left: fixed identity panel ─────────────────────── -->
 		<aside class="identity-panel">
 			<div class="identity-top">
-				<p class="eyebrow">lcmrhodes.github.io</p>
-				<h1 class="identity-name">Luke Rhodes</h1>
-				<p class="identity-tagline">Visualisation, product, and research software.</p>
+				<p class="eyebrow anim-entrance" data-delay="0">lcmrhodes.github.io</p>
+				<h1 class="identity-name anim-entrance" data-delay="1">Luke Rhodes</h1>
+				<p class="identity-tagline anim-entrance" data-delay="2">Visualisation, product, and research software.</p>
 			</div>
 
 			<nav class="side-nav" aria-label="Site sections">
-				{['about', 'work', 'gallery', 'proof', 'contact'].map((tab) => (
-					<button class="side-nav-item" data-tab={tab} type="button">
+				{tabs.map((tab) => (
+					<button
+						class:list={['side-nav-item', 'anim-entrance', { active: tab === 'about' }]}
+						data-delay="3"
+						data-tab={tab}
+						type="button"
+						aria-current={tab === 'about' ? 'page' : 'false'}
+					>
 						{tab.charAt(0).toUpperCase() + tab.slice(1)}
 					</button>
 				))}
+				<span class="side-nav-indicator" aria-hidden="true"></span>
 			</nav>
 
-			<div class="identity-bottom">
+			<div class="identity-bottom anim-entrance" data-delay="4">
 				<div class="identity-links">
 					<a href="https://github.com/lcmrhodes" target="_blank" rel="noreferrer">GitHub</a>
 					<a href="https://www.linkedin.com/in/lukecmrhodes" target="_blank" rel="noreferrer">LinkedIn</a>
 					<a href="/Luke_Rhodes_CV_2025.docx">CV</a>
 					<a href="mailto:lcmrhodes98@gmail.com">Email</a>
 				</div>
-				<button class="theme-toggle-side" type="button" data-theme-toggle>Dark mode</button>
+				<button class="theme-toggle-side" type="button" data-theme-toggle aria-label="Dark mode">
+					<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+						<circle class="theme-icon-sun" cx="12" cy="12" r="5"></circle>
+						<g class="theme-icon-rays">
+							<line x1="12" y1="1" x2="12" y2="3"></line>
+							<line x1="12" y1="21" x2="12" y2="23"></line>
+							<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+							<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+							<line x1="1" y1="12" x2="3" y2="12"></line>
+							<line x1="21" y1="12" x2="23" y2="12"></line>
+							<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+							<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+						</g>
+						<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+					</svg>
+					<span class="theme-toggle-label">Dark mode</span>
+				</button>
 			</div>
 		</aside>
 
@@ -107,19 +132,19 @@ const galleryItems = [
 		<main class="content-panel" id="content-panel">
 
 			<!-- About -->
-			<section class="content-section" data-section="about" id="tab-about">
+			<section class="content-section active" data-section="about" id="tab-about" aria-hidden="false">
 				<div class="content-section-inner">
 					<div class="section-intro">
-						<p class="eyebrow">About</p>
-						<h2>Understand. Build. Translate.</h2>
-						<p>
+						<p class="eyebrow anim-entrance" data-delay="3" data-number="01">About</p>
+						<h2 class="anim-entrance" data-delay="4">Understand. Build. Translate.</h2>
+						<p class="anim-entrance" data-delay="5">
 							I came to software through health research, maps, and print design — not the
 							other way around. That order matters: I think about the explanation before I
 							think about the implementation.
 						</p>
 					</div>
 
-					<div class="about-copy">
+					<div class="about-copy anim-entrance" data-delay="6">
 						<p>
 							My work sits at the intersection of three things that don't usually travel
 							together: serious research methodology, visual and editorial thinking, and the
@@ -147,7 +172,7 @@ const galleryItems = [
 			<section class="content-section" data-section="work" id="tab-work">
 				<div class="content-section-inner work-stack">
 					<div class="section-intro section-intro-wide">
-						<p class="eyebrow">Selected work</p>
+						<p class="eyebrow" data-number="02">Selected work</p>
 						<h2>The projects at the core of the site.</h2>
 						<p>
 							Work grouped by capability. The flagship trio is
@@ -189,7 +214,7 @@ const galleryItems = [
 			<section class="content-section" data-section="gallery" id="tab-gallery">
 				<div class="content-section-inner">
 					<div class="section-intro section-intro-wide">
-						<p class="eyebrow">Visual work</p>
+						<p class="eyebrow" data-number="03">Visual work</p>
 						<h2>Maps, print, and things that don't fit neatly elsewhere.</h2>
 						<p>
 							Cartographic analysis, publication design, and visualisation work that lives
@@ -237,7 +262,7 @@ const galleryItems = [
 			<section class="content-section" data-section="proof" id="tab-proof">
 				<div class="content-section-inner proof-grid">
 					<div class="section-intro section-intro-wide">
-						<p class="eyebrow">Proof & affiliations</p>
+						<p class="eyebrow" data-number="04">Proof & affiliations</p>
 						<h2>Selected context, not a logo wall.</h2>
 						<p>
 							For now this section stays text-first. It anchors the work in real institutions,
@@ -267,7 +292,7 @@ const galleryItems = [
 			<section class="content-section" data-section="contact" id="tab-contact">
 				<div class="content-section-inner contact-grid">
 					<div class="section-intro">
-						<p class="eyebrow">Contact</p>
+						<p class="eyebrow" data-number="05">Contact</p>
 						<h2>Want to work on something thoughtful?</h2>
 						<p>
 							If the project sits anywhere near visual explanation, product framing, or serious
@@ -297,88 +322,38 @@ const galleryItems = [
 		</button>
 	</header>
 	<nav class="mobile-nav" id="mobile-nav" aria-hidden="true">
-		{['about', 'work', 'gallery', 'proof', 'contact'].map((tab) => (
-			<button class="mobile-nav-item" data-tab={tab} type="button">
+		{tabs.map((tab) => (
+			<button
+				class:list={['mobile-nav-item', { active: tab === 'about' }]}
+				data-tab={tab}
+				type="button"
+				aria-current={tab === 'about' ? 'page' : 'false'}
+			>
 				{tab.charAt(0).toUpperCase() + tab.slice(1)}
 			</button>
 		))}
-		<button class="theme-toggle-side" type="button" data-theme-toggle style="align-self:start;margin-top:0.5rem;">Dark mode</button>
+		<button class="theme-toggle-side theme-toggle-side--mobile" type="button" data-theme-toggle aria-label="Dark mode">
+			<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+				<circle class="theme-icon-sun" cx="12" cy="12" r="5"></circle>
+				<g class="theme-icon-rays">
+					<line x1="12" y1="1" x2="12" y2="3"></line>
+					<line x1="12" y1="21" x2="12" y2="23"></line>
+					<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+					<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+					<line x1="1" y1="12" x2="3" y2="12"></line>
+					<line x1="21" y1="12" x2="23" y2="12"></line>
+					<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+					<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+				</g>
+				<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+			</svg>
+			<span class="theme-toggle-label">Dark mode</span>
+		</button>
 	</nav>
 
 	<script>
-		// ── Tab switching ────────────────────────────────────────
-		const TABS = ['about', 'work', 'gallery', 'proof', 'contact'];
-		const DEFAULT_TAB = 'about';
+		import initPortfolioInteractions from '../scripts/interactions';
 
-		function activateTab(tab: string) {
-			if (!TABS.includes(tab)) tab = DEFAULT_TAB;
-
-			// Update side-nav buttons
-			document.querySelectorAll('.side-nav-item, .mobile-nav-item').forEach((btn) => {
-				const el = btn as HTMLButtonElement;
-				el.classList.toggle('active', el.dataset.tab === tab);
-				el.setAttribute('aria-current', el.dataset.tab === tab ? 'page' : 'false');
-			});
-
-			// Show/hide sections
-			document.querySelectorAll('.content-section').forEach((section) => {
-				const el = section as HTMLElement;
-				const isActive = el.dataset.section === tab;
-				el.classList.toggle('active', isActive);
-				el.setAttribute('aria-hidden', isActive ? 'false' : 'true');
-			});
-
-			// Scroll right panel to top
-			const panel = document.getElementById('content-panel');
-			if (panel) panel.scrollTop = 0;
-
-			// Update hash without triggering scroll
-			history.replaceState(null, '', `#${tab}`);
-		}
-
-		// Click handlers — side nav and mobile nav
-		document.querySelectorAll('[data-tab]').forEach((btn) => {
-			btn.addEventListener('click', () => {
-				const tab = (btn as HTMLElement).dataset.tab ?? DEFAULT_TAB;
-				activateTab(tab);
-
-				// Close mobile nav if open
-				const mobileNav = document.getElementById('mobile-nav');
-				const toggle = document.querySelector('.mobile-nav-toggle');
-				if (mobileNav && toggle) {
-					mobileNav.setAttribute('aria-hidden', 'true');
-					mobileNav.classList.remove('open');
-					toggle.setAttribute('aria-expanded', 'false');
-				}
-			});
-		});
-
-		// Mobile hamburger
-		const mobileToggle = document.querySelector('.mobile-nav-toggle');
-		const mobileNav = document.getElementById('mobile-nav');
-		if (mobileToggle && mobileNav) {
-			mobileToggle.addEventListener('click', () => {
-				const isOpen = mobileNav.classList.toggle('open');
-				mobileToggle.setAttribute('aria-expanded', String(isOpen));
-				mobileNav.setAttribute('aria-hidden', String(!isOpen));
-			});
-		}
-
-		// Theme toggle (all instances)
-		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
-			btn.addEventListener('click', () => {
-				const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-				const next = isDark ? 'light' : 'dark';
-				document.documentElement.setAttribute('data-theme', next);
-				localStorage.setItem('theme', next);
-				document.querySelectorAll('[data-theme-toggle]').forEach((b) => {
-					b.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
-				});
-			});
-		});
-
-		// Init from hash or default
-		const hash = window.location.hash.slice(1);
-		activateTab(TABS.includes(hash) ? hash : DEFAULT_TAB);
+		initPortfolioInteractions();
 	</script>
 </Layout>
