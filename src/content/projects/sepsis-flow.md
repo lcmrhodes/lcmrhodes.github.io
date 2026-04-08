@@ -2,7 +2,12 @@
 title: Sepsis Flow
 summary: Multi-service research platform for pediatric treatment-intensity prediction, with APIs, orchestration, and a hosted evaluation interface.
 lane: research
-rank: 6
+rank: 5
+papers:
+  - label: "Two-stage manuscript (PDF)"
+    url: /papers/luke_rhodes_two_stage_manuscript.pdf
+  - label: "Translational review (PDF)"
+    url: /papers/luke_rhodes_translational_review.pdf
 featured: true
 visibility: public
 stack:
