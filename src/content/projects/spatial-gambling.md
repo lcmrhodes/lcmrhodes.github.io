@@ -3,6 +3,11 @@ title: Spatial Analysis of Gambling-Related Harm
 summary: Spatial public-health analysis combining mapped vulnerability indices, census data, and regression methods.
 lane: visualization
 rank: 2
+papers:
+  - label: "Full paper (PDF)"
+    url: /papers/gambling_spatial_analysis_luke.pdf
+  - label: "Social network assignment"
+    url: /papers/social_network_assignment.pdf
 featured: false
 visibility: public
 stack:

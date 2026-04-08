@@ -42,6 +42,9 @@ const { title, subtitle, projects } = Astro.props;
 					{project.data.repoUrl && (
 						<a href={project.data.repoUrl} target="_blank" rel="noreferrer">Repo</a>
 					)}
+					{project.data.papers && project.data.papers.map((paper) => (
+						<a href={paper.url} target="_blank" rel="noreferrer">↓ {paper.label}</a>
+					))}
 				</div>
 			</article>
 		))}

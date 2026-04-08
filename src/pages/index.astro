@@ -29,255 +29,356 @@ const laneProjects = lanes.map((lane) => ({
 	projects: projects.filter((project) => project.data.lane === lane.key),
 }));
 
-const heroPhrases = [
-	'build interactive visualisations that make complex systems legible.',
-	'design recommendation tools with editorial, product-minded interfaces.',
-	'turn research software into something robust, usable, and deployable.',
-	'work across TypeScript, Astro, Next.js, R, Python, and C++.',
-];
-
 const proofItems = [
 	{
 		title: 'MORU',
 		label: 'Research Consultant',
 		body: 'Building deployment-ready pediatric triage and decision-support tooling for low-resource health contexts.',
+		link: { label: 'Contributing author — JMIR preprint 2025 ↗', url: 'https://preprints.jmir.org/preprint/97395' },
 	},
 	{
 		title: 'University of Oxford',
 		label: 'MSc, Modelling for Global Health',
 		body: 'Distinction-level training in modeling, applied health analysis, and research systems.',
+		link: { label: 'Genetics essay (PDF) ↓', url: '/papers/genetics_essay.pdf' },
 	},
 	{
 		title: 'UCL',
 		label: 'Population Health & Data Science',
 		body: 'Population Health degree plus dashboard and reporting work for the UCL Institute of Education.',
+		link: { label: 'Undergraduate dissertation (PDF) ↓', url: '/papers/undergraduate_dissertation.pdf' },
 	},
 	{
 		title: 'Population Health Sciences Magazine',
 		label: 'Graphical Design Editor',
 		body: 'Directed visual strategy and design delivery across print and digital publication work.',
+		link: null,
 	},
 ];
 
 const featuredProjects = projects.filter((project) => project.data.featured);
+
+const galleryItems = [
+	{ type: 'image', src: '/images/gallery/tolkien_thumb.jpg', title: 'Tolkien Constellation', caption: "Narrative dataviz mapping Tolkien's world — coursework piece", fullRes: '/images/gallery/tolkien_full.png', hero: true },
+	{ type: 'image', src: '/images/gallery/bookmaker_map.jpg', title: 'Bookmaker Density Map', caption: 'Combined spatial output from gambling harm analysis' },
+	{ type: 'image', src: '/images/gallery/morans_map.jpg', title: "Multi-Health Moran's I", caption: 'Spatial autocorrelation across deprivation indices' },
+	{ type: 'image', src: '/images/gallery/neighbour_map.jpg', title: 'Neighbourhood Structure', caption: 'Spatial weights and adjacency — analysis context map' },
+	{ type: 'image', src: '/images/gallery/design_principles_map.jpg', title: 'Design Principles Map', caption: 'Cartographic coursework, group project' },
+	{ type: 'pdf', src: '/papers/phs_magazine_pages.pdf', title: 'PHS Magazine pp.30–38', caption: 'Spreads from the Population Health Sciences Magazine' },
+	{ type: 'pdf', src: '/papers/oregon_dunes.pdf', title: 'Oregon Dunes', caption: 'Geographic documentation piece' },
+	{ type: 'pdf', src: '/papers/invitation_template.pdf', title: 'Invitation Template', caption: 'Print design — personalised invitation system' },
+];
 ---
 
 <Layout
 	title="Luke Rhodes | Visualisation, Product, and Research Software"
 	description="Interactive visualisations, recommendation tools, and research software by Luke Rhodes."
 >
-	<main class="page-shell">
-		<button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+	<div class="layout">
 
-		<section class="panel hero-panel" id="hero">
-			<div class="ambient ambient-one"></div>
-			<div class="hero-grid section-frame">
-				<div class="hero-copy">
-					<p class="eyebrow">lcmrhodes.github.io</p>
-					<h1>Luke Rhodes</h1>
-					<p class="hero-role">Visualisation, product, and research software.</p>
-					<p class="hero-summary">
-						I build interactive visualisations, recommendation tools, and research systems
-						that make complicated ideas easier to explore, trust, and use.
-					</p>
-					<div class="hero-links">
-						<a href="https://github.com/lcmrhodes">GitHub</a>
-						<a href="https://www.linkedin.com/in/lukecmrhodes">LinkedIn</a>
-						<a href="/Luke_Rhodes_CV_2025.docx">CV</a>
-						<a href="mailto:lcmrhodes98@gmail.com">Email</a>
-					</div>
-				</div>
-
-				<div class="hero-aside">
-					<div class="terminal-window">
-						<div class="terminal-head">
-							<div class="traffic-lights" aria-hidden="true">
-								<span></span>
-								<span></span>
-								<span></span>
-							</div>
-							<span>skills.txt</span>
-						</div>
-						<div class="terminal-body">
-							<p class="terminal-line">
-								<span class="terminal-prompt">&gt;</span>
-								<span>I </span>
-								<span id="typed-phrase"></span>
-								<span class="terminal-caret" aria-hidden="true"></span>
-							</p>
-						</div>
-					</div>
-
-					<nav class="hero-nav">
-						<a href="#about">About</a>
-						<a href="#work">Work</a>
-						<a href="#proof">Proof</a>
-						<a href="#contact">Contact</a>
-					</nav>
-				</div>
+		<!-- ── Left: fixed identity panel ─────────────────────── -->
+		<aside class="identity-panel">
+			<div class="identity-top">
+				<p class="eyebrow">lcmrhodes.github.io</p>
+				<h1 class="identity-name">Luke Rhodes</h1>
+				<p class="identity-tagline">Visualisation, product, and research software.</p>
 			</div>
-			<script is:inline define:vars={{ heroPhrases }}>
-				const typedPhrase = document.getElementById('typed-phrase');
-				if (typedPhrase) {
-					let phraseIndex = 0;
-					let characterIndex = 0;
-					let deleting = false;
 
-					const tick = () => {
-						const phrase = heroPhrases[phraseIndex];
-						typedPhrase.textContent = deleting
-							? phrase.slice(0, characterIndex--)
-							: phrase.slice(0, characterIndex++);
-
-						const finishedTyping = !deleting && characterIndex > phrase.length;
-						const finishedDeleting = deleting && characterIndex < 0;
-
-						if (finishedTyping) {
-							deleting = true;
-							setTimeout(tick, 1200);
-							return;
-						}
-
-						if (finishedDeleting) {
-							deleting = false;
-							phraseIndex = (phraseIndex + 1) % heroPhrases.length;
-						}
-
-						setTimeout(tick, deleting ? 28 : 54);
-					};
-
-					tick();
-				}
-			</script>
-		</section>
-
-		<section class="panel about-panel" id="about">
-			<div class="ambient ambient-two"></div>
-			<div class="section-frame about-grid">
-				<div class="section-intro">
-					<p class="eyebrow">About</p>
-					<h2>Understand. Build. Translate.</h2>
-					<p>
-						I like work that sits between explanation and execution: data that needs to be
-						understood, systems that need to be made usable, and products that should feel
-						intelligent rather than merely functional.
-					</p>
-				</div>
-
-				<div class="about-copy">
-					<p>
-						My background moves between population health, modeling, design, and product-like
-						web work. That mix shows up in how I build: visual explanations when complexity
-						is the problem, polished interfaces when adoption is the problem, and robust
-						research or API tooling when trust is the problem.
-					</p>
-					<p>
-						Right now that includes interactive visualisation, fragrance recommendation
-						products, and pediatric decision-support systems. I care about clarity, visual
-						hierarchy, and giving serious work an interface people can actually navigate.
-					</p>
-					<ul class="about-points">
-						<li>TypeScript, Astro, Next.js, D3, Framer Motion</li>
-						<li>R, Python, C++, modeling, APIs, and analytics workflows</li>
-						<li>Editorial design instincts shaped by publication and visual strategy work</li>
-					</ul>
-				</div>
-			</div>
-		</section>
-
-		<section class="panel work-panel" id="work">
-			<div class="ambient ambient-three"></div>
-			<div class="section-frame work-stack">
-				<div class="section-intro section-intro-wide">
-					<p class="eyebrow">Selected work</p>
-					<h2>The projects at the core of the site.</h2>
-					<p>
-						The homepage groups work by capability rather than chronology. The flagship trio
-						is <strong>WeddingNetwork</strong>, <strong>ScentSense</strong>, and
-						<strong>Sepsis Flow</strong>, with supporting projects giving the rest of the
-						context.
-					</p>
-				</div>
-
-				<div class="featured-strip" aria-label="Flagship projects">
-					{featuredProjects.map((project) => (
-						<article class="featured-card">
-							<p class="featured-label">{project.data.lane}</p>
-							<h3>{project.data.title}</h3>
-							<p>{project.data.summary}</p>
-							<div class="featured-links">
-								<a href={`/projects/${project.id}/`}>Read case study</a>
-								{project.data.liveUrl && (
-									<a href={project.data.liveUrl} target="_blank" rel="noreferrer">Live</a>
-								)}
-							</div>
-						</article>
-					))}
-				</div>
-
-				{laneProjects.map((lane) => (
-					<ProjectLane
-						title={lane.title}
-						subtitle={lane.subtitle}
-						projects={lane.projects}
-					/>
+			<nav class="side-nav" aria-label="Site sections">
+				{['about', 'work', 'gallery', 'proof', 'contact'].map((tab) => (
+					<button class="side-nav-item" data-tab={tab} type="button">
+						{tab.charAt(0).toUpperCase() + tab.slice(1)}
+					</button>
 				))}
-			</div>
-		</section>
+			</nav>
 
-		<section class="panel proof-panel" id="proof">
-			<div class="section-frame proof-grid">
-				<div class="section-intro section-intro-wide">
-					<p class="eyebrow">Proof & affiliations</p>
-					<h2>Selected context, not a logo wall.</h2>
-					<p>
-						For now this section stays text-first. It anchors the work in real institutions,
-						roles, and outputs without pretending the site needs testimonial theatre before it
-						has earned it.
-					</p>
+			<div class="identity-bottom">
+				<div class="identity-links">
+					<a href="https://github.com/lcmrhodes" target="_blank" rel="noreferrer">GitHub</a>
+					<a href="https://www.linkedin.com/in/lukecmrhodes" target="_blank" rel="noreferrer">LinkedIn</a>
+					<a href="/Luke_Rhodes_CV_2025.docx">CV</a>
+					<a href="mailto:lcmrhodes98@gmail.com">Email</a>
 				</div>
+				<button class="theme-toggle-side" type="button" data-theme-toggle>Dark mode</button>
+			</div>
+		</aside>
 
-				<div class="proof-cards">
-					{proofItems.map((item) => (
-						<article class="proof-card">
-							<p class="proof-title">{item.title}</p>
-							<h3>{item.label}</h3>
-							<p>{item.body}</p>
-						</article>
+		<!-- ── Right: switchable content panel ───────────────── -->
+		<main class="content-panel" id="content-panel">
+
+			<!-- About -->
+			<section class="content-section" data-section="about" id="tab-about">
+				<div class="content-section-inner">
+					<div class="section-intro">
+						<p class="eyebrow">About</p>
+						<h2>Understand. Build. Translate.</h2>
+						<p>
+							I came to software through health research, maps, and print design — not the
+							other way around. That order matters: I think about the explanation before I
+							think about the implementation.
+						</p>
+					</div>
+
+					<div class="about-copy">
+						<p>
+							My work sits at the intersection of three things that don't usually travel
+							together: serious research methodology, visual and editorial thinking, and the
+							kind of product discipline that makes something feel designed rather than just
+							functional. I trained in population health at UCL, then in global health
+							modelling at Oxford, and spent time in between directing visual strategy for a
+							research publication and building network visualisations for a wedding.
+						</p>
+						<p>
+							Right now I'm a research consultant at MORU, building deployment-ready
+							clinical decision-support tools for low-resource settings. On the side: a
+							fragrance recommendation engine with 32,000 perfume profiles, and whatever
+							else sits interestingly at the edge of data, design, and a usable interface.
+						</p>
+						<ul class="about-points">
+							<li>TypeScript, Astro, Next.js, D3, Framer Motion</li>
+							<li>R, Python, C++ — modelling, APIs, and analytical workflows</li>
+							<li>Editorial and spatial design shaped by publication and cartographic work</li>
+						</ul>
+					</div>
+				</div>
+			</section>
+
+			<!-- Work -->
+			<section class="content-section" data-section="work" id="tab-work">
+				<div class="content-section-inner work-stack">
+					<div class="section-intro section-intro-wide">
+						<p class="eyebrow">Selected work</p>
+						<h2>The projects at the core of the site.</h2>
+						<p>
+							Work grouped by capability. The flagship trio is
+							<strong>WeddingNetwork</strong>, <strong>ScentSense</strong>, and
+							<strong>Sepsis Flow</strong>.
+						</p>
+					</div>
+
+					<div class="featured-strip" aria-label="Flagship projects">
+						{featuredProjects.map((project) => (
+							<article class="featured-card">
+								<p class="featured-label">{project.data.lane}</p>
+								<h3>{project.data.title}</h3>
+								<p>{project.data.summary}</p>
+								<div class="featured-links">
+									<a href={`/projects/${project.id}/`}>Read case study</a>
+									{project.data.liveUrl && (
+										<a href={project.data.liveUrl} target="_blank" rel="noreferrer">Live</a>
+									)}
+									{project.data.papers && project.data.papers.map((paper) => (
+										<a href={paper.url} target="_blank" rel="noreferrer">↓ {paper.label}</a>
+									))}
+								</div>
+							</article>
+						))}
+					</div>
+
+					{laneProjects.map((lane) => (
+						<ProjectLane
+							title={lane.title}
+							subtitle={lane.subtitle}
+							projects={lane.projects}
+						/>
 					))}
 				</div>
-			</div>
-		</section>
+			</section>
 
-		<section class="panel contact-panel" id="contact">
-			<div class="section-frame contact-grid">
-				<div class="section-intro">
-					<p class="eyebrow">Contact</p>
-					<h2>Want to work on something thoughtful?</h2>
-					<p>
-						If the project sits anywhere near visual explanation, product framing, or serious
-						research tooling, I’m interested.
-					</p>
+			<!-- Gallery -->
+			<section class="content-section" data-section="gallery" id="tab-gallery">
+				<div class="content-section-inner">
+					<div class="section-intro section-intro-wide">
+						<p class="eyebrow">Visual work</p>
+						<h2>Maps, print, and things that don't fit neatly elsewhere.</h2>
+						<p>
+							Cartographic analysis, publication design, and visualisation work that lives
+							outside the project case studies.
+						</p>
+					</div>
+
+					<div class="gallery-scroll">
+						{galleryItems.map((item) => (
+							<div class={`gallery-item ${item.hero ? 'gallery-item--hero' : item.type === 'pdf' ? 'gallery-item--pdf' : 'gallery-item--standard'}`}>
+								{item.type === 'image' ? (
+									<div class={`gallery-artwork ${item.hero ? 'gallery-artwork--hero' : 'gallery-artwork--standard'}`}>
+										<img
+											src={item.src}
+											alt={item.title}
+											loading="lazy"
+										/>
+									</div>
+								) : (
+									<div class="gallery-pdf-artwork">
+										<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+											<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+											<polyline points="14 2 14 8 20 8"/>
+										</svg>
+										<span class="gallery-pdf-label">PDF</span>
+									</div>
+								)}
+								<div class="gallery-plaque">
+									<p class="gallery-plaque-title">{item.title}</p>
+									<p class="gallery-plaque-caption">{item.caption}</p>
+									{item.type === 'pdf' && (
+										<a class="gallery-plaque-link" href={item.src} target="_blank" rel="noreferrer">View PDF ↗</a>
+									)}
+									{item.fullRes && (
+										<a class="gallery-plaque-link" href={item.fullRes} target="_blank" download>Full resolution ↗</a>
+									)}
+								</div>
+							</div>
+						))}
+					</div>
 				</div>
+			</section>
 
-				<div class="contact-card">
-					<a href="mailto:lcmrhodes98@gmail.com">lcmrhodes98@gmail.com</a>
-					<a href="https://github.com/lcmrhodes">github.com/lcmrhodes</a>
-					<a href="https://www.linkedin.com/in/lukecmrhodes">linkedin.com/in/lukecmrhodes</a>
-					<a href="/Luke_Rhodes_CV_2025.docx">Download CV</a>
+			<!-- Proof -->
+			<section class="content-section" data-section="proof" id="tab-proof">
+				<div class="content-section-inner proof-grid">
+					<div class="section-intro section-intro-wide">
+						<p class="eyebrow">Proof & affiliations</p>
+						<h2>Selected context, not a logo wall.</h2>
+						<p>
+							For now this section stays text-first. It anchors the work in real institutions,
+							roles, and outputs without pretending the site needs testimonial theatre before it
+							has earned it.
+						</p>
+					</div>
+
+					<div class="proof-cards">
+						{proofItems.map((item) => (
+							<article class="proof-card">
+								<p class="proof-title">{item.title}</p>
+								<h3>{item.label}</h3>
+								<p>{item.body}</p>
+								{item.link && (
+									<a href={item.link.url} target="_blank" rel="noreferrer" class="proof-link">
+										{item.link.label}
+									</a>
+								)}
+							</article>
+						))}
+					</div>
 				</div>
-			</div>
-		</section>
+			</section>
 
-		<footer class="site-footer">
-			<p>
-				© 2026 Luke Rhodes. Structural inspiration from
-				<a href="https://ncsdecoopman.github.io">Nicolas Decoopman</a>, with additional
-				reference from
-				<a href="https://github.com/emmabostian/developer-portfolios?tab=readme-ov-file">
-					Emma Bostian’s portfolio bank
-				</a>.
-			</p>
-		</footer>
-	</main>
+			<!-- Contact -->
+			<section class="content-section" data-section="contact" id="tab-contact">
+				<div class="content-section-inner contact-grid">
+					<div class="section-intro">
+						<p class="eyebrow">Contact</p>
+						<h2>Want to work on something thoughtful?</h2>
+						<p>
+							If the project sits anywhere near visual explanation, product framing, or serious
+							research tooling, I'm interested.
+						</p>
+					</div>
+
+					<div class="contact-card">
+						<a href="mailto:lcmrhodes98@gmail.com">lcmrhodes98@gmail.com</a>
+						<a href="https://github.com/lcmrhodes" target="_blank" rel="noreferrer">github.com/lcmrhodes</a>
+						<a href="https://www.linkedin.com/in/lukecmrhodes" target="_blank" rel="noreferrer">linkedin.com/in/lukecmrhodes</a>
+						<a href="/Luke_Rhodes_CV_2025.docx">Download CV</a>
+					</div>
+				</div>
+			</section>
+
+		</main>
+	</div>
+
+	<!-- Mobile top bar (shown only on small screens) -->
+	<header class="mobile-header">
+		<span class="mobile-name">Luke Rhodes</span>
+		<button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav">
+			<span class="mobile-nav-toggle-bar"></span>
+			<span class="mobile-nav-toggle-bar"></span>
+			<span class="mobile-nav-toggle-bar"></span>
+		</button>
+	</header>
+	<nav class="mobile-nav" id="mobile-nav" aria-hidden="true">
+		{['about', 'work', 'gallery', 'proof', 'contact'].map((tab) => (
+			<button class="mobile-nav-item" data-tab={tab} type="button">
+				{tab.charAt(0).toUpperCase() + tab.slice(1)}
+			</button>
+		))}
+		<button class="theme-toggle-side" type="button" data-theme-toggle style="align-self:start;margin-top:0.5rem;">Dark mode</button>
+	</nav>
+
+	<script>
+		// ── Tab switching ────────────────────────────────────────
+		const TABS = ['about', 'work', 'gallery', 'proof', 'contact'];
+		const DEFAULT_TAB = 'about';
+
+		function activateTab(tab: string) {
+			if (!TABS.includes(tab)) tab = DEFAULT_TAB;
+
+			// Update side-nav buttons
+			document.querySelectorAll('.side-nav-item, .mobile-nav-item').forEach((btn) => {
+				const el = btn as HTMLButtonElement;
+				el.classList.toggle('active', el.dataset.tab === tab);
+				el.setAttribute('aria-current', el.dataset.tab === tab ? 'page' : 'false');
+			});
+
+			// Show/hide sections
+			document.querySelectorAll('.content-section').forEach((section) => {
+				const el = section as HTMLElement;
+				const isActive = el.dataset.section === tab;
+				el.classList.toggle('active', isActive);
+				el.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+			});
+
+			// Scroll right panel to top
+			const panel = document.getElementById('content-panel');
+			if (panel) panel.scrollTop = 0;
+
+			// Update hash without triggering scroll
+			history.replaceState(null, '', `#${tab}`);
+		}
+
+		// Click handlers — side nav and mobile nav
+		document.querySelectorAll('[data-tab]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const tab = (btn as HTMLElement).dataset.tab ?? DEFAULT_TAB;
+				activateTab(tab);
+
+				// Close mobile nav if open
+				const mobileNav = document.getElementById('mobile-nav');
+				const toggle = document.querySelector('.mobile-nav-toggle');
+				if (mobileNav && toggle) {
+					mobileNav.setAttribute('aria-hidden', 'true');
+					mobileNav.classList.remove('open');
+					toggle.setAttribute('aria-expanded', 'false');
+				}
+			});
+		});
+
+		// Mobile hamburger
+		const mobileToggle = document.querySelector('.mobile-nav-toggle');
+		const mobileNav = document.getElementById('mobile-nav');
+		if (mobileToggle && mobileNav) {
+			mobileToggle.addEventListener('click', () => {
+				const isOpen = mobileNav.classList.toggle('open');
+				mobileToggle.setAttribute('aria-expanded', String(isOpen));
+				mobileNav.setAttribute('aria-hidden', String(!isOpen));
+			});
+		}
+
+		// Theme toggle (all instances)
+		document.querySelectorAll('[data-theme-toggle]').forEach((btn) => {
+			btn.addEventListener('click', () => {
+				const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+				const next = isDark ? 'light' : 'dark';
+				document.documentElement.setAttribute('data-theme', next);
+				localStorage.setItem('theme', next);
+				document.querySelectorAll('[data-theme-toggle]').forEach((b) => {
+					b.textContent = next === 'dark' ? 'Light mode' : 'Dark mode';
+				});
+			});
+		});
+
+		// Init from hash or default
+		const hash = window.location.hash.slice(1);
+		activateTab(TABS.includes(hash) ? hash : DEFAULT_TAB);
+	</script>
 </Layout>
