@@ -1377,7 +1377,20 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 }
 
 .experience-brand-logo--ucl {
-	max-width: min(14rem, 100%);
+	max-width: min(22rem, 100%);
+}
+
+/* Light/dark logo switching — mirrors the portrait image pattern */
+.experience-logo-img--dark {
+	display: none;
+}
+
+:root[data-theme='dark'] .experience-logo-img--light {
+	display: none;
+}
+
+:root[data-theme='dark'] .experience-logo-img--dark {
+	display: block;
 }
 
 /* Hover text panel */
