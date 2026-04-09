@@ -66,11 +66,10 @@
 }
 
 .content-section.tab-entering .section-intro > *,
-.content-section.tab-entering .featured-card,
+.content-section.tab-entering .project-placeholder-tile,
 .content-section.tab-entering .proof-card,
 .content-section.tab-entering .contact-card,
-.content-section.tab-entering .about-copy,
-.content-section.tab-entering .lane-section {
+.content-section.tab-entering .about-copy {
 	opacity: 0;
 	animation: fadeUp calc(350ms * var(--motion-duration))
 		cubic-bezier(0.645, 0.045, 0.355, 1) forwards;
@@ -81,12 +80,14 @@
 .content-section.tab-entering .section-intro > *:nth-child(3) { animation-delay: 180ms; }
 .content-section.tab-entering .about-copy { animation-delay: 260ms; }
 .content-section.tab-entering .contact-card { animation-delay: 240ms; }
-.content-section.tab-entering .featured-card:nth-child(1) { animation-delay: 200ms; }
-.content-section.tab-entering .featured-card:nth-child(2) { animation-delay: 260ms; }
-.content-section.tab-entering .featured-card:nth-child(3) { animation-delay: 320ms; }
-.content-section.tab-entering .lane-section:nth-of-type(1) { animation-delay: 280ms; }
-.content-section.tab-entering .lane-section:nth-of-type(2) { animation-delay: 340ms; }
-.content-section.tab-entering .lane-section:nth-of-type(3) { animation-delay: 400ms; }
+.content-section.tab-entering .project-placeholder-tile:nth-child(1) { animation-delay: 180ms; }
+.content-section.tab-entering .project-placeholder-tile:nth-child(2) { animation-delay: 220ms; }
+.content-section.tab-entering .project-placeholder-tile:nth-child(3) { animation-delay: 260ms; }
+.content-section.tab-entering .project-placeholder-tile:nth-child(4) { animation-delay: 300ms; }
+.content-section.tab-entering .project-placeholder-tile:nth-child(5) { animation-delay: 340ms; }
+.content-section.tab-entering .project-placeholder-tile:nth-child(6) { animation-delay: 380ms; }
+.content-section.tab-entering .project-placeholder-tile:nth-child(7) { animation-delay: 420ms; }
+.content-section.tab-entering .project-placeholder-tile:nth-child(8) { animation-delay: 460ms; }
 .content-section.tab-entering .proof-card:nth-child(1) { animation-delay: 120ms; }
 .content-section.tab-entering .proof-card:nth-child(2) { animation-delay: 180ms; }
 .content-section.tab-entering .proof-card:nth-child(3) { animation-delay: 240ms; }
@@ -222,23 +223,38 @@
 		transform: translateX(4px);
 	}
 
-	.featured-card,
-	.proof-card,
-	.project-card {
+	.project-placeholder-tile,
+	.proof-card {
 		transition:
 			transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
 			box-shadow 250ms ease;
 	}
 
-	.featured-card:hover,
-	.proof-card:hover,
-	.project-card:hover {
+	.project-placeholder-tile:hover,
+	.proof-card:hover {
 		transform: translateY(-4px);
 		box-shadow:
 			0 4px 6px rgba(0, 0, 0, 0.04),
 			0 10px 20px rgba(0, 0, 0, 0.06),
 			0 25px 50px rgba(0, 0, 0, 0.08),
 			0 40px 80px rgba(0, 0, 0, 0.06);
+	}
+
+	.project-placeholder-hover {
+		transition:
+			opacity 220ms ease,
+			transform 220ms ease;
+	}
+
+	.project-placeholder-hover {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+
+	.project-placeholder-tile:hover .project-placeholder-hover,
+	.project-placeholder-tile:focus-within .project-placeholder-hover {
+		opacity: 1;
+		transform: translateY(0);
 	}
 
 	.gallery-artwork img {
@@ -278,4 +294,3 @@
 		animation-play-state: paused;
 	}
 }
-

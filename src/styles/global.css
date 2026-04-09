@@ -981,38 +981,151 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 
 /* ── Work section ────────────────────────────────────────────── */
 
-.work-stack {
-	gap: 2.5rem;
+.project-gallery-shell {
+	max-width: 76rem;
+	display: grid;
+	align-items: stretch;
 }
 
-.featured-strip {
+.project-placeholder-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	grid-auto-rows: minmax(5.5rem, 5.5rem);
 	gap: 1rem;
 }
 
-.featured-card {
-	padding: 1.5rem;
+.project-placeholder-tile {
+	position: relative;
 	border: 1px solid var(--border);
-	border-radius: 1.65rem;
-	background: var(--panel);
+	border-radius: 1.75rem;
+	overflow: hidden;
+	background: linear-gradient(180deg, color-mix(in srgb, var(--panel-strong) 94%, transparent), var(--panel));
 	box-shadow: var(--shadow);
+	outline: none;
+}
+
+.project-placeholder-tile--teal {
+	--placeholder-accent: #2d7f7a;
+}
+
+.project-placeholder-tile--stone {
+	--placeholder-accent: #9f8b6d;
+}
+
+.project-placeholder-tile--ink {
+	--placeholder-accent: #4c6788;
+}
+
+.project-placeholder-tile--sand {
+	--placeholder-accent: #b17056;
+}
+
+.project-placeholder-tile--hero {
+	grid-column: span 7;
+	grid-row: span 3;
+}
+
+.project-placeholder-tile--wide {
+	grid-column: span 7;
+	grid-row: span 2;
+}
+
+.project-placeholder-tile--tall {
+	grid-column: span 5;
+	grid-row: span 3;
+}
+
+.project-placeholder-tile--small {
+	grid-column: span 5;
+	grid-row: span 2;
+}
+
+.project-placeholder-surface {
+	position: relative;
 	display: grid;
-	gap: 0.6rem;
+	align-content: space-between;
+	height: 100%;
+	padding: 1.2rem;
+	background:
+		radial-gradient(circle at top right, color-mix(in srgb, var(--placeholder-accent) 18%, transparent), transparent 42%),
+		radial-gradient(circle at bottom left, color-mix(in srgb, var(--placeholder-accent) 11%, transparent), transparent 54%),
+		linear-gradient(180deg, var(--panel-strong), var(--panel));
 }
 
-.featured-card h3 {
-	margin: 0;
-	font-family: var(--font-display);
-	font-size: clamp(1.2rem, 2vw, 1.7rem);
-	line-height: 1.1;
-	letter-spacing: 0.01em;
-	font-weight: 500;
+.project-placeholder-surface::before {
+	content: '';
+	position: absolute;
+	inset: 1rem;
+	border: 1px dashed color-mix(in srgb, var(--placeholder-accent) 28%, var(--border) 72%);
+	border-radius: 1.2rem;
+	opacity: 0.6;
 }
 
-.featured-card p {
+.project-placeholder-surface::after {
+	content: '';
+	position: absolute;
+	left: 1.2rem;
+	right: 1.2rem;
+	bottom: 1.2rem;
+	height: clamp(2.4rem, 18%, 4.5rem);
+	border-radius: 1.1rem;
+	background:
+		linear-gradient(135deg, color-mix(in srgb, var(--placeholder-accent) 44%, white 56%), transparent 72%),
+		color-mix(in srgb, var(--placeholder-accent) 9%, transparent);
+	opacity: 0.9;
+	pointer-events: none;
+}
+
+.project-placeholder-index,
+.project-placeholder-type {
 	margin: 0;
+	position: relative;
+	z-index: 1;
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.project-placeholder-index {
+	color: color-mix(in srgb, var(--placeholder-accent) 88%, var(--text) 12%);
+}
+
+.project-placeholder-type {
+	justify-self: end;
 	color: var(--muted);
+}
+
+.project-placeholder-hover {
+	position: absolute;
+	inset: auto 0 0;
+	display: grid;
+	gap: 0.28rem;
+	padding: 1rem 1rem 1.05rem;
+	background: linear-gradient(180deg, rgba(12, 20, 18, 0.08), rgba(12, 20, 18, 0.88));
+	color: #f5f1e8;
+}
+
+.project-placeholder-hover p {
+	margin: 0;
+}
+
+.project-placeholder-hover-type {
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.project-placeholder-hover-note {
+	font-family: var(--font-display);
+	font-size: clamp(1rem, 1.4vw, 1.35rem);
+	line-height: 1.08;
+}
+
+.project-placeholder-hover-type,
+.project-placeholder-hover-note {
+	color: rgba(245, 241, 232, 0.86);
 }
 
 .featured-label,
@@ -1038,6 +1151,7 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 .featured-links a,
 .card-actions a,
 .detail-actions a,
+.project-gallery-card-actions a,
 .contact-card a,
 .back-link {
 	display: inline-flex;
@@ -1052,89 +1166,6 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	font-weight: 600;
 	font-size: 0.88rem;
 	text-decoration: none;
-}
-
-/* Lane rail */
-.lane-section {
-	display: grid;
-	gap: 1rem;
-}
-
-.lane-header {
-	display: grid;
-	gap: 0.45rem;
-}
-
-.lane-header h3 {
-	margin: 0;
-	font-family: var(--font-display);
-	font-size: clamp(1.2rem, 2vw, 1.55rem);
-	line-height: 1.1;
-	letter-spacing: 0.01em;
-	font-weight: 500;
-}
-
-.lane-header p {
-	margin: 0;
-	color: var(--muted);
-}
-
-.lane-rail {
-	display: grid;
-	grid-auto-flow: column;
-	grid-auto-columns: minmax(18.75rem, 23rem);
-	gap: 1rem;
-	padding-bottom: 0.75rem;
-	overflow-x: auto;
-	scroll-snap-type: x proximity;
-	scrollbar-width: thin;
-}
-
-.project-card {
-	display: grid;
-	gap: 1rem;
-	padding: 1.35rem;
-	border: 1px solid var(--border);
-	border-radius: 1.5rem;
-	background: linear-gradient(180deg, var(--panel-strong), var(--panel));
-	box-shadow: var(--shadow);
-	scroll-snap-align: start;
-	min-height: 19rem;
-}
-
-.project-card h4 {
-	margin: 0;
-	font-family: var(--font-display);
-	font-size: clamp(1.2rem, 2vw, 1.5rem);
-	line-height: 1.1;
-	letter-spacing: 0.01em;
-	font-weight: 500;
-}
-
-.project-card p {
-	margin: 0;
-	color: var(--muted);
-}
-
-.project-meta {
-	display: flex;
-	justify-content: space-between;
-	color: var(--muted);
-}
-
-.tag-list {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-}
-
-.tag-list span {
-	padding: 0.36rem 0.7rem;
-	border-radius: 999px;
-	background: var(--accent-soft);
-	color: var(--accent-strong);
-	font-size: 0.82rem;
-	font-weight: 600;
 }
 
 .disclaimer-inline,
@@ -1337,27 +1368,26 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	justify-content: center;
 }
 
-.experience-col--professional .experience-logo-stack {
-	align-items: flex-end;
-}
-
-.experience-col--education .experience-logo-stack {
-	align-items: flex-start;
-}
-
-/* Individual logo item */
+/* Individual logo item — full width, flex column so logo + hover panel
+   align together rather than relying on the stack's align-items */
 .experience-logo-item {
 	position: relative;
 	cursor: pointer;
 	outline: none;
-	width: fit-content;
-	max-width: 100%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start; /* education default */
+}
+
+.experience-col--professional .experience-logo-item {
+	align-items: flex-end; /* logos hug the divider */
 }
 
 /* Logo image */
 .experience-logo-img {
 	display: block;
-	width: 100%;
+	width: auto;
 	max-width: 100%;
 	height: auto;
 	object-fit: contain;
@@ -1368,16 +1398,30 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 		filter 220ms ease;
 }
 
+/* Professional logos: fixed widths so they sit naturally near the divider */
 .experience-brand-logo--moru {
-	max-width: min(28rem, 100%);
+	width: min(18rem, 100%);
 }
 
+.experience-brand-logo--phs {
+	width: min(12rem, 100%);
+}
+
+.experience-brand-logo--deliveroo {
+	width: min(16rem, 100%);
+}
+
+.experience-brand-logo--boots {
+	width: min(10rem, 100%);
+}
+
+/* Education logos: fill their column width up to a cap */
 .experience-brand-logo--oxford {
-	max-width: min(22rem, 100%);
+	width: min(22rem, 100%);
 }
 
 .experience-brand-logo--ucl {
-	max-width: min(22rem, 100%);
+	width: min(22rem, 100%);
 }
 
 /* Light/dark logo switching — mirrors the portrait image pattern */
@@ -1393,15 +1437,25 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	display: block;
 }
 
-/* Hover text panel */
+/* Hover text panel — anchored to the top of the logo, expands
+   downward to fit content so nothing is clipped or unclickable */
 .experience-logo-hover {
-	display: grid;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	min-height: 100%;
+	transform: translateY(-50%);
+	z-index: 10;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 	gap: 0.22rem;
-	margin-top: 0.9rem;
 	padding: 0.9rem 1rem;
 	border: 1px solid var(--border);
 	border-radius: 0.75rem;
-	background: var(--panel);
+	background: color-mix(in srgb, var(--bg-soft) 88%, transparent);
+	backdrop-filter: blur(14px);
 }
 
 .experience-brand-name,
@@ -1560,37 +1614,21 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 
 @media (hover: hover) and (pointer: fine) {
 	.experience-logo-hover {
-		max-height: 0;
 		opacity: 0;
-		overflow: hidden;
-		padding-top: 0;
-		padding-bottom: 0;
-		margin-top: 0;
-		border-color: transparent;
-		transform: translateY(-0.35rem);
-		transition:
-			max-height 300ms ease,
-			opacity 240ms ease,
-			transform 240ms ease,
-			padding 240ms ease,
-			margin 240ms ease,
-			border-color 240ms ease;
+		pointer-events: none;
+		transition: opacity 200ms ease;
 	}
 
 	.experience-logo-item:hover .experience-logo-hover,
 	.experience-logo-item:focus-within .experience-logo-hover {
-		max-height: 16rem;
 		opacity: 1;
-		transform: translateY(0);
-		padding: 0.9rem 1rem;
-		margin-top: 0.9rem;
-		border-color: var(--border);
+		pointer-events: auto;
 	}
 
 	.experience-logo-item:hover .experience-logo-img,
 	.experience-logo-item:focus-within .experience-logo-img {
-		transform: translateY(-2px) scale(1.012);
-		filter: drop-shadow(0 22px 36px rgba(0, 0, 0, 0.24));
+		opacity: 0.15;
+		filter: blur(1px);
 	}
 
 	.proof-card--logo .proof-card-overlay {
@@ -1917,6 +1955,21 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 		max-width: 100%;
 	}
 
+	.project-placeholder-grid {
+		grid-template-columns: repeat(8, minmax(0, 1fr));
+		grid-auto-rows: minmax(5rem, 5rem);
+	}
+
+	.project-placeholder-tile--hero,
+	.project-placeholder-tile--wide {
+		grid-column: span 5;
+	}
+
+	.project-placeholder-tile--tall,
+	.project-placeholder-tile--small {
+		grid-column: span 3;
+	}
+
 	.experience-columns {
 		grid-template-columns: 1fr;
 		gap: 2rem;
@@ -1942,6 +1995,10 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 
 	.experience-col--professional .experience-logo-stack,
 	.experience-col--education .experience-logo-stack {
+		align-items: flex-start;
+	}
+
+	.experience-col--professional .experience-logo-item {
 		align-items: flex-start;
 	}
 }
@@ -2014,6 +2071,25 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	.gallery-artwork--standard { height: 160px; }
 
 	.project-card { min-height: 17rem; }
+
+	.project-gallery-shell {
+		max-width: 100%;
+	}
+
+	.project-placeholder-grid {
+		grid-template-columns: 1fr;
+		grid-auto-rows: minmax(8rem, auto);
+	}
+
+	.project-placeholder-tile,
+	.project-placeholder-tile--hero,
+	.project-placeholder-tile--wide,
+	.project-placeholder-tile--tall,
+	.project-placeholder-tile--small {
+		grid-column: auto;
+		grid-row: span 1;
+		min-height: 11rem;
+	}
 
 	.experience-logo-stack {
 		gap: 2rem;
