@@ -77,6 +77,8 @@ const galleryItems = [
 	description="Interactive visualisations, recommendation tools, and research software by Luke Rhodes."
 >
 	<div class="layout" data-active-tab="about">
+		<canvas id="weather-canvas" aria-hidden="true"></canvas>
+		<div id="weather-clouds" aria-hidden="true"></div>
 
 		<!-- ── Left: fixed identity panel ─────────────────────── -->
 		<aside class="identity-panel">
@@ -121,7 +123,41 @@ const galleryItems = [
 							<path class="sound-icon-mute" d="m15 9 6 6"></path>
 							<path class="sound-icon-mute" d="m21 9-6 6"></path>
 						</svg>
-						<span class="sound-toggle-label">Sound on</span>
+					</button>
+					<button class="weather-toggle-side" type="button" data-weather-toggle aria-label="Weather: off">
+						<svg class="weather-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<!-- off: cloud outline -->
+							<path class="weather-icon-off" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+							<!-- rain: cloud + drops -->
+							<g class="weather-icon-rain">
+								<path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path>
+								<line x1="8" y1="19" x2="8" y2="21"></line>
+								<line x1="8" y1="23" x2="8" y2="25"></line>
+								<line x1="12" y1="18" x2="12" y2="20"></line>
+								<line x1="12" y1="22" x2="12" y2="24"></line>
+								<line x1="16" y1="19" x2="16" y2="21"></line>
+								<line x1="16" y1="23" x2="16" y2="25"></line>
+							</g>
+							<!-- clouds: sun + cloud -->
+							<g class="weather-icon-clouds">
+								<path d="M12 2v2M4.93 4.93l1.41 1.41M2 12h2M4.93 19.07l1.41-1.41M8 13a4 4 0 0 1 4-4"></path>
+								<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+							</g>
+							<!-- snow: snowflake -->
+							<g class="weather-icon-snow">
+								<line x1="12" y1="2" x2="12" y2="22"></line>
+								<path d="m20 6-8 6-8-6"></path>
+								<path d="m4 18 8-6 8 6"></path>
+								<line x1="2" y1="12" x2="22" y2="12"></line>
+								<path d="m20 18-8-6-8 6"></path>
+								<path d="m4 6 8 6 8-6"></path>
+							</g>
+							<!-- overcast: filled cloud -->
+							<g class="weather-icon-overcast">
+								<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+								<path d="M6 20h12" stroke-linecap="round"></path>
+							</g>
+						</svg>
 					</button>
 					<button class="theme-toggle-side" type="button" data-theme-toggle aria-label="Dark mode">
 						<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -138,7 +174,6 @@ const galleryItems = [
 							</g>
 							<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
 						</svg>
-						<span class="theme-toggle-label">Dark mode</span>
 					</button>
 				</div>
 			</div>
@@ -281,7 +316,36 @@ const galleryItems = [
 					<path class="sound-icon-mute" d="m15 9 6 6"></path>
 					<path class="sound-icon-mute" d="m21 9-6 6"></path>
 				</svg>
-				<span class="sound-toggle-label">Sound on</span>
+			</button>
+			<button class="weather-toggle-side weather-toggle-side--mobile" type="button" data-weather-toggle aria-label="Weather: off">
+				<svg class="weather-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+					<path class="weather-icon-off" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+					<g class="weather-icon-rain">
+						<path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path>
+						<line x1="8" y1="19" x2="8" y2="21"></line>
+						<line x1="8" y1="23" x2="8" y2="25"></line>
+						<line x1="12" y1="18" x2="12" y2="20"></line>
+						<line x1="12" y1="22" x2="12" y2="24"></line>
+						<line x1="16" y1="19" x2="16" y2="21"></line>
+						<line x1="16" y1="23" x2="16" y2="25"></line>
+					</g>
+					<g class="weather-icon-clouds">
+						<path d="M12 2v2M4.93 4.93l1.41 1.41M2 12h2M4.93 19.07l1.41-1.41M8 13a4 4 0 0 1 4-4"></path>
+						<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+					</g>
+					<g class="weather-icon-snow">
+						<line x1="12" y1="2" x2="12" y2="22"></line>
+						<path d="m20 6-8 6-8-6"></path>
+						<path d="m4 18 8-6 8 6"></path>
+						<line x1="2" y1="12" x2="22" y2="12"></line>
+						<path d="m20 18-8-6-8 6"></path>
+						<path d="m4 6 8 6 8-6"></path>
+					</g>
+					<g class="weather-icon-overcast">
+						<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+						<path d="M6 20h12" stroke-linecap="round"></path>
+					</g>
+				</svg>
 			</button>
 			<button class="theme-toggle-side theme-toggle-side--mobile" type="button" data-theme-toggle aria-label="Dark mode">
 				<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -298,7 +362,6 @@ const galleryItems = [
 					</g>
 					<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
 				</svg>
-				<span class="theme-toggle-label">Dark mode</span>
 			</button>
 		</div>
 	</nav>

@@ -1529,3 +1529,139 @@ button:focus:not(:focus-visible),
 a:focus:not(:focus-visible) {
 	outline: none;
 }
+
+/* ── Weather overlay ──────────────────────────────────────── */
+
+#weather-canvas,
+#weather-clouds {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 0;
+	opacity: 0;
+	transition: opacity 800ms ease;
+}
+
+[data-weather='rain'] #weather-canvas,
+[data-weather='snow'] #weather-canvas {
+	opacity: 1;
+}
+
+[data-weather='clouds'] #weather-clouds,
+[data-weather='overcast'] #weather-clouds {
+	opacity: 1;
+}
+
+/* Light mode: also show #weather-clouds in rain/snow (for sky gradient only) */
+:root:not([data-theme='dark'])[data-weather='rain'] #weather-clouds,
+:root:not([data-theme='dark'])[data-weather='snow'] #weather-clouds {
+	opacity: 1;
+}
+
+/* Sky gradients — light mode only, per weather state */
+:root:not([data-theme='dark'])[data-weather='rain'] #weather-clouds::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to bottom, rgba(105, 128, 150, 0.22) 0%, transparent 55%);
+	pointer-events: none;
+}
+
+:root:not([data-theme='dark'])[data-weather='clouds'] #weather-clouds::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to bottom, rgba(105, 165, 215, 0.22) 0%, transparent 52%);
+	pointer-events: none;
+}
+
+:root:not([data-theme='dark'])[data-weather='snow'] #weather-clouds::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to bottom, rgba(180, 205, 228, 0.28) 0%, transparent 52%);
+	pointer-events: none;
+}
+
+:root:not([data-theme='dark'])[data-weather='overcast'] #weather-clouds::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to bottom, rgba(118, 126, 138, 0.28) 0%, transparent 56%);
+	pointer-events: none;
+}
+
+/* Dark mode: subtle flat tint for clouds only */
+[data-theme='dark'][data-weather='clouds'] #weather-clouds::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: rgba(160, 200, 230, 0.04);
+	pointer-events: none;
+}
+
+/* Cloud shapes */
+.weather-cloud {
+	position: absolute;
+	border-radius: 50px;
+	animation: cloud-drift linear infinite;
+	will-change: transform;
+}
+
+/* ── Weather toggle button ───────────────────────────────── */
+
+.weather-toggle-side {
+	display: inline-flex;
+	align-items: center;
+	border: none;
+	background: none;
+	cursor: pointer;
+	color: var(--muted);
+	padding: 0;
+	transition: color 160ms ease;
+}
+
+.weather-toggle-side:hover {
+	color: var(--text);
+}
+
+.weather-toggle-side--mobile {
+	align-self: flex-start;
+}
+
+/* Weather icon states */
+.weather-icon-off,
+.weather-icon-rain,
+.weather-icon-clouds,
+.weather-icon-snow,
+.weather-icon-overcast {
+	transition: opacity 200ms ease;
+}
+
+/* default: show off icon */
+.weather-icon-rain,
+.weather-icon-clouds,
+.weather-icon-snow,
+.weather-icon-overcast {
+	opacity: 0;
+}
+
+[data-weather='rain'] .weather-icon-off,
+[data-weather='clouds'] .weather-icon-off,
+[data-weather='snow'] .weather-icon-off,
+[data-weather='overcast'] .weather-icon-off {
+	opacity: 0;
+}
+
+[data-weather='rain'] .weather-icon-rain { opacity: 1; }
+[data-weather='clouds'] .weather-icon-clouds { opacity: 1; }
+[data-weather='snow'] .weather-icon-snow { opacity: 1; }
+[data-weather='overcast'] .weather-icon-overcast { opacity: 1; }
+
+/* Tint weather icon when active */
+[data-weather='rain'] .weather-toggle-side,
+[data-weather='clouds'] .weather-toggle-side,
+[data-weather='snow'] .weather-toggle-side,
+[data-weather='overcast'] .weather-toggle-side {
+	color: var(--accent);
+}

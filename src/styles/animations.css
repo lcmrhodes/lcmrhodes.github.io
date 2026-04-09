@@ -265,3 +265,16 @@
 	.mobile-nav.open .mobile-nav-item:nth-child(4) { animation-delay: 160ms; }
 	.mobile-nav.open .mobile-nav-item:nth-child(5) { animation-delay: 200ms; }
 }
+
+/* ── Cloud drift ──────────────────────────────────────────── */
+
+@keyframes cloud-drift {
+	from { transform: translateX(var(--cloud-start-x)); }
+	to   { transform: translateX(var(--cloud-end-x)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.weather-cloud {
+		animation-play-state: paused;
+	}
+}
