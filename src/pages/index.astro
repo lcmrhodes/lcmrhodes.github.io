@@ -31,30 +31,38 @@ const laneProjects = lanes.map((lane) => ({
 	projects: projects.filter((project) => project.data.lane === lane.key),
 }));
 
-const experienceItems = [
+const professionalExperienceItems = [
 	{
 		title: 'MORU',
 		label: 'Research Consultant',
+		dates: 'Apr. 2025 – Present',
+		location: 'Hybrid (Bangkok/Oxford/Remote)',
 		body: 'Building deployment-ready pediatric triage and decision-support tooling for low-resource health contexts.',
+		logo: '/images/moru-logo.png',
+		logoAlt: 'Mahidol-Oxford Tropical Medicine Research Unit logo',
+		logoClass: 'experience-brand-logo--moru',
 		link: { label: 'Contributing author — JMIR preprint 2025 ↗', url: 'https://preprints.jmir.org/preprint/97395' },
 	},
+];
+
+const educationExperienceItems = [
 	{
 		title: 'University of Oxford',
 		label: 'MSc, Modelling for Global Health',
+		logo: '/images/oxford-logo.svg',
+		logoAlt: 'University of Oxford logo',
+		logoClass: 'experience-brand-logo--oxford',
 		body: 'Distinction-level training in modeling, applied health analysis, and research systems.',
 		link: { label: 'Genetics essay (PDF) ↓', url: '/papers/genetics_essay.pdf' },
 	},
 	{
 		title: 'UCL',
 		label: 'Population Health & Data Science',
+		logo: '/images/ucl-logo.svg',
+		logoAlt: 'University College London logo',
+		logoClass: 'experience-brand-logo--ucl',
 		body: 'Population Health degree plus dashboard and reporting work for the UCL Institute of Education.',
 		link: { label: 'Undergraduate dissertation (PDF) ↓', url: '/papers/undergraduate_dissertation.pdf' },
-	},
-	{
-		title: 'Population Health Sciences Magazine',
-		label: 'Graphical Design Editor',
-		body: 'Directed visual strategy and design delivery across print and digital publication work.',
-		link: null,
 	},
 ];
 
@@ -251,29 +259,68 @@ const galleryItems = [
 
 			<!-- Experience -->
 			<section class="content-section" data-section="experience" id="tab-experience">
-				<div class="content-section-inner proof-grid">
-					<div class="section-intro section-intro-wide">
-						<p class="eyebrow" data-number="02">Experience</p>
-						<h2>A few of the places and roles shaping how I build.</h2>
-						<p>
-							Research, product thinking, and visual work have all fed into the way I
-							approach software.
-						</p>
-					</div>
+				<div class="content-section-inner">
+					<div class="experience-columns">
 
-					<div class="proof-cards">
-						{experienceItems.map((item) => (
-							<article class="proof-card">
-								<p class="proof-title">{item.title}</p>
-								<h3>{item.label}</h3>
-								<p>{item.body}</p>
-								{item.link && (
-									<a href={item.link.url} target="_blank" rel="noreferrer" class="proof-link">
-										{item.link.label}
-									</a>
-								)}
-							</article>
-						))}
+						<!-- Professional column -->
+						<div class="experience-col experience-col--professional">
+							<h3 class="experience-col-title experience-col-title--professional">Professional</h3>
+							<div class="experience-logo-stack">
+								{professionalExperienceItems.map((item) => (
+									<div class="experience-logo-item" tabindex="0">
+										<img
+											class:list={['experience-logo-img', item.logoClass]}
+											src={item.logo}
+											alt={item.logoAlt}
+											loading="lazy"
+										/>
+										<div class="experience-logo-hover" aria-hidden="true">
+											<p class="experience-brand-name">{item.title}</p>
+											<p class="experience-brand-role">{item.label}</p>
+											{item.dates && <p class="experience-brand-detail">{item.dates}</p>}
+											{item.location && <p class="experience-brand-detail">{item.location}</p>}
+											<p class="experience-brand-copy">{item.body}</p>
+											{item.link && (
+												<a href={item.link.url} target="_blank" rel="noreferrer" class="proof-link">
+													{item.link.label}
+												</a>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+
+						<!-- Vertical divider -->
+						<div class="experience-col-divider" aria-hidden="true"></div>
+
+						<!-- Education column -->
+						<div class="experience-col experience-col--education">
+							<h3 class="experience-col-title experience-col-title--education">Education</h3>
+							<div class="experience-logo-stack">
+								{educationExperienceItems.map((item) => (
+									<div class="experience-logo-item" tabindex="0">
+										<img
+											class:list={['experience-logo-img', item.logoClass]}
+											src={item.logo}
+											alt={item.logoAlt}
+											loading="lazy"
+										/>
+										<div class="experience-logo-hover" aria-hidden="true">
+											<p class="experience-brand-name">{item.title}</p>
+											<p class="experience-brand-role">{item.label}</p>
+											<p class="experience-brand-copy">{item.body}</p>
+											{item.link && (
+												<a href={item.link.url} target="_blank" rel="noreferrer" class="proof-link">
+													{item.link.label}
+												</a>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+
 					</div>
 				</div>
 			</section>
