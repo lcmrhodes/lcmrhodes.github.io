@@ -17,6 +17,7 @@ let galleryObserver: IntersectionObserver | null = null;
 let identityTypingToken = 0;
 let audioContext: AudioContext | null = null;
 const pulseHoverTimeouts = new WeakMap<HTMLElement, number>();
+const hoveredButtons = new WeakSet<HTMLElement>();
 let soundEnabled = true;
 let activeInlineHoverLink: HTMLElement | null = null;
 let weatherMode: WeatherMode = 'off';
@@ -289,6 +290,156 @@ function playWeddingBubbleCluster() {
 	});
 }
 
+function playButtonHoverTone() {
+	const ctx = getAudioContext();
+
+	if (!ctx || !soundEnabled || ctx.state === 'suspended') {
+		return;
+	}
+
+	const now = ctx.currentTime;
+	const master = ctx.createGain();
+	const filter = ctx.createBiquadFilter();
+	const oscA = ctx.createOscillator();
+	const oscB = ctx.createOscillator();
+	const gainA = ctx.createGain();
+	const gainB = ctx.createGain();
+
+	filter.type = 'lowpass';
+	filter.frequency.setValueAtTime(1800, now);
+	filter.Q.setValueAtTime(0.8, now);
+
+	master.gain.setValueAtTime(0.0001, now);
+	master.gain.exponentialRampToValueAtTime(0.0042, now + 0.012);
+	master.gain.exponentialRampToValueAtTime(0.0016, now + 0.05);
+	master.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+	oscA.type = 'sine';
+	oscA.frequency.setValueAtTime(940, now);
+	oscA.frequency.linearRampToValueAtTime(840, now + 0.09);
+
+	oscB.type = 'triangle';
+	oscB.frequency.setValueAtTime(1410, now);
+	oscB.frequency.linearRampToValueAtTime(1260, now + 0.09);
+
+	gainA.gain.setValueAtTime(1, now);
+	gainB.gain.setValueAtTime(0.1, now);
+
+	oscA.connect(gainA);
+	oscB.connect(gainB);
+	gainA.connect(filter);
+	gainB.connect(filter);
+	filter.connect(master);
+	master.connect(ctx.destination);
+
+	oscA.start(now);
+	oscB.start(now);
+	oscA.stop(now + 0.1);
+	oscB.stop(now + 0.1);
+}
+
+function playButtonClickTone() {
+	const ctx = getAudioContext();
+
+	if (!ctx || !soundEnabled || ctx.state === 'suspended') {
+		return;
+	}
+
+	const now = ctx.currentTime;
+	const master = ctx.createGain();
+	const lowpass = ctx.createBiquadFilter();
+	const oscA = ctx.createOscillator();
+	const oscB = ctx.createOscillator();
+	const gainA = ctx.createGain();
+	const gainB = ctx.createGain();
+
+	lowpass.type = 'lowpass';
+	lowpass.frequency.setValueAtTime(1450, now);
+	lowpass.Q.setValueAtTime(0.9, now);
+
+	master.gain.setValueAtTime(0.0001, now);
+	master.gain.exponentialRampToValueAtTime(0.0085, now + 0.01);
+	master.gain.exponentialRampToValueAtTime(0.0036, now + 0.055);
+	master.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+
+	oscA.type = 'triangle';
+	oscA.frequency.setValueAtTime(510, now);
+	oscA.frequency.exponentialRampToValueAtTime(360, now + 0.14);
+
+	oscB.type = 'sine';
+	oscB.frequency.setValueAtTime(760, now);
+	oscB.frequency.exponentialRampToValueAtTime(560, now + 0.12);
+
+	gainA.gain.setValueAtTime(1, now);
+	gainB.gain.setValueAtTime(0.18, now);
+
+	oscA.connect(gainA);
+	oscB.connect(gainB);
+	gainA.connect(lowpass);
+	gainB.connect(lowpass);
+	lowpass.connect(master);
+	master.connect(ctx.destination);
+
+	oscA.start(now);
+	oscB.start(now);
+	oscA.stop(now + 0.15);
+	oscB.stop(now + 0.15);
+}
+
+function playTabClickTone() {
+	const ctx = getAudioContext();
+
+	if (!ctx || !soundEnabled || ctx.state === 'suspended') {
+		return;
+	}
+
+	const now = ctx.currentTime;
+	const master = ctx.createGain();
+	const bandpass = ctx.createBiquadFilter();
+	const lowpass = ctx.createBiquadFilter();
+	const oscA = ctx.createOscillator();
+	const oscB = ctx.createOscillator();
+	const gainA = ctx.createGain();
+	const gainB = ctx.createGain();
+
+	bandpass.type = 'bandpass';
+	bandpass.frequency.setValueAtTime(540, now);
+	bandpass.Q.setValueAtTime(0.75, now);
+
+	lowpass.type = 'lowpass';
+	lowpass.frequency.setValueAtTime(980, now);
+	lowpass.Q.setValueAtTime(0.25, now);
+
+	master.gain.setValueAtTime(0.0001, now);
+	master.gain.exponentialRampToValueAtTime(0.0047, now + 0.006);
+	master.gain.exponentialRampToValueAtTime(0.00155, now + 0.034);
+	master.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+
+	oscA.type = 'triangle';
+	oscA.frequency.setValueAtTime(360, now);
+	oscA.frequency.exponentialRampToValueAtTime(292, now + 0.09);
+
+	oscB.type = 'sine';
+	oscB.frequency.setValueAtTime(510, now);
+	oscB.frequency.exponentialRampToValueAtTime(410, now + 0.082);
+
+	gainA.gain.setValueAtTime(1, now);
+	gainB.gain.setValueAtTime(0.07, now);
+
+	oscA.connect(gainA);
+	oscB.connect(gainB);
+	gainA.connect(bandpass);
+	gainB.connect(bandpass);
+	bandpass.connect(lowpass);
+	lowpass.connect(master);
+	master.connect(ctx.destination);
+
+	oscA.start(now);
+	oscB.start(now);
+	oscA.stop(now + 0.095);
+	oscB.stop(now + 0.095);
+}
+
 function shuffle<T>(values: T[]) {
 	const copy = [...values];
 
@@ -377,12 +528,23 @@ function syncThemeToggleLabels() {
 }
 
 function setTheme(nextTheme: ThemeName) {
-	document.documentElement.dataset.theme = nextTheme;
+	const root = document.documentElement;
+
+	if (root.dataset.theme === nextTheme) {
+		return;
+	}
+
+	root.classList.add('theme-switching');
+	root.dataset.theme = nextTheme;
 	localStorage.setItem('theme', nextTheme);
 	syncThemeToggleLabels();
 	// Refresh cloud colors when theme changes
 	if (weatherMode === 'clouds') createClouds('clouds');
 	else if (weatherMode === 'overcast') createClouds('overcast');
+
+	window.setTimeout(() => {
+		root.classList.remove('theme-switching');
+	}, 380);
 }
 
 function getIdentityTextElements() {
@@ -478,7 +640,10 @@ function updateNavIndicator() {
 
 	const y = activeButton.offsetTop + activeButton.offsetHeight / 2 - indicator.offsetHeight / 2;
 	indicator.style.opacity = '1';
-	indicator.style.transform = `translateY(${y}px)`;
+	indicator.style.top = `${y}px`;
+	indicator.classList.remove('is-bouncing');
+	void indicator.offsetWidth;
+	indicator.classList.add('is-bouncing');
 }
 
 function closeMobileNav() {
@@ -697,6 +862,67 @@ function bindSoundButtons() {
 	document.querySelectorAll<HTMLElement>('[data-sound-toggle]').forEach((button) => {
 		button.addEventListener('click', () => {
 			setSoundEnabled(!soundEnabled);
+		});
+	});
+}
+
+function bindButtonUiSounds() {
+	document.querySelectorAll<HTMLButtonElement>('button').forEach((button) => {
+		const isTabButton = button.matches('[data-tab]');
+
+		if (window.matchMedia(FINE_POINTER_QUERY).matches) {
+			button.addEventListener('pointerenter', () => {
+				if (prefersReducedMotion() || button.disabled || hoveredButtons.has(button) || isTabButton) {
+					return;
+				}
+
+				hoveredButtons.add(button);
+				playButtonHoverTone();
+			});
+
+			button.addEventListener('pointerleave', () => {
+				hoveredButtons.delete(button);
+			});
+		}
+
+		button.addEventListener('click', () => {
+			if (prefersReducedMotion() || button.disabled) {
+				return;
+			}
+
+			if (isTabButton) {
+				playTabClickTone();
+				return;
+			}
+
+			playButtonClickTone();
+		});
+	});
+}
+
+function bindIconLinkUiSounds() {
+	document.querySelectorAll<HTMLAnchorElement>('.identity-link-icon').forEach((link) => {
+		if (window.matchMedia(FINE_POINTER_QUERY).matches) {
+			link.addEventListener('pointerenter', () => {
+				if (prefersReducedMotion() || hoveredButtons.has(link)) {
+					return;
+				}
+
+				hoveredButtons.add(link);
+				playButtonHoverTone();
+			});
+
+			link.addEventListener('pointerleave', () => {
+				hoveredButtons.delete(link);
+			});
+		}
+
+		link.addEventListener('pointerdown', () => {
+			if (prefersReducedMotion()) {
+				return;
+			}
+
+			playButtonClickTone();
 		});
 	});
 }
@@ -1121,6 +1347,11 @@ export default function initPortfolioInteractions() {
 	}
 
 	document.body.dataset.portfolioInteractionsReady = 'true';
+
+	// Enable smooth palette transitions now that the initial theme is already set.
+	// Must come after the inline script in Layout.astro has run to prevent FOUC.
+	document.documentElement.classList.add('theme-ready');
+
 	soundEnabled = localStorage.getItem(SOUND_ENABLED_KEY) !== 'false';
 
 	cacheIdentityText();
@@ -1128,6 +1359,8 @@ export default function initPortfolioInteractions() {
 	bindMobileNav();
 	bindThemeButtons();
 	bindSoundButtons();
+	bindButtonUiSounds();
+	bindIconLinkUiSounds();
 	bindWeatherButtons();
 	bindInlineHoverFocus();
 	bindPulseHaloSound();

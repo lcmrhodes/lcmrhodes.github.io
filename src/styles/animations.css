@@ -135,7 +135,7 @@
 }
 
 :root[data-theme='dark'] .theme-icon {
-	transform: rotate(40deg);
+	transform: rotate(50deg);
 }
 
 :root[data-theme='dark'] .theme-icon-moon {
@@ -278,3 +278,4 @@
 		animation-play-state: paused;
 	}
 }
+
