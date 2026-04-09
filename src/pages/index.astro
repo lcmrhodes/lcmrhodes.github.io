@@ -38,7 +38,8 @@ const professionalExperienceItems = [
 		dates: 'Apr. 2025 – Present',
 		location: 'Hybrid (Bangkok/Oxford/Remote)',
 		body: 'Building deployment-ready pediatric triage and decision-support tooling for low-resource health contexts.',
-		logo: '/images/moru-logo.png',
+		logoLight: '/images/moro_logo_light.svg',
+		logoDark: '/images/moro_logo_dark.svg',
 		logoAlt: 'Mahidol-Oxford Tropical Medicine Research Unit logo',
 		logoClass: 'experience-brand-logo--moru',
 		link: { label: 'Contributing author — JMIR preprint 2025 ↗', url: 'https://preprints.jmir.org/preprint/97395' },
@@ -49,7 +50,8 @@ const educationExperienceItems = [
 	{
 		title: 'University of Oxford',
 		label: 'MSc, Modelling for Global Health',
-		logo: '/images/oxford-logo.svg',
+		logoLight: '/images/oxford_logo_light.svg',
+		logoDark: '/images/oxford_logo_dark.svg',
 		logoAlt: 'University of Oxford logo',
 		logoClass: 'experience-brand-logo--oxford',
 		body: 'Distinction-level training in modeling, applied health analysis, and research systems.',
@@ -58,7 +60,8 @@ const educationExperienceItems = [
 	{
 		title: 'UCL',
 		label: 'Population Health & Data Science',
-		logo: '/images/ucl-logo.svg',
+		logoLight: '/images/ucl_logo_light.svg',
+		logoDark: '/images/ucl_logo_dark.svg',
 		logoAlt: 'University College London logo',
 		logoClass: 'experience-brand-logo--ucl',
 		body: 'Population Health degree plus dashboard and reporting work for the UCL Institute of Education.',
@@ -269,9 +272,16 @@ const galleryItems = [
 								{professionalExperienceItems.map((item) => (
 									<div class="experience-logo-item" tabindex="0">
 										<img
-											class:list={['experience-logo-img', item.logoClass]}
-											src={item.logo}
+											class:list={['experience-logo-img', 'experience-logo-img--light', item.logoClass]}
+											src={item.logoLight}
 											alt={item.logoAlt}
+											loading="lazy"
+										/>
+										<img
+											class:list={['experience-logo-img', 'experience-logo-img--dark', item.logoClass]}
+											src={item.logoDark}
+											alt=""
+											aria-hidden="true"
 											loading="lazy"
 										/>
 										<div class="experience-logo-hover" aria-hidden="true">
@@ -301,9 +311,16 @@ const galleryItems = [
 								{educationExperienceItems.map((item) => (
 									<div class="experience-logo-item" tabindex="0">
 										<img
-											class:list={['experience-logo-img', item.logoClass]}
-											src={item.logo}
+											class:list={['experience-logo-img', 'experience-logo-img--light', item.logoClass]}
+											src={item.logoLight}
 											alt={item.logoAlt}
+											loading="lazy"
+										/>
+										<img
+											class:list={['experience-logo-img', 'experience-logo-img--dark', item.logoClass]}
+											src={item.logoDark}
+											alt=""
+											aria-hidden="true"
 											loading="lazy"
 										/>
 										<div class="experience-logo-hover" aria-hidden="true">
