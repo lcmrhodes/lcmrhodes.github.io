@@ -6,6 +6,9 @@ const PULSE_HALO_SOUND_DELAY_MS = 320;
 const FRAGRANCE_BLOOM_SOUND_DELAY_MS = 320;
 const WEDDING_SPARKLE_SOUND_DELAY_MS = 130;
 const SOUND_ENABLED_KEY = 'sound-enabled';
+const WEATHER_KEY = 'weather';
+
+type WeatherMode = 'off' | 'rain' | 'clouds' | 'snow' | 'overcast';
 
 type TabKey = (typeof TABS)[number];
 type ThemeName = 'light' | 'dark';
@@ -16,6 +19,8 @@ let audioContext: AudioContext | null = null;
 const pulseHoverTimeouts = new WeakMap<HTMLElement, number>();
 let soundEnabled = true;
 let activeInlineHoverLink: HTMLElement | null = null;
+let weatherMode: WeatherMode = 'off';
+let weatherRafId: number | null = null;
 
 function prefersReducedMotion() {
 	return window.matchMedia(REDUCED_MOTION_QUERY).matches;
@@ -36,11 +41,6 @@ function syncSoundToggleLabels() {
 		const nextLabel = soundEnabled ? 'Mute sounds' : 'Enable sounds';
 		button.setAttribute('aria-label', nextLabel);
 		button.setAttribute('aria-pressed', String(soundEnabled));
-
-		const label = button.querySelector<HTMLElement>('.sound-toggle-label');
-		if (label) {
-			label.textContent = soundEnabled ? 'Sound on' : 'Sound off';
-		}
 	});
 }
 
@@ -373,11 +373,6 @@ function syncThemeToggleLabels() {
 	document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((button) => {
 		button.setAttribute('aria-label', nextLabel);
 		button.setAttribute('aria-pressed', String(getActiveTheme() === 'dark'));
-
-		const label = button.querySelector<HTMLElement>('.theme-toggle-label');
-		if (label) {
-			label.textContent = nextLabel;
-		}
 	});
 }
 
@@ -385,6 +380,9 @@ function setTheme(nextTheme: ThemeName) {
 	document.documentElement.dataset.theme = nextTheme;
 	localStorage.setItem('theme', nextTheme);
 	syncThemeToggleLabels();
+	// Refresh cloud colors when theme changes
+	if (weatherMode === 'clouds') createClouds('clouds');
+	else if (weatherMode === 'overcast') createClouds('overcast');
 }
 
 function getIdentityTextElements() {
@@ -839,6 +837,284 @@ function bindInlineHoverFocus() {
 	});
 }
 
+// ── Weather ──────────────────────────────────────────────────
+
+interface RainParticle {
+	x: number;
+	y: number;
+	speed: number;
+	length: number;
+	opacity: number;
+}
+
+interface SnowParticle {
+	x: number;
+	y: number;
+	speed: number;
+	radius: number;
+	drift: number;
+	driftOffset: number;
+	opacity: number;
+}
+
+function getRainColor(): string {
+	return getActiveTheme() === 'dark'
+		? 'rgba(180, 200, 220, 0.07)'
+		: 'rgba(55, 75, 105, 0.16)';
+}
+
+function getSnowColor(): string {
+	return getActiveTheme() === 'dark'
+		? 'rgba(220, 230, 240, 0.12)'
+		: 'rgba(120, 145, 175, 0.32)';
+}
+
+function createRainParticles(count: number, w: number, h: number): RainParticle[] {
+	return Array.from({ length: count }, () => ({
+		x: Math.random() * w,
+		y: Math.random() * h,
+		speed: 3 + Math.random() * 3,
+		length: 10 + Math.random() * 12,
+		opacity: 0.4 + Math.random() * 0.6,
+	}));
+}
+
+function createSnowParticles(count: number, w: number, h: number): SnowParticle[] {
+	return Array.from({ length: count }, () => ({
+		x: Math.random() * w,
+		y: Math.random() * h,
+		speed: 0.4 + Math.random() * 1.1,
+		radius: 1 + Math.random() * 2,
+		drift: 0.3 + Math.random() * 0.5,
+		driftOffset: Math.random() * Math.PI * 2,
+		opacity: 0.4 + Math.random() * 0.6,
+	}));
+}
+
+function stopWeatherCanvas() {
+	if (weatherRafId !== null) {
+		cancelAnimationFrame(weatherRafId);
+		weatherRafId = null;
+	}
+	const canvas = document.getElementById('weather-canvas') as HTMLCanvasElement | null;
+	if (canvas) {
+		const ctx = canvas.getContext('2d');
+		ctx?.clearRect(0, 0, canvas.width, canvas.height);
+	}
+}
+
+function startRain() {
+	if (prefersReducedMotion()) return;
+
+	const canvas = document.getElementById('weather-canvas') as HTMLCanvasElement | null;
+	if (!canvas) return;
+
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	const ctx = canvas.getContext('2d');
+	if (!ctx) return;
+
+	let particles = createRainParticles(100, canvas.width, canvas.height);
+	const angle = 0.2; // slight lean
+
+	function frame() {
+		if (weatherMode !== 'rain') return;
+		canvas!.width = window.innerWidth;
+		canvas!.height = window.innerHeight;
+		ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+
+		const color = getRainColor();
+		ctx!.strokeStyle = color;
+		ctx!.lineWidth = 1;
+
+		// ensure particle count matches canvas size
+		while (particles.length < 100) {
+			particles.push({
+				x: Math.random() * canvas!.width,
+				y: -20,
+				speed: 3 + Math.random() * 3,
+				length: 10 + Math.random() * 12,
+				opacity: 0.4 + Math.random() * 0.6,
+			});
+		}
+
+		particles.forEach((p) => {
+			ctx!.beginPath();
+			ctx!.moveTo(p.x, p.y);
+			ctx!.lineTo(p.x + Math.sin(angle) * p.length, p.y + Math.cos(angle) * p.length);
+			ctx!.stroke();
+
+			p.y += p.speed;
+			p.x += Math.sin(angle) * p.speed * 0.3;
+
+			if (p.y > canvas!.height + 20) {
+				p.y = -20;
+				p.x = Math.random() * canvas!.width;
+			}
+		});
+
+		weatherRafId = requestAnimationFrame(frame);
+	}
+
+	weatherRafId = requestAnimationFrame(frame);
+}
+
+function startSnow() {
+	if (prefersReducedMotion()) return;
+
+	const canvas = document.getElementById('weather-canvas') as HTMLCanvasElement | null;
+	if (!canvas) return;
+
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	const ctx = canvas.getContext('2d');
+	if (!ctx) return;
+
+	const particles = createSnowParticles(50, canvas.width, canvas.height);
+	let tick = 0;
+
+	function frame() {
+		if (weatherMode !== 'snow') return;
+		canvas!.width = window.innerWidth;
+		canvas!.height = window.innerHeight;
+		ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
+
+		const color = getSnowColor();
+		ctx!.fillStyle = color;
+
+		tick += 0.008;
+
+		particles.forEach((p) => {
+			ctx!.beginPath();
+			ctx!.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+			ctx!.fill();
+
+			p.y += p.speed;
+			p.x += Math.sin(tick + p.driftOffset) * p.drift;
+
+			if (p.y > canvas!.height + 10) {
+				p.y = -10;
+				p.x = Math.random() * canvas!.width;
+			}
+			if (p.x > canvas!.width + 10) p.x = -10;
+			if (p.x < -10) p.x = canvas!.width + 10;
+		});
+
+		weatherRafId = requestAnimationFrame(frame);
+	}
+
+	weatherRafId = requestAnimationFrame(frame);
+}
+
+function clearClouds() {
+	const container = document.getElementById('weather-clouds');
+	if (container) container.innerHTML = '';
+}
+
+function createClouds(mode: 'clouds' | 'overcast') {
+	const container = document.getElementById('weather-clouds');
+	if (!container) return;
+	container.innerHTML = '';
+
+	const isDark = getActiveTheme() === 'dark';
+	const isClouds = mode === 'clouds';
+
+	const configs = isClouds
+		? [
+			{ w: 320, h: 80, top: '6%', startX: '-380px', endX: '110vw', dur: 80, delay: 0, opacity: isDark ? 0.08 : 0.30 },
+			{ w: 240, h: 60, top: '15%', startX: '-290px', endX: '110vw', dur: 70, delay: -25000, opacity: isDark ? 0.06 : 0.24 },
+			{ w: 400, h: 90, top: '2%', startX: '-460px', endX: '110vw', dur: 90, delay: -50000, opacity: isDark ? 0.05 : 0.20 },
+			{ w: 200, h: 50, top: '22%', startX: '-250px', endX: '110vw', dur: 75, delay: -38000, opacity: isDark ? 0.07 : 0.26 },
+		]
+		: [
+			{ w: 480, h: 110, top: '3%', startX: '-540px', endX: '110vw', dur: 60, delay: 0, opacity: isDark ? 0.1 : 0.28 },
+			{ w: 360, h: 90, top: '10%', startX: '-420px', endX: '110vw', dur: 55, delay: -20000, opacity: isDark ? 0.09 : 0.26 },
+			{ w: 520, h: 120, top: '0%', startX: '-580px', endX: '110vw', dur: 65, delay: -40000, opacity: isDark ? 0.08 : 0.24 },
+			{ w: 300, h: 80, top: '18%', startX: '-360px', endX: '110vw', dur: 50, delay: -10000, opacity: isDark ? 0.07 : 0.22 },
+			{ w: 440, h: 100, top: '7%', startX: '-500px', endX: '110vw', dur: 58, delay: -30000, opacity: isDark ? 0.09 : 0.26 },
+		];
+
+	configs.forEach((c) => {
+		const cloud = document.createElement('div');
+		cloud.className = 'weather-cloud';
+
+		const baseColor = isClouds
+			? (isDark ? '200, 215, 230' : '215, 228, 245')
+			: (isDark ? '110, 118, 128' : '148, 156, 168');
+
+		cloud.style.cssText = `
+			width: ${c.w}px;
+			height: ${c.h}px;
+			top: ${c.top};
+			background: radial-gradient(ellipse 60% 50% at 40% 50%, rgba(${baseColor}, ${c.opacity}) 0%, transparent 100%);
+			--cloud-start-x: ${c.startX};
+			--cloud-end-x: ${c.endX};
+			animation-duration: ${c.dur}s;
+			animation-delay: ${c.delay}ms;
+		`;
+
+		container.appendChild(cloud);
+	});
+}
+
+function syncWeatherToggleLabels() {
+	const labels: Record<WeatherMode, string> = {
+		off: 'Weather: off',
+		rain: 'Weather: rain',
+		clouds: 'Weather: clouds',
+		snow: 'Weather: snow',
+		overcast: 'Weather: overcast',
+	};
+
+	document.querySelectorAll<HTMLElement>('[data-weather-toggle]').forEach((btn) => {
+		btn.setAttribute('aria-label', labels[weatherMode]);
+	});
+}
+
+function setWeather(mode: WeatherMode) {
+	weatherMode = mode;
+	document.documentElement.dataset.weather = mode;
+	localStorage.setItem(WEATHER_KEY, mode);
+
+	stopWeatherCanvas();
+	clearClouds();
+
+	if (mode === 'rain') startRain();
+	else if (mode === 'snow') startSnow();
+	else if (mode === 'clouds') createClouds('clouds');
+	else if (mode === 'overcast') createClouds('overcast');
+
+	syncWeatherToggleLabels();
+}
+
+function bindWeatherButtons() {
+	const cycle: WeatherMode[] = ['off', 'rain', 'clouds', 'snow', 'overcast'];
+
+	document.querySelectorAll<HTMLElement>('[data-weather-toggle]').forEach((btn) => {
+		btn.addEventListener('click', () => {
+			const current = cycle.indexOf(weatherMode);
+			const next = cycle[(current + 1) % cycle.length];
+			setWeather(next);
+		});
+	});
+}
+
+function initWeather() {
+	const saved = localStorage.getItem(WEATHER_KEY) as WeatherMode | null;
+	const valid: WeatherMode[] = ['off', 'rain', 'clouds', 'snow', 'overcast'];
+	const initial = saved && valid.includes(saved) ? saved : 'off';
+	weatherMode = initial;
+
+	if (initial !== 'off') {
+		if (initial === 'rain') startRain();
+		else if (initial === 'snow') startSnow();
+		else if (initial === 'clouds') createClouds('clouds');
+		else if (initial === 'overcast') createClouds('overcast');
+	}
+
+	syncWeatherToggleLabels();
+}
+
 export default function initPortfolioInteractions() {
 	if (document.body.dataset.portfolioInteractionsReady === 'true') {
 		return;
@@ -852,6 +1128,7 @@ export default function initPortfolioInteractions() {
 	bindMobileNav();
 	bindThemeButtons();
 	bindSoundButtons();
+	bindWeatherButtons();
 	bindInlineHoverFocus();
 	bindPulseHaloSound();
 	bindFragranceBloomSound();
@@ -859,6 +1136,7 @@ export default function initPortfolioInteractions() {
 	syncThemeToggleLabels();
 	syncSoundToggleLabels();
 	initMouseGlow();
+	initWeather();
 
 	const initialHash = window.location.hash.slice(1);
 	const initialTab = isValidTab(initialHash) ? initialHash : DEFAULT_TAB;

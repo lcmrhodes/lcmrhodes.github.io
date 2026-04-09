@@ -39,6 +39,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 			if (savedTheme === 'dark' || savedTheme === 'light') {
 				document.documentElement.dataset.theme = savedTheme;
 			}
+			const savedWeather = localStorage.getItem('weather');
+			const validWeather = ['off', 'rain', 'clouds', 'snow', 'overcast'];
+			if (savedWeather && validWeather.includes(savedWeather)) {
+				document.documentElement.dataset.weather = savedWeather;
+			} else {
+				document.documentElement.dataset.weather = 'off';
+			}
 		</script>
 	</head>
 	<body>
