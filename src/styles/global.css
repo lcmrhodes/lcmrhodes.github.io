@@ -68,9 +68,17 @@ a {
 	min-height: 100vh;
 	position: relative;
 	isolation: isolate;
+	--identity-width: 28%;
 	--mouse-x: 50vw;
 	--mouse-y: 50vh;
 	--glow-opacity: 0;
+	transition:
+		--identity-width 360ms cubic-bezier(0.645, 0.045, 0.355, 1),
+		--identity-content-shift 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.layout[data-active-tab='about'] {
+	--identity-content-shift: 1.2rem;
 }
 
 .layout::before,
@@ -121,6 +129,9 @@ a {
 	padding: 4.4rem 2.7rem 3.6rem 6.2rem;
 	background: transparent;
 	z-index: 10;
+	transition:
+		width 360ms cubic-bezier(0.645, 0.045, 0.355, 1),
+		padding 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 .identity-top {
@@ -129,6 +140,76 @@ a {
 	gap: 0.6rem;
 	margin-left: var(--identity-content-shift);
 	max-width: calc(100% - var(--identity-content-shift));
+	max-height: 16rem;
+	overflow: hidden;
+	transition:
+		margin-left 360ms cubic-bezier(0.645, 0.045, 0.355, 1),
+		max-width 360ms cubic-bezier(0.645, 0.045, 0.355, 1),
+		max-height 320ms cubic-bezier(0.645, 0.045, 0.355, 1),
+	opacity 220ms ease;
+}
+
+.layout[data-active-tab='about'] .identity-top {
+	opacity: 0;
+	max-height: 0;
+	pointer-events: none;
+}
+
+.about-portrait-placeholder {
+	display: block;
+	position: absolute;
+	top: 4rem;
+	left: 7.2rem;
+	width: clamp(12.8rem, 19vw, 16.8rem);
+	aspect-ratio: 1;
+	overflow: hidden;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.9);
+	box-shadow:
+		0 20px 55px rgba(38, 46, 43, 0.08),
+		inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+	opacity: 0;
+	transform: translateY(16px);
+	pointer-events: none;
+	transition:
+		opacity 260ms ease,
+		transform 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+:root[data-theme='dark'] .about-portrait-placeholder {
+	background: rgba(255, 255, 255, 0.94);
+	box-shadow:
+		0 24px 60px rgba(0, 0, 0, 0.28),
+		inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+.about-portrait-image {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: 52% 4%;
+	filter: saturate(0.96) contrast(1.02);
+	transition: opacity 220ms ease;
+}
+
+.about-portrait-image--dark {
+	opacity: 0;
+}
+
+:root[data-theme='dark'] .about-portrait-image--light {
+	opacity: 0;
+}
+
+:root[data-theme='dark'] .about-portrait-image--dark {
+	opacity: 1;
+}
+
+.layout[data-active-tab='about'] .about-portrait-placeholder {
+	opacity: 1;
+	transform: translateY(0);
 }
 
 .identity-name {
@@ -156,6 +237,9 @@ a {
 	padding-left: 1rem;
 	margin-left: var(--identity-content-shift);
 	max-width: calc(100% - var(--identity-content-shift));
+	transition:
+		margin-left 360ms cubic-bezier(0.645, 0.045, 0.355, 1),
+		max-width 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 .side-nav-item {
@@ -205,6 +289,20 @@ a {
 	gap: 1rem;
 	margin-left: var(--identity-content-shift);
 	max-width: calc(100% - var(--identity-content-shift));
+	transition:
+		margin-left 360ms cubic-bezier(0.645, 0.045, 0.355, 1),
+		max-width 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.layout[data-active-tab='about'] .identity-panel {
+	padding-top: 5rem;
+	padding-bottom: 3.2rem;
+}
+
+.layout[data-active-tab='about'] .side-nav,
+.layout[data-active-tab='about'] .identity-bottom {
+	margin-left: 0.5rem;
+	max-width: 100%;
 }
 
 .identity-links {
@@ -226,6 +324,19 @@ a {
 	color: var(--text);
 }
 
+.identity-controls {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.85rem;
+}
+
+.identity-controls--mobile {
+	align-self: flex-start;
+	margin-top: 0.5rem;
+}
+
+.sound-toggle-side,
 .theme-toggle-side {
 	display: inline-flex;
 	align-items: center;
@@ -241,13 +352,33 @@ a {
 	transition: color 160ms ease;
 }
 
+.sound-toggle-side--mobile,
 .theme-toggle-side--mobile {
 	align-self: flex-start;
-	margin-top: 0.5rem;
 }
 
+.sound-toggle-side:hover,
 .theme-toggle-side:hover {
 	color: var(--text);
+}
+
+.sound-icon-wave,
+.sound-icon-mute {
+	transition: opacity 180ms ease, transform 180ms ease;
+	transform-origin: center;
+}
+
+.sound-icon-mute {
+	opacity: 0;
+}
+
+[data-sound-enabled='false'] .sound-icon-wave {
+	opacity: 0;
+	transform: scale(0.8);
+}
+
+[data-sound-enabled='false'] .sound-icon-mute {
+	opacity: 1;
 }
 
 /* Right: scrollable content panel */
@@ -260,6 +391,7 @@ a {
 	background: transparent;
 	scrollbar-width: thin;
 	scrollbar-color: var(--border) transparent;
+	transition: margin-left 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 .content-section {
@@ -268,6 +400,7 @@ a {
 	padding: 4.75rem 4rem 5rem 6.6rem;
 	position: relative;
 	z-index: 1;
+	transition: padding 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
 .content-section.active {
@@ -278,6 +411,11 @@ a {
 	max-width: 46rem;
 	display: grid;
 	gap: 2.5rem;
+	transition: max-width 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.layout[data-active-tab='about'] .content-section[data-section='about'] .content-section-inner {
+	max-width: 62rem;
 }
 
 /* ── Typography ──────────────────────────────────────────────── */
@@ -316,6 +454,425 @@ a {
 
 .section-intro-wide {
 	max-width: 860px;
+}
+
+.about-hero {
+	gap: 2.35rem;
+	padding-top: 1.25rem;
+}
+
+.about-hero h2 {
+	max-width: 8.5ch;
+	font-family: var(--font-display);
+	font-size: clamp(4.4rem, 9vw, 7.75rem);
+	line-height: 0.88;
+	font-weight: 400;
+	letter-spacing: -0.01em;
+	white-space: nowrap;
+}
+
+.about-hero .about-summary {
+	max-width: 40rem;
+	font-family: var(--font-display);
+	font-size: clamp(1.82rem, 2.65vw, 2.5rem);
+	font-weight: 400;
+	line-height: 1.34;
+	letter-spacing: 0.005em;
+	color: color-mix(in srgb, var(--text) 84%, var(--bg) 16%);
+}
+
+.about-summary-lead,
+.about-summary-detail {
+	display: block;
+}
+
+.about-summary-detail {
+	margin-top: 1.15rem;
+}
+
+:where(.identity-name, .identity-tagline, .side-nav-item, .identity-links a, .sound-toggle-label, .theme-toggle-label, .about-hero h2, .about-hero .about-summary) {
+	transition: color 220ms ease;
+}
+
+a.about-inline-link,
+a.about-inline-link .about-inline-link-text {
+	color: inherit;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.about-inline-link.is-inline-hover-active {
+	z-index: 30;
+}
+
+.about-inline-link--pulse {
+	--pulse-color: #b24d4f;
+	--pulse-soft: rgba(178, 77, 79, 0.14);
+	--pulse-ring: rgba(178, 77, 79, 0.24);
+	position: relative;
+	display: inline-block;
+	vertical-align: baseline;
+	isolation: isolate;
+}
+
+.about-inline-link-text {
+	position: relative;
+	z-index: 1;
+}
+
+.about-inline-link--fragrance {
+	--fragrance-rose: rgba(184, 109, 125, 0.28);
+	--fragrance-amber: rgba(212, 161, 95, 0.3);
+	position: relative;
+	display: inline-block;
+	vertical-align: baseline;
+	isolation: isolate;
+	z-index: 0;
+}
+
+.about-inline-link--wedding {
+	--wed-ivory-node: #f1eee5;
+	--wed-blush-node: #e7c2c6;
+	--wed-sage-node: #92a382;
+	--wed-burgundy-node: #a33d44;
+	--wed-plum-node: #6f5469;
+	position: relative;
+	display: inline-block;
+	vertical-align: baseline;
+	isolation: isolate;
+	z-index: 0;
+}
+
+.about-inline-link--fragrance .about-inline-link-text {
+	z-index: 3;
+}
+
+.about-inline-link--wedding .about-inline-link-text {
+	z-index: 3;
+}
+
+.about-inline-link__sparkles {
+	position: absolute;
+	inset: 50% auto auto 50%;
+	width: 0;
+	height: 0;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.about-inline-link__sparkles span {
+	position: absolute;
+	display: block;
+	width: var(--sparkle-size, 0.32em);
+	height: var(--sparkle-size, 0.32em);
+	border-radius: 999px;
+	background: var(--sparkle-fill, var(--wed-ivory-node));
+	border: var(--sparkle-border, none);
+	box-shadow: 0 0 var(--sparkle-glow-size, 0.38em) var(--sparkle-glow, rgba(255, 255, 255, 0.42));
+	opacity: 0;
+	left: 0;
+	top: 0;
+	transform: translate(-50%, -50%) scale(0.2);
+	will-change: transform, opacity;
+}
+
+.about-inline-link--fragrance::before,
+.about-inline-link--fragrance::after,
+.about-inline-link--fragrance .about-inline-link-text::before,
+.about-inline-link--fragrance .about-inline-link-text::after {
+	content: '';
+	position: absolute;
+	pointer-events: none;
+	opacity: 0;
+}
+
+.about-inline-link--fragrance::before {
+	inset: -0.46em -0.56em -0.38em -0.56em;
+	background:
+		radial-gradient(ellipse 34% 28% at 18% 62%, rgba(255, 255, 255, 0.22), transparent 74%),
+		radial-gradient(ellipse 44% 34% at 38% 54%, var(--fragrance-amber), transparent 74%),
+		radial-gradient(ellipse 52% 40% at 60% 48%, var(--fragrance-rose), transparent 75%),
+		radial-gradient(ellipse 38% 30% at 80% 58%, rgba(255, 255, 255, 0.18), transparent 78%),
+		radial-gradient(ellipse 68% 42% at 50% 56%, rgba(255,255,255,0.1), transparent 80%);
+	filter: blur(10px) saturate(126%);
+	transform: scale(0.76);
+	z-index: -2;
+}
+
+.about-inline-link--fragrance::after {
+	inset: -0.36em -0.42em -0.34em -0.42em;
+	background:
+		radial-gradient(ellipse 56% 42% at 50% 56%, rgba(255,255,255,0.2), transparent 70%),
+		radial-gradient(ellipse 42% 30% at 24% 64%, rgba(212, 161, 95, 0.22), transparent 72%),
+		radial-gradient(ellipse 42% 30% at 76% 64%, rgba(184, 109, 125, 0.24), transparent 72%),
+		radial-gradient(ellipse 68% 44% at 50% 54%, rgba(184, 109, 125, 0.1), transparent 76%);
+	filter: blur(16px) saturate(132%);
+	transform: scale(0.82);
+	z-index: -2;
+}
+
+.about-inline-link--fragrance .about-inline-link-text::before {
+	inset: -0.5em -0.56em -0.44em -0.56em;
+	background:
+		radial-gradient(circle at 10% 64%, rgba(255,255,255,0.44) 0 0.14em, transparent 0.2em),
+		radial-gradient(circle at 18% 48%, rgba(255,255,255,0.32) 0 0.09em, transparent 0.15em),
+		radial-gradient(circle at 26% 58%, rgba(255,255,255,0.36) 0 0.11em, transparent 0.17em),
+		radial-gradient(circle at 34% 42%, rgba(255,255,255,0.28) 0 0.08em, transparent 0.14em),
+		radial-gradient(circle at 42% 60%, rgba(255,255,255,0.34) 0 0.1em, transparent 0.16em),
+		radial-gradient(circle at 50% 46%, rgba(255,255,255,0.26) 0 0.08em, transparent 0.14em),
+		radial-gradient(circle at 58% 62%, rgba(255,255,255,0.32) 0 0.1em, transparent 0.15em),
+		radial-gradient(circle at 66% 44%, rgba(255,255,255,0.3) 0 0.1em, transparent 0.15em),
+		radial-gradient(circle at 74% 58%, rgba(255,255,255,0.28) 0 0.09em, transparent 0.15em),
+		radial-gradient(circle at 82% 46%, rgba(255,255,255,0.24) 0 0.08em, transparent 0.14em),
+		radial-gradient(circle at 90% 56%, rgba(255,255,255,0.22) 0 0.08em, transparent 0.14em);
+	filter: blur(1px) saturate(120%);
+	transform: scale(0.88);
+	z-index: -1;
+}
+
+.about-inline-link--fragrance .about-inline-link-text::after {
+	inset: -0.14em -0.22em -0.12em -0.22em;
+	background: radial-gradient(ellipse at center, rgba(255,255,255,0.08), transparent 72%);
+	transform: scale(0.84);
+	filter: blur(8px);
+	z-index: -1;
+}
+
+.about-inline-link--pulse::before,
+.about-inline-link--pulse::after {
+	content: '';
+	position: absolute;
+	pointer-events: none;
+	border-radius: 999px;
+	opacity: 0;
+}
+
+.about-inline-link--pulse::before {
+	inset: 0.2em -0.12em 0.14em -0.12em;
+	background: radial-gradient(circle at 50% 50%, var(--pulse-soft) 0%, rgba(178, 77, 79, 0.06) 55%, transparent 78%);
+	transform: scale(0.92);
+	z-index: 0;
+}
+
+.about-inline-link--pulse::after {
+	inset: 0.15em -0.14em 0.1em -0.14em;
+	box-shadow: 0 0 0 0 var(--pulse-ring);
+	transform: scale(0.9);
+	z-index: 0;
+}
+
+:root[data-theme='dark'] .about-inline-link--pulse {
+	--pulse-color: #d46b6b;
+	--pulse-soft: rgba(212, 107, 107, 0.14);
+	--pulse-ring: rgba(212, 107, 107, 0.26);
+}
+
+:root[data-theme='dark'] .about-inline-link--fragrance {
+	--fragrance-rose: rgba(213, 143, 160, 0.32);
+	--fragrance-amber: rgba(228, 187, 125, 0.3);
+}
+
+:root[data-theme='dark'] .about-inline-link--wedding {
+	--wed-ivory-node: #f7f3ea;
+	--wed-blush-node: #ebbfc7;
+	--wed-sage-node: #9bae8d;
+	--wed-burgundy-node: #c0565e;
+	--wed-plum-node: #87667f;
+}
+
+:root[data-theme='dark'] .about-inline-link--fragrance::before {
+	opacity: 0;
+	filter: blur(9px) saturate(118%);
+}
+
+:root[data-theme='dark'] .about-inline-link--fragrance::after {
+	opacity: 0;
+	filter: blur(14px) saturate(122%);
+}
+
+:root[data-theme='dark'] .about-inline-link--fragrance .about-inline-link-text {
+	text-shadow:
+		0 0 0.04em rgba(17, 25, 24, 0.9),
+		0 0 0.2em rgba(17, 25, 24, 0.45);
+}
+
+body[data-inline-hover='true'] .identity-name,
+body[data-inline-hover='true'] .about-hero h2 {
+	color: color-mix(in srgb, var(--text) 30%, var(--bg) 70%);
+}
+
+body[data-inline-hover='true'] .identity-tagline,
+body[data-inline-hover='true'] .side-nav-item,
+body[data-inline-hover='true'] .identity-links a,
+body[data-inline-hover='true'] .sound-toggle-label,
+body[data-inline-hover='true'] .theme-toggle-label {
+	color: color-mix(in srgb, var(--text) 26%, var(--bg) 74%);
+}
+
+body[data-inline-hover='true'] .about-hero .about-summary {
+	color: color-mix(in srgb, var(--text) 32%, var(--bg) 68%);
+}
+
+body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active,
+body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-inline-link-text {
+	color: color-mix(in srgb, var(--text) 88%, var(--bg) 12%);
+}
+
+:root[data-theme='dark'] body[data-inline-hover='true'] .identity-name,
+:root[data-theme='dark'] body[data-inline-hover='true'] .about-hero h2 {
+	color: color-mix(in srgb, var(--text) 36%, var(--bg) 64%);
+}
+
+:root[data-theme='dark'] body[data-inline-hover='true'] .identity-tagline,
+:root[data-theme='dark'] body[data-inline-hover='true'] .side-nav-item,
+:root[data-theme='dark'] body[data-inline-hover='true'] .identity-links a,
+:root[data-theme='dark'] body[data-inline-hover='true'] .sound-toggle-label,
+:root[data-theme='dark'] body[data-inline-hover='true'] .theme-toggle-label {
+	color: color-mix(in srgb, var(--text) 30%, var(--bg) 70%);
+}
+
+:root[data-theme='dark'] body[data-inline-hover='true'] .about-hero .about-summary {
+	color: color-mix(in srgb, var(--text) 38%, var(--bg) 62%);
+}
+
+:root[data-theme='dark'] body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active,
+:root[data-theme='dark'] body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-inline-link-text {
+	color: color-mix(in srgb, var(--text) 92%, var(--bg) 8%);
+}
+
+@keyframes pulse-halo-fill {
+	0% {
+		opacity: 0;
+		transform: scale(0.92);
+	}
+
+	30% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0.95;
+		transform: scale(1);
+	}
+}
+
+@keyframes pulse-halo-ring {
+	0% {
+		opacity: 0;
+		transform: scale(0.9);
+		box-shadow: 0 0 0 0 var(--pulse-ring);
+	}
+
+	34% {
+		opacity: 1;
+		box-shadow: 0 0 0 0.05em var(--pulse-ring);
+	}
+
+	100% {
+		opacity: 1;
+		transform: scale(1.08);
+		box-shadow: 0 0 0 0.42em transparent;
+	}
+}
+
+@keyframes fragrance-bloom-core {
+	0% {
+		opacity: 0;
+		transform: scale(0.76);
+	}
+
+	28% {
+		opacity: 0.95;
+	}
+
+	100% {
+		opacity: 1;
+		transform: scale(1.08);
+	}
+}
+
+@keyframes fragrance-bloom-haze {
+	0% {
+		opacity: 0;
+		transform: scale(0.82);
+	}
+
+	100% {
+		opacity: 0.96;
+		transform: scale(1.1);
+	}
+}
+
+@keyframes fragrance-bloom-grain {
+	0% {
+		opacity: 0;
+		transform: scale(0.88);
+	}
+
+	36% {
+		opacity: 0.72;
+	}
+
+	100% {
+		opacity: 0.98;
+		transform: scale(1.06);
+	}
+}
+
+@keyframes wedding-sparkle-burst {
+	0% {
+		opacity: 0;
+		transform: translate(-50%, -50%) scale(0.2);
+	}
+
+	18% {
+		opacity: 1;
+	}
+
+	82% {
+		opacity: 1;
+		transform: translate(calc(-50% + var(--sparkle-end-x, 0em)), calc(-50% + var(--sparkle-end-y, 0em))) scale(0.98);
+	}
+
+	92% {
+		opacity: 1;
+		transform: translate(calc(-50% + var(--sparkle-end-x, 0em)), calc(-50% + var(--sparkle-end-y, 0em))) scale(1.15);
+	}
+
+	100% {
+		opacity: 1;
+		transform: translate(calc(-50% + var(--sparkle-end-x, 0em)), calc(-50% + var(--sparkle-end-y, 0em))) scale(0.92);
+	}
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.about-inline-link--pulse:hover::before {
+		animation: pulse-halo-fill 620ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	.about-inline-link--pulse:hover::after {
+		animation: pulse-halo-ring 620ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	.about-inline-link--fragrance:hover::before {
+		animation: fragrance-bloom-core 640ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	.about-inline-link--fragrance:hover::after {
+		animation: fragrance-bloom-haze 640ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	.about-inline-link--fragrance:hover .about-inline-link-text::before {
+		animation: fragrance-bloom-grain 640ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	.about-inline-link--fragrance:hover .about-inline-link-text::after {
+		animation: fragrance-bloom-haze 640ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	}
+
+	.about-inline-link--wedding:hover .about-inline-link__sparkles span {
+		animation: wedding-sparkle-burst 520ms cubic-bezier(0.2, 0.9, 0.22, 1) forwards;
+	}
 }
 
 /* ── About section ───────────────────────────────────────────── */
@@ -895,6 +1452,15 @@ a {
 		display: none;
 	}
 
+	.layout[data-active-tab='about'] {
+		--identity-width: 41%;
+		--identity-content-shift: 2.6rem;
+	}
+
+	.about-portrait-placeholder {
+		display: none !important;
+	}
+
 	.content-section {
 		padding: 2rem 1.25rem 3rem;
 		min-height: calc(100vh - 57px);
@@ -902,6 +1468,23 @@ a {
 
 	.content-section-inner {
 		max-width: 100%;
+	}
+
+	.about-hero {
+		gap: 1.7rem;
+		padding-top: 0.2rem;
+	}
+
+	.about-hero h2 {
+		max-width: 8ch;
+		font-size: clamp(3.4rem, 15vw, 4.9rem);
+		white-space: normal;
+	}
+
+	.about-hero .about-summary {
+		max-width: 100%;
+		font-size: clamp(1.42rem, 6.4vw, 1.82rem);
+		line-height: 1.32;
 	}
 
 	.identity-top,

@@ -4,7 +4,7 @@ import { getCollection } from 'astro:content';
 import ProjectLane from '../components/ProjectLane.astro';
 import '../styles/global.css';
 
-const tabs = ['about', 'work', 'gallery', 'proof', 'contact'];
+const tabs = ['about', 'experience', 'projects'];
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.rank - b.data.rank);
 
@@ -31,7 +31,7 @@ const laneProjects = lanes.map((lane) => ({
 	projects: projects.filter((project) => project.data.lane === lane.key),
 }));
 
-const proofItems = [
+const experienceItems = [
 	{
 		title: 'MORU',
 		label: 'Research Consultant',
@@ -76,14 +76,18 @@ const galleryItems = [
 	title="Luke Rhodes | Visualisation, Product, and Research Software"
 	description="Interactive visualisations, recommendation tools, and research software by Luke Rhodes."
 >
-	<div class="layout">
+	<div class="layout" data-active-tab="about">
 
 		<!-- ── Left: fixed identity panel ─────────────────────── -->
 		<aside class="identity-panel">
 			<div class="identity-top">
-				<p class="eyebrow anim-entrance" data-delay="0">lcmrhodes.github.io</p>
-				<h1 class="identity-name anim-entrance" data-delay="1">Luke Rhodes</h1>
-				<p class="identity-tagline anim-entrance" data-delay="2">Visualisation, product, and research software.</p>
+				<h1 class="identity-name anim-entrance" data-delay="0">Luke Rhodes</h1>
+				<p class="identity-tagline anim-entrance" data-delay="1">Visualisation, product, and research software.</p>
+			</div>
+
+			<div class="about-portrait-placeholder">
+				<img class="about-portrait-image about-portrait-image--light" src="/images/luke-portrait.jpg" alt="Portrait of Luke Rhodes" />
+				<img class="about-portrait-image about-portrait-image--dark" src="/images/luke-portrait-dark.png" alt="Portrait of Luke Rhodes" />
 			</div>
 
 			<nav class="side-nav" aria-label="Site sections">
@@ -108,23 +112,35 @@ const galleryItems = [
 					<a href="/Luke_Rhodes_CV_2025.docx">CV</a>
 					<a href="mailto:lcmrhodes98@gmail.com">Email</a>
 				</div>
-				<button class="theme-toggle-side" type="button" data-theme-toggle aria-label="Dark mode">
-					<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-						<circle class="theme-icon-sun" cx="12" cy="12" r="5"></circle>
-						<g class="theme-icon-rays">
-							<line x1="12" y1="1" x2="12" y2="3"></line>
-							<line x1="12" y1="21" x2="12" y2="23"></line>
-							<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-							<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-							<line x1="1" y1="12" x2="3" y2="12"></line>
-							<line x1="21" y1="12" x2="23" y2="12"></line>
-							<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-							<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-						</g>
-						<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-					</svg>
-					<span class="theme-toggle-label">Dark mode</span>
-				</button>
+				<div class="identity-controls">
+					<button class="sound-toggle-side" type="button" data-sound-toggle aria-label="Mute sounds">
+						<svg class="sound-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<path class="sound-icon-speaker" d="M11 5 6 9H3v6h3l5 4V5z"></path>
+							<path class="sound-icon-wave sound-icon-wave--inner" d="M15.5 9.5a4 4 0 0 1 0 5"></path>
+							<path class="sound-icon-wave sound-icon-wave--outer" d="M18.5 7a8 8 0 0 1 0 10"></path>
+							<path class="sound-icon-mute" d="m15 9 6 6"></path>
+							<path class="sound-icon-mute" d="m21 9-6 6"></path>
+						</svg>
+						<span class="sound-toggle-label">Sound on</span>
+					</button>
+					<button class="theme-toggle-side" type="button" data-theme-toggle aria-label="Dark mode">
+						<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+							<circle class="theme-icon-sun" cx="12" cy="12" r="5"></circle>
+							<g class="theme-icon-rays">
+								<line x1="12" y1="1" x2="12" y2="3"></line>
+								<line x1="12" y1="21" x2="12" y2="23"></line>
+								<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+								<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+								<line x1="1" y1="12" x2="3" y2="12"></line>
+								<line x1="21" y1="12" x2="23" y2="12"></line>
+								<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+								<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+							</g>
+							<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+						</svg>
+						<span class="theme-toggle-label">Dark mode</span>
+					</button>
+				</div>
 			</div>
 		</aside>
 
@@ -134,45 +150,68 @@ const galleryItems = [
 			<!-- About -->
 			<section class="content-section active" data-section="about" id="tab-about" aria-hidden="false">
 				<div class="content-section-inner">
-					<div class="section-intro">
-						<p class="eyebrow anim-entrance" data-delay="3" data-number="01">About</p>
-						<h2 class="anim-entrance" data-delay="4">Understand. Build. Translate.</h2>
-						<p class="anim-entrance" data-delay="5">
-							I came to software through health research, maps, and print design — not the
-							other way around. That order matters: I think about the explanation before I
-							think about the implementation.
+					<div class="section-intro about-hero">
+						<h2 class="anim-entrance" data-delay="3">Hi, I'm Luke.</h2>
+						<p class="anim-entrance about-summary" data-delay="4">
+							<span class="about-summary-lead">
+								I turn information into products that make decisions easier.
+							</span>
+							<span class="about-summary-detail">
+								From a <a
+									href="https://sepsis-flow-web-app.onrender.com"
+									target="_blank"
+									rel="noreferrer"
+									class="about-inline-link about-inline-link--pulse"
+								><span class="about-inline-link-text">clinical decision-support tool</span></a> to a <a
+									href="https://myscenttaste.vercel.app"
+									class="about-inline-link about-inline-link--fragrance"
+								><span class="about-inline-link-text">taste-led fragrance profiling app</span></a> and an <a
+									href="https://wedding-network.vercel.app"
+									target="_blank"
+									rel="noreferrer"
+									class="about-inline-link about-inline-link--wedding"
+								><span class="about-inline-link-text">interactive wedding network</span><span class="about-inline-link__sparkles" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></a> built as part of my own invitations, I like making
+								things that work well and look right.
+							</span>
 						</p>
-					</div>
-
-					<div class="about-copy anim-entrance" data-delay="6">
-						<p>
-							My work sits at the intersection of three things that don't usually travel
-							together: serious research methodology, visual and editorial thinking, and the
-							kind of product discipline that makes something feel designed rather than just
-							functional. I trained in population health at UCL, then in global health
-							modelling at Oxford, and spent time in between directing visual strategy for a
-							research publication and building network visualisations for a wedding.
-						</p>
-						<p>
-							Right now I'm a research consultant at MORU, building deployment-ready
-							clinical decision-support tools for low-resource settings. On the side: a
-							fragrance recommendation engine with 32,000 perfume profiles, and whatever
-							else sits interestingly at the edge of data, design, and a usable interface.
-						</p>
-						<ul class="about-points">
-							<li>TypeScript, Astro, Next.js, D3, Framer Motion</li>
-							<li>R, Python, C++ — modelling, APIs, and analytical workflows</li>
-							<li>Editorial and spatial design shaped by publication and cartographic work</li>
-						</ul>
 					</div>
 				</div>
 			</section>
 
-			<!-- Work -->
-			<section class="content-section" data-section="work" id="tab-work">
+			<!-- Experience -->
+			<section class="content-section" data-section="experience" id="tab-experience">
+				<div class="content-section-inner proof-grid">
+					<div class="section-intro section-intro-wide">
+						<p class="eyebrow" data-number="02">Experience</p>
+						<h2>A few of the places and roles shaping how I build.</h2>
+						<p>
+							Research, product thinking, and visual work have all fed into the way I
+							approach software.
+						</p>
+					</div>
+
+					<div class="proof-cards">
+						{experienceItems.map((item) => (
+							<article class="proof-card">
+								<p class="proof-title">{item.title}</p>
+								<h3>{item.label}</h3>
+								<p>{item.body}</p>
+								{item.link && (
+									<a href={item.link.url} target="_blank" rel="noreferrer" class="proof-link">
+										{item.link.label}
+									</a>
+								)}
+							</article>
+						))}
+					</div>
+				</div>
+			</section>
+
+			<!-- Projects -->
+			<section class="content-section" data-section="projects" id="tab-projects">
 				<div class="content-section-inner work-stack">
 					<div class="section-intro section-intro-wide">
-						<p class="eyebrow" data-number="02">Selected work</p>
+						<p class="eyebrow" data-number="03">Projects</p>
 						<h2>The projects at the core of the site.</h2>
 						<p>
 							Work grouped by capability. The flagship trio is
@@ -210,105 +249,6 @@ const galleryItems = [
 				</div>
 			</section>
 
-			<!-- Gallery -->
-			<section class="content-section" data-section="gallery" id="tab-gallery">
-				<div class="content-section-inner">
-					<div class="section-intro section-intro-wide">
-						<p class="eyebrow" data-number="03">Visual work</p>
-						<h2>Maps, print, and things that don't fit neatly elsewhere.</h2>
-						<p>
-							Cartographic analysis, publication design, and visualisation work that lives
-							outside the project case studies.
-						</p>
-					</div>
-
-					<div class="gallery-scroll">
-						{galleryItems.map((item) => (
-							<div class={`gallery-item ${item.hero ? 'gallery-item--hero' : item.type === 'pdf' ? 'gallery-item--pdf' : 'gallery-item--standard'}`}>
-								{item.type === 'image' ? (
-									<div class={`gallery-artwork ${item.hero ? 'gallery-artwork--hero' : 'gallery-artwork--standard'}`}>
-										<img
-											src={item.src}
-											alt={item.title}
-											loading="lazy"
-										/>
-									</div>
-								) : (
-									<div class="gallery-pdf-artwork">
-										<svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-											<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-											<polyline points="14 2 14 8 20 8"/>
-										</svg>
-										<span class="gallery-pdf-label">PDF</span>
-									</div>
-								)}
-								<div class="gallery-plaque">
-									<p class="gallery-plaque-title">{item.title}</p>
-									<p class="gallery-plaque-caption">{item.caption}</p>
-									{item.type === 'pdf' && (
-										<a class="gallery-plaque-link" href={item.src} target="_blank" rel="noreferrer">View PDF ↗</a>
-									)}
-									{item.fullRes && (
-										<a class="gallery-plaque-link" href={item.fullRes} target="_blank" download>Full resolution ↗</a>
-									)}
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
-			</section>
-
-			<!-- Proof -->
-			<section class="content-section" data-section="proof" id="tab-proof">
-				<div class="content-section-inner proof-grid">
-					<div class="section-intro section-intro-wide">
-						<p class="eyebrow" data-number="04">Proof & affiliations</p>
-						<h2>Selected context, not a logo wall.</h2>
-						<p>
-							For now this section stays text-first. It anchors the work in real institutions,
-							roles, and outputs without pretending the site needs testimonial theatre before it
-							has earned it.
-						</p>
-					</div>
-
-					<div class="proof-cards">
-						{proofItems.map((item) => (
-							<article class="proof-card">
-								<p class="proof-title">{item.title}</p>
-								<h3>{item.label}</h3>
-								<p>{item.body}</p>
-								{item.link && (
-									<a href={item.link.url} target="_blank" rel="noreferrer" class="proof-link">
-										{item.link.label}
-									</a>
-								)}
-							</article>
-						))}
-					</div>
-				</div>
-			</section>
-
-			<!-- Contact -->
-			<section class="content-section" data-section="contact" id="tab-contact">
-				<div class="content-section-inner contact-grid">
-					<div class="section-intro">
-						<p class="eyebrow" data-number="05">Contact</p>
-						<h2>Want to work on something thoughtful?</h2>
-						<p>
-							If the project sits anywhere near visual explanation, product framing, or serious
-							research tooling, I'm interested.
-						</p>
-					</div>
-
-					<div class="contact-card">
-						<a href="mailto:lcmrhodes98@gmail.com">lcmrhodes98@gmail.com</a>
-						<a href="https://github.com/lcmrhodes" target="_blank" rel="noreferrer">github.com/lcmrhodes</a>
-						<a href="https://www.linkedin.com/in/lukecmrhodes" target="_blank" rel="noreferrer">linkedin.com/in/lukecmrhodes</a>
-						<a href="/Luke_Rhodes_CV_2025.docx">Download CV</a>
-					</div>
-				</div>
-			</section>
-
 		</main>
 	</div>
 
@@ -332,23 +272,35 @@ const galleryItems = [
 				{tab.charAt(0).toUpperCase() + tab.slice(1)}
 			</button>
 		))}
-		<button class="theme-toggle-side theme-toggle-side--mobile" type="button" data-theme-toggle aria-label="Dark mode">
-			<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-				<circle class="theme-icon-sun" cx="12" cy="12" r="5"></circle>
-				<g class="theme-icon-rays">
-					<line x1="12" y1="1" x2="12" y2="3"></line>
-					<line x1="12" y1="21" x2="12" y2="23"></line>
-					<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-					<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-					<line x1="1" y1="12" x2="3" y2="12"></line>
-					<line x1="21" y1="12" x2="23" y2="12"></line>
-					<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-					<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-				</g>
-				<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-			</svg>
-			<span class="theme-toggle-label">Dark mode</span>
-		</button>
+		<div class="identity-controls identity-controls--mobile">
+			<button class="sound-toggle-side sound-toggle-side--mobile" type="button" data-sound-toggle aria-label="Mute sounds">
+				<svg class="sound-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+					<path class="sound-icon-speaker" d="M11 5 6 9H3v6h3l5 4V5z"></path>
+					<path class="sound-icon-wave sound-icon-wave--inner" d="M15.5 9.5a4 4 0 0 1 0 5"></path>
+					<path class="sound-icon-wave sound-icon-wave--outer" d="M18.5 7a8 8 0 0 1 0 10"></path>
+					<path class="sound-icon-mute" d="m15 9 6 6"></path>
+					<path class="sound-icon-mute" d="m21 9-6 6"></path>
+				</svg>
+				<span class="sound-toggle-label">Sound on</span>
+			</button>
+			<button class="theme-toggle-side theme-toggle-side--mobile" type="button" data-theme-toggle aria-label="Dark mode">
+				<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+					<circle class="theme-icon-sun" cx="12" cy="12" r="5"></circle>
+					<g class="theme-icon-rays">
+						<line x1="12" y1="1" x2="12" y2="3"></line>
+						<line x1="12" y1="21" x2="12" y2="23"></line>
+						<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+						<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+						<line x1="1" y1="12" x2="3" y2="12"></line>
+						<line x1="21" y1="12" x2="23" y2="12"></line>
+						<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+						<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+					</g>
+					<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+				</svg>
+				<span class="theme-toggle-label">Dark mode</span>
+			</button>
+		</div>
 	</nav>
 
 	<script>
