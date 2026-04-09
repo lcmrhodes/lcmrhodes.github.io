@@ -1,85 +1,107 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getCollection } from 'astro:content';
-import ProjectLane from '../components/ProjectLane.astro';
 import '../styles/global.css';
 
 const tabs = ['about', 'experience', 'projects'];
-
-const projects = (await getCollection('projects')).sort((a, b) => a.data.rank - b.data.rank);
-
-const lanes = [
-	{
-		key: 'visualization',
-		title: 'Visualisation & Storytelling',
-		subtitle: 'Interactive work that turns data, systems, and relationships into something people can actually feel.',
-	},
-	{
-		key: 'product',
-		title: 'Recommendation & Product Systems',
-		subtitle: 'Interfaces and tools where user flow, taste, and decision logic matter as much as implementation.',
-	},
-	{
-		key: 'research',
-		title: 'Research & Health Systems',
-		subtitle: 'Modeling, APIs, and decision-support tooling built for serious operational or analytical contexts.',
-	},
-];
-
-const laneProjects = lanes.map((lane) => ({
-	...lane,
-	projects: projects.filter((project) => project.data.lane === lane.key),
-}));
 
 const professionalExperienceItems = [
 	{
 		title: 'MORU',
 		label: 'Research Consultant',
-		dates: 'Apr. 2025 – Present',
-		location: 'Hybrid (Bangkok/Oxford/Remote)',
-		body: 'Building deployment-ready pediatric triage and decision-support tooling for low-resource health contexts.',
+		dates: '2025 – Present',
+		location: 'Remote / Bangkok',
+		body: 'Leading development and deployment of a machine learning–driven clinical triage tool for paediatric febrile illness in low-resource settings.',
 		logoLight: '/images/moro_logo_light.svg',
 		logoDark: '/images/moro_logo_dark.svg',
 		logoAlt: 'Mahidol-Oxford Tropical Medicine Research Unit logo',
 		logoClass: 'experience-brand-logo--moru',
-		link: { label: 'Contributing author — JMIR preprint 2025 ↗', url: 'https://preprints.jmir.org/preprint/97395' },
+		links: [
+			{ label: 'Preprint — JMIR 2025 ↗', url: 'https://preprints.jmir.org/preprint/97395' },
+			{ label: 'Sepsis Flow (live) ↗', url: 'https://sepsis-flow-web-app.onrender.com' },
+		],
+	},
+	{
+		title: 'Population Health Sciences Magazine',
+		label: 'Graphical Design Editor',
+		dates: 'Feb. 2024 – May 2024',
+		location: 'London',
+		body: 'Led visual identity and editorial graphics, translating complex research into clear, publication-ready visual systems.',
+		logoLight: '/images/pop_health_mag_logo_light.svg',
+		logoDark: '/images/pop_health_mag_logo_dark.svg',
+		logoAlt: 'Population Health Sciences Magazine logo',
+		logoClass: 'experience-brand-logo--phs',
+		links: [
+			{ label: 'My contributions (PDF) ↓', url: '/papers/phs_magazine_pages.pdf' },
+		],
+	},
+	{
+		title: 'Deliveroo',
+		label: 'Store Developer',
+		dates: 'Sept. 2023',
+		location: 'Remote',
+		body: 'Designed and launched a full online storefront, structuring product data, pricing, and catalogue logic across 300+ items.',
+		logoLight: '/images/deliveroo_logo_light.svg',
+		logoDark: '/images/deliveroo_logo_dark.svg',
+		logoAlt: 'Deliveroo logo',
+		logoClass: 'experience-brand-logo--deliveroo',
+		links: [],
+	},
+	{
+		title: 'Boots UK',
+		label: 'Pharmacy Advisor / Dispenser',
+		dates: 'Feb. 2017 – Jan. 2022',
+		location: 'Malvern & London',
+		body: 'Delivered frontline pharmacy services including dispensing, vaccinations, and patient support within high-volume clinical settings.',
+		logoLight: '/images/boots_logo_light.svg',
+		logoDark: '/images/boots_logo_dark.svg',
+		logoAlt: 'Boots logo',
+		logoClass: 'experience-brand-logo--boots',
+		links: [],
 	},
 ];
 
 const educationExperienceItems = [
 	{
 		title: 'University of Oxford',
-		label: 'MSc, Modelling for Global Health',
+		label: 'MSc Modelling for Global Health',
+		awarded: 'Distinction (~3.9 GPA)',
+		dates: '2024 – 2025',
+		location: 'Oxford',
+		body: 'Trained in statistical and computational modelling for global health, focusing on infectious disease dynamics, machine learning, and decision-support systems.',
 		logoLight: '/images/oxford_logo_light.svg',
 		logoDark: '/images/oxford_logo_dark.svg',
 		logoAlt: 'University of Oxford logo',
 		logoClass: 'experience-brand-logo--oxford',
-		body: 'Distinction-level training in modeling, applied health analysis, and research systems.',
-		link: { label: 'Genetics essay (PDF) ↓', url: '/papers/genetics_essay.pdf' },
+		links: [
+			{ label: 'Dissertation preview (pp. 1–2) ↓ — contact for full', url: '/papers/oxford_dissertation_preview.pdf' },
+		],
 	},
 	{
-		title: 'UCL',
-		label: 'Population Health & Data Science',
+		title: 'University College London',
+		label: 'BSc Population Health Sciences (Data Science)',
+		awarded: 'Upper Second Class Hons (~3.7 GPA)',
+		dates: '2021 – 2024',
+		location: 'London',
+		body: 'Studied epidemiology and health data science, culminating in a dissertation applying IRT and regression to model medication burden and illness.',
 		logoLight: '/images/ucl_logo_light.svg',
 		logoDark: '/images/ucl_logo_dark.svg',
 		logoAlt: 'University College London logo',
 		logoClass: 'experience-brand-logo--ucl',
-		body: 'Population Health degree plus dashboard and reporting work for the UCL Institute of Education.',
-		link: { label: 'Undergraduate dissertation (PDF) ↓', url: '/papers/undergraduate_dissertation.pdf' },
+		links: [
+			{ label: 'Dissertation preview (pp. 1–2) ↓ — contact for full', url: '/papers/ucl_dissertation_preview.pdf' },
+		],
 	},
 ];
 
-const featuredProjects = projects.filter((project) => project.data.featured);
-
-const galleryItems = [
-	{ type: 'image', src: '/images/gallery/tolkien_thumb.jpg', title: 'Tolkien Constellation', caption: "Narrative dataviz mapping Tolkien's world — coursework piece", fullRes: '/images/gallery/tolkien_full.png', hero: true },
-	{ type: 'image', src: '/images/gallery/bookmaker_map.jpg', title: 'Bookmaker Density Map', caption: 'Combined spatial output from gambling harm analysis' },
-	{ type: 'image', src: '/images/gallery/morans_map.jpg', title: "Multi-Health Moran's I", caption: 'Spatial autocorrelation across deprivation indices' },
-	{ type: 'image', src: '/images/gallery/neighbour_map.jpg', title: 'Neighbourhood Structure', caption: 'Spatial weights and adjacency — analysis context map' },
-	{ type: 'image', src: '/images/gallery/design_principles_map.jpg', title: 'Design Principles Map', caption: 'Cartographic coursework, group project' },
-	{ type: 'pdf', src: '/papers/phs_magazine_pages.pdf', title: 'PHS Magazine pp.30–38', caption: 'Spreads from the Population Health Sciences Magazine' },
-	{ type: 'pdf', src: '/papers/oregon_dunes.pdf', title: 'Oregon Dunes', caption: 'Geographic documentation piece' },
-	{ type: 'pdf', src: '/papers/invitation_template.pdf', title: 'Invitation Template', caption: 'Print design — personalised invitation system' },
+const projectPlaceholders = [
+	{ kind: 'website', tone: 'teal', size: 'hero', label: '01' },
+	{ kind: 'image', tone: 'stone', size: 'tall', label: '02' },
+	{ kind: 'pdf', tone: 'ink', size: 'small', label: '03' },
+	{ kind: 'website', tone: 'sand', size: 'wide', label: '04' },
+	{ kind: 'image', tone: 'teal', size: 'small', label: '05' },
+	{ kind: 'pdf', tone: 'stone', size: 'tall', label: '06' },
+	{ kind: 'website', tone: 'ink', size: 'small', label: '07' },
+	{ kind: 'image', tone: 'sand', size: 'wide', label: '08' },
 ];
 ---
 
@@ -290,11 +312,11 @@ const galleryItems = [
 											{item.dates && <p class="experience-brand-detail">{item.dates}</p>}
 											{item.location && <p class="experience-brand-detail">{item.location}</p>}
 											<p class="experience-brand-copy">{item.body}</p>
-											{item.link && (
-												<a href={item.link.url} target="_blank" rel="noreferrer" class="proof-link">
-													{item.link.label}
+											{item.links && item.links.map((link) => (
+												<a href={link.url} target="_blank" rel="noreferrer" class="proof-link">
+													{link.label}
 												</a>
-											)}
+											))}
 										</div>
 									</div>
 								))}
@@ -326,12 +348,15 @@ const galleryItems = [
 										<div class="experience-logo-hover" aria-hidden="true">
 											<p class="experience-brand-name">{item.title}</p>
 											<p class="experience-brand-role">{item.label}</p>
+											{item.awarded && <p class="experience-brand-detail">{item.awarded}</p>}
+											{item.dates && <p class="experience-brand-detail">{item.dates}</p>}
+											{item.location && <p class="experience-brand-detail">{item.location}</p>}
 											<p class="experience-brand-copy">{item.body}</p>
-											{item.link && (
-												<a href={item.link.url} target="_blank" rel="noreferrer" class="proof-link">
-													{item.link.label}
+											{item.links && item.links.map((link) => (
+												<a href={link.url} target="_blank" rel="noreferrer" class="proof-link">
+													{link.label}
 												</a>
-											)}
+											))}
 										</div>
 									</div>
 								))}
@@ -344,43 +369,29 @@ const galleryItems = [
 
 			<!-- Projects -->
 			<section class="content-section" data-section="projects" id="tab-projects">
-				<div class="content-section-inner work-stack">
-					<div class="section-intro section-intro-wide">
-						<p class="eyebrow" data-number="03">Projects</p>
-						<h2>The projects at the core of the site.</h2>
-						<p>
-							Work grouped by capability. The flagship trio is
-							<strong>WeddingNetwork</strong>, <strong>ScentSense</strong>, and
-							<strong>Sepsis Flow</strong>.
-						</p>
-					</div>
-
-					<div class="featured-strip" aria-label="Flagship projects">
-						{featuredProjects.map((project) => (
-							<article class="featured-card">
-								<p class="featured-label">{project.data.lane}</p>
-								<h3>{project.data.title}</h3>
-								<p>{project.data.summary}</p>
-								<div class="featured-links">
-									<a href={`/projects/${project.id}/`}>Read case study</a>
-									{project.data.liveUrl && (
-										<a href={project.data.liveUrl} target="_blank" rel="noreferrer">Live</a>
-									)}
-									{project.data.papers && project.data.papers.map((paper) => (
-										<a href={paper.url} target="_blank" rel="noreferrer">↓ {paper.label}</a>
-									))}
+				<div class="content-section-inner project-gallery-shell">
+					<div class="project-placeholder-grid" aria-label="Projects gallery placeholders">
+						{projectPlaceholders.map((item) => (
+							<article
+								class:list={[
+									'project-placeholder-tile',
+									`project-placeholder-tile--${item.kind}`,
+									`project-placeholder-tile--${item.tone}`,
+									`project-placeholder-tile--${item.size}`,
+								]}
+								tabindex="0"
+							>
+								<div class="project-placeholder-surface">
+									<span class="project-placeholder-index">{item.label}</span>
+									<span class="project-placeholder-type">{item.kind}</span>
+								</div>
+								<div class="project-placeholder-hover" aria-hidden="true">
+									<p class="project-placeholder-hover-type">{item.kind} placeholder</p>
+									<p class="project-placeholder-hover-note">Layout only for now</p>
 								</div>
 							</article>
 						))}
 					</div>
-
-					{laneProjects.map((lane) => (
-						<ProjectLane
-							title={lane.title}
-							subtitle={lane.subtitle}
-							projects={lane.projects}
-						/>
-					))}
 				</div>
 			</section>
 
@@ -471,4 +482,5 @@ const galleryItems = [
 
 		initPortfolioInteractions();
 	</script>
+
 </Layout>
