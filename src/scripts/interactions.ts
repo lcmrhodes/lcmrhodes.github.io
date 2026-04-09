@@ -407,12 +407,12 @@ function playTabClickTone() {
 	bandpass.Q.setValueAtTime(0.75, now);
 
 	lowpass.type = 'lowpass';
-	lowpass.frequency.setValueAtTime(980, now);
+	lowpass.frequency.setValueAtTime(1180, now);
 	lowpass.Q.setValueAtTime(0.25, now);
 
 	master.gain.setValueAtTime(0.0001, now);
-	master.gain.exponentialRampToValueAtTime(0.0047, now + 0.006);
-	master.gain.exponentialRampToValueAtTime(0.00155, now + 0.034);
+	master.gain.exponentialRampToValueAtTime(0.015, now + 0.006);
+	master.gain.exponentialRampToValueAtTime(0.0054, now + 0.036);
 	master.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
 
 	oscA.type = 'triangle';
@@ -424,7 +424,7 @@ function playTabClickTone() {
 	oscB.frequency.exponentialRampToValueAtTime(410, now + 0.082);
 
 	gainA.gain.setValueAtTime(1, now);
-	gainB.gain.setValueAtTime(0.07, now);
+	gainB.gain.setValueAtTime(0.16, now);
 
 	oscA.connect(gainA);
 	oscB.connect(gainB);
