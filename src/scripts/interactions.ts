@@ -345,6 +345,78 @@ function playButtonHoverTone() {
 	oscB.stop(now + 0.1);
 }
 
+function playProjectCardHoverTone() {
+	const ctx = getAudioContext();
+
+	if (!ctx || !soundEnabled || ctx.state === 'suspended') {
+		return;
+	}
+
+	const now = ctx.currentTime;
+	const master = ctx.createGain();
+	const bandpass = ctx.createBiquadFilter();
+	const lowpass = ctx.createBiquadFilter();
+	const oscA = ctx.createOscillator();
+	const oscB = ctx.createOscillator();
+	const gainA = ctx.createGain();
+	const gainB = ctx.createGain();
+	const noiseSource = ctx.createBufferSource();
+	const noiseFilter = ctx.createBiquadFilter();
+	const noiseGain = ctx.createGain();
+
+	bandpass.type = 'bandpass';
+	bandpass.frequency.setValueAtTime(460, now);
+	bandpass.Q.setValueAtTime(1.15, now);
+
+	lowpass.type = 'lowpass';
+	lowpass.frequency.setValueAtTime(1650, now);
+	lowpass.Q.setValueAtTime(0.55, now);
+
+	master.gain.setValueAtTime(0.0001, now);
+	master.gain.exponentialRampToValueAtTime(0.0068, now + 0.01);
+	master.gain.exponentialRampToValueAtTime(0.0028, now + 0.048);
+	master.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+
+	oscA.type = 'triangle';
+	oscA.frequency.setValueAtTime(392, now);
+	oscA.frequency.exponentialRampToValueAtTime(330, now + 0.11);
+
+	oscB.type = 'sine';
+	oscB.frequency.setValueAtTime(588, now);
+	oscB.frequency.exponentialRampToValueAtTime(522, now + 0.08);
+
+	gainA.gain.setValueAtTime(1, now);
+	gainB.gain.setValueAtTime(0.18, now);
+
+	noiseSource.buffer = createNoiseBuffer(ctx, 0.08);
+	noiseFilter.type = 'highpass';
+	noiseFilter.frequency.setValueAtTime(1500, now);
+	noiseFilter.Q.setValueAtTime(0.75, now);
+
+	noiseGain.gain.setValueAtTime(0.0001, now);
+	noiseGain.gain.exponentialRampToValueAtTime(0.00085, now + 0.006);
+	noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+
+	oscA.connect(gainA);
+	oscB.connect(gainB);
+	gainA.connect(bandpass);
+	gainB.connect(bandpass);
+	bandpass.connect(lowpass);
+	lowpass.connect(master);
+	master.connect(ctx.destination);
+
+	noiseSource.connect(noiseFilter);
+	noiseFilter.connect(noiseGain);
+	noiseGain.connect(master);
+
+	oscA.start(now);
+	oscB.start(now);
+	noiseSource.start(now);
+	oscA.stop(now + 0.12);
+	oscB.stop(now + 0.12);
+	noiseSource.stop(now + 0.08);
+}
+
 function playButtonClickTone() {
 	const ctx = getAudioContext();
 
@@ -1164,10 +1236,17 @@ function bindSoundButtons() {
 function bindButtonUiSounds() {
 	document.querySelectorAll<HTMLButtonElement>('button').forEach((button) => {
 		const isTabButton = button.matches('[data-tab]');
+		const isProjectGalleryButton = button.matches('.gallery-tile__action');
 
 		if (window.matchMedia(FINE_POINTER_QUERY).matches) {
 			button.addEventListener('pointerenter', () => {
-				if (prefersReducedMotion() || button.disabled || hoveredButtons.has(button) || isTabButton) {
+				if (
+					prefersReducedMotion() ||
+					button.disabled ||
+					hoveredButtons.has(button) ||
+					isTabButton ||
+					isProjectGalleryButton
+				) {
 					return;
 				}
 
@@ -1191,6 +1270,27 @@ function bindButtonUiSounds() {
 			}
 
 			playButtonClickTone();
+		});
+	});
+}
+
+function bindProjectGalleryUiSounds() {
+	if (!window.matchMedia(FINE_POINTER_QUERY).matches) {
+		return;
+	}
+
+	document.querySelectorAll<HTMLElement>('.gallery-tile__action').forEach((card) => {
+		card.addEventListener('pointerenter', () => {
+			if (prefersReducedMotion() || hoveredButtons.has(card) || card.matches(':disabled')) {
+				return;
+			}
+
+			hoveredButtons.add(card);
+			playProjectCardHoverTone();
+		});
+
+		card.addEventListener('pointerleave', () => {
+			hoveredButtons.delete(card);
 		});
 	});
 }
@@ -1836,6 +1936,7 @@ export default function initPortfolioInteractions() {
 	bindThemeButtons();
 	bindSoundButtons();
 	bindButtonUiSounds();
+	bindProjectGalleryUiSounds();
 	bindIconLinkUiSounds();
 	bindWeatherButtons();
 	bindPillboxOverflow();

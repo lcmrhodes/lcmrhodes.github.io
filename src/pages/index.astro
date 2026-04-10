@@ -113,8 +113,10 @@ const educationExperienceItems = [
 			</div>
 
 			<div class="about-portrait-placeholder">
-				<img class="about-portrait-image about-portrait-image--light" src="/images/luke-portrait.jpg" alt="Portrait of Luke Rhodes" />
-				<img class="about-portrait-image about-portrait-image--dark" src="/images/luke-portrait-dark.png" alt="Portrait of Luke Rhodes" />
+				<img class="about-portrait-image about-portrait-image--light" src="/images/luke-portrait.jpg" alt="Portrait of Luke Rhodes" loading="eager" decoding="sync" fetchpriority="high" />
+				<img class="about-portrait-image about-portrait-image--dark" src="/images/luke-portrait-dark.png" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high" />
+				<img class="about-portrait-image about-portrait-image--hover-light" src="/images/luke-portrait-hover-light.png" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high" />
+				<img class="about-portrait-image about-portrait-image--hover-dark" src="/images/luke-portrait-hover-dark.png" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high" />
 			</div>
 
 			<nav class="side-nav" aria-label="Site sections">

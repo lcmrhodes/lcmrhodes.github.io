@@ -13,6 +13,7 @@ That script will:
 
 - create `public/papers/gambling_spatial_analysis_preview.pdf` from the first 3 pages of `public/papers/gambling_spatial_analysis_luke.pdf`
 - create `public/papers/luke_rhodes_translational_review_preview.pdf` from the first 3 pages of `public/papers/luke_rhodes_translational_review.pdf`
+- generate paper covers for the Oxford and UCL dissertation preview PDFs already in `public/papers/`
 - rasterise the first page of each paper PDF with `qlmanage`
 - resize and encode the paper cover images into `public/images/projects/papers/*.webp`
 - emit `public/images/projects/papers/_dims.json` as a size reference
