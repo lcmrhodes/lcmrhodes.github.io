@@ -7,6 +7,11 @@ const FRAGRANCE_BLOOM_SOUND_DELAY_MS = 320;
 const WEDDING_SPARKLE_SOUND_DELAY_MS = 130;
 const SOUND_ENABLED_KEY = 'sound-enabled';
 const WEATHER_KEY = 'weather';
+const ABOUT_HERO_TYPED_KEY = 'about-hero-typed';
+const IDENTITY_TYPED_KEY = 'identity-typed';
+const ABOUT_HERO_LINE_PAUSE_MS = 1000;
+const ABOUT_HERO_CHUNK_PAUSE_MS = 500;
+const ABOUT_HERO_HEADING_SPLIT_PAUSE_MS = 280;
 
 type WeatherMode = 'off' | 'rain' | 'clouds' | 'snow' | 'overcast';
 
@@ -14,6 +19,7 @@ type TabKey = (typeof TABS)[number];
 type ThemeName = 'light' | 'dark';
 
 let galleryObserver: IntersectionObserver | null = null;
+let aboutTypingToken = 0;
 let identityTypingToken = 0;
 let audioContext: AudioContext | null = null;
 const pulseHoverTimeouts = new WeakMap<HTMLElement, number>();
@@ -22,6 +28,7 @@ let soundEnabled = true;
 let activeInlineHoverLink: HTMLElement | null = null;
 let weatherMode: WeatherMode = 'off';
 let weatherRafId: number | null = null;
+const aboutHeroTextCache = new WeakMap<Text, string>();
 
 function prefersReducedMotion() {
 	return window.matchMedia(REDUCED_MOTION_QUERY).matches;
@@ -542,17 +549,13 @@ function setTheme(nextTheme: ThemeName) {
 	if (weatherMode === 'clouds') createClouds('clouds');
 	else if (weatherMode === 'overcast') createClouds('overcast');
 
-	window.setTimeout(() => {
-		root.classList.remove('theme-switching');
-	}, 380);
+window.setTimeout(() => {
+	root.classList.remove('theme-switching');
+}, 380);
 }
 
 function getIdentityTextElements() {
-	return Array.from(
-		document.querySelectorAll<HTMLElement>(
-			'.identity-top .eyebrow, .identity-top .identity-name, .identity-top .identity-tagline',
-		),
-	);
+	return Array.from(document.querySelectorAll<HTMLElement>('.identity-top .identity-name, .identity-top .identity-tagline'));
 }
 
 function cacheIdentityText() {
@@ -570,6 +573,34 @@ function restoreIdentityText() {
 	getIdentityTextElements().forEach((element) => {
 		element.textContent = element.dataset.fullText ?? '';
 	});
+}
+
+function hasTypedIdentity() {
+	if (document.body.dataset.identityTyped === 'true') {
+		return true;
+	}
+
+	try {
+		const hasTyped = sessionStorage.getItem(IDENTITY_TYPED_KEY) === 'true';
+
+		if (hasTyped) {
+			document.body.dataset.identityTyped = 'true';
+		}
+
+		return hasTyped;
+	} catch {
+		return false;
+	}
+}
+
+function markIdentityTyped() {
+	document.body.dataset.identityTyped = 'true';
+
+	try {
+		sessionStorage.setItem(IDENTITY_TYPED_KEY, 'true');
+	} catch {
+		// Ignore storage failures and fall back to the in-memory body dataset.
+	}
 }
 
 function prepareIdentityTyping() {
@@ -595,16 +626,20 @@ function startIdentityTyping(token: number) {
 		return;
 	}
 
-	let index = 0;
+	let elementIndex = 0;
 
-	const typeNext = () => {
-		if (token !== identityTypingToken || index >= elements.length) {
+	const typeNextElement = () => {
+		if (token !== identityTypingToken) {
 			return;
 		}
 
-		const { element, text, charDelay } = elements[index];
-		index += 1;
+		const current = elements[elementIndex];
 
+		if (!current) {
+			return;
+		}
+
+		elementIndex += 1;
 		let charIndex = 0;
 
 		const typeChar = () => {
@@ -613,20 +648,268 @@ function startIdentityTyping(token: number) {
 			}
 
 			charIndex += 1;
-			element.textContent = text.slice(0, charIndex);
+			current.element.textContent = current.text.slice(0, charIndex);
 
-			if (charIndex < text.length) {
-				window.setTimeout(typeChar, charDelay);
+			if (charIndex < current.text.length) {
+				window.setTimeout(typeChar, current.charDelay);
 				return;
 			}
 
-			window.setTimeout(typeNext, 90);
+			window.setTimeout(typeNextElement, 120);
 		};
 
-		window.setTimeout(typeChar, 70);
+		window.setTimeout(typeChar, 72);
 	};
 
-	typeNext();
+	typeNextElement();
+}
+
+type AboutHeroTypingNode = {
+	node: Text;
+	text: string;
+	charDelay: number;
+};
+
+type AboutHeroTypingBlock = {
+	nodes: AboutHeroTypingNode[];
+	initialDelay: number;
+	pauseAfter: number;
+	glowTarget?: HTMLElement | null;
+	keepGlowActive?: boolean;
+};
+
+function hasTypedAboutHero() {
+	if (document.body.dataset.aboutHeroTyped === 'true') {
+		return true;
+	}
+
+	try {
+		const hasTyped = sessionStorage.getItem(ABOUT_HERO_TYPED_KEY) === 'true';
+
+		if (hasTyped) {
+			document.body.dataset.aboutHeroTyped = 'true';
+		}
+
+		return hasTyped;
+	} catch {
+		return false;
+	}
+}
+
+function markAboutHeroTyped() {
+	document.body.dataset.aboutHeroTyped = 'true';
+
+	try {
+		sessionStorage.setItem(ABOUT_HERO_TYPED_KEY, 'true');
+	} catch {
+		// Ignore storage failures and fall back to the in-memory body dataset.
+	}
+}
+
+function collectAboutHeroTypingNodes(root: HTMLElement, charDelay: number) {
+	const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+		acceptNode(node) {
+			const cachedValue = aboutHeroTextCache.get(node as Text) ?? '';
+			const value = node.textContent ?? '';
+			return cachedValue.trim().length > 0 || value.trim().length > 0
+				? NodeFilter.FILTER_ACCEPT
+				: NodeFilter.FILTER_REJECT;
+		},
+	});
+	const nodes: AboutHeroTypingNode[] = [];
+	let currentNode = walker.nextNode();
+
+	while (currentNode) {
+		const textNode = currentNode as Text;
+		const cachedText = aboutHeroTextCache.get(textNode) ?? textNode.textContent ?? '';
+		aboutHeroTextCache.set(textNode, cachedText);
+		nodes.push({
+			node: textNode,
+			text: cachedText,
+			charDelay,
+		});
+		currentNode = walker.nextNode();
+	}
+
+	return nodes;
+}
+
+function createAboutHeroTypingBlock(
+	root: HTMLElement,
+	charDelay: number,
+	initialDelay: number,
+	pauseAfter: number,
+	glowTarget?: HTMLElement | null,
+	keepGlowActive = false,
+) {
+	return {
+		nodes: collectAboutHeroTypingNodes(root, charDelay),
+		initialDelay,
+		pauseAfter,
+		glowTarget,
+		keepGlowActive,
+	};
+}
+
+function clearAboutTypingGlow() {
+	document.querySelectorAll<HTMLElement>('.about-inline-link.is-type-glowing').forEach((link) => {
+		link.classList.remove('is-type-glowing');
+	});
+}
+
+function setAboutTypingGlow(target: HTMLElement | null | undefined, mode: 'replace' | 'add' = 'replace') {
+	if (mode === 'replace') {
+		clearAboutTypingGlow();
+	}
+
+	target?.classList.add('is-type-glowing');
+}
+
+function getAboutHeroTypingBlocks() {
+	const heading = document.querySelector<HTMLElement>('.about-hero h2');
+	const lead = document.querySelector<HTMLElement>('.about-summary-lead');
+	const detail = document.querySelector<HTMLElement>('.about-summary-detail');
+	const blocks: AboutHeroTypingBlock[] = [];
+
+	if (heading) {
+		const headingChunks = Array.from(heading.querySelectorAll<HTMLElement>('.about-heading-chunk'));
+
+		if (headingChunks.length > 0) {
+			headingChunks.forEach((chunk, index) => {
+				blocks.push(
+					createAboutHeroTypingBlock(
+						chunk,
+						88,
+						72,
+						index < headingChunks.length - 1 ? ABOUT_HERO_HEADING_SPLIT_PAUSE_MS : ABOUT_HERO_LINE_PAUSE_MS,
+					),
+				);
+			});
+		} else {
+			blocks.push(createAboutHeroTypingBlock(heading, 88, 72, ABOUT_HERO_LINE_PAUSE_MS));
+		}
+	}
+
+	if (lead) {
+		blocks.push(createAboutHeroTypingBlock(lead, 34, 56, ABOUT_HERO_LINE_PAUSE_MS));
+	}
+
+	if (detail) {
+		const detailChunks = Array.from(detail.querySelectorAll<HTMLElement>('.about-summary-chunk'));
+
+		if (detailChunks.length > 0) {
+			detailChunks.forEach((chunk, index) => {
+				const links = Array.from(chunk.querySelectorAll<HTMLElement>('.about-inline-link'));
+				const glowTarget = links.at(-1) ?? null;
+
+				blocks.push(
+					createAboutHeroTypingBlock(
+						chunk,
+						36,
+						60,
+						0,
+						glowTarget,
+						true,
+					),
+				);
+			});
+		} else {
+			const links = Array.from(detail.querySelectorAll<HTMLElement>('.about-inline-link'));
+			blocks.push(createAboutHeroTypingBlock(detail, 36, 60, 0, links.at(-1) ?? null, true));
+		}
+	}
+
+	return blocks.filter((block) => block.nodes.length > 0);
+}
+
+function restoreAboutHeroText() {
+	aboutTypingToken += 1;
+	clearAboutTypingGlow();
+
+	getAboutHeroTypingBlocks().forEach(({ nodes }) => {
+		nodes.forEach(({ node, text }) => {
+			node.textContent = text;
+		});
+	});
+}
+
+function prepareAboutHeroTyping() {
+	aboutTypingToken += 1;
+	clearAboutTypingGlow();
+
+	getAboutHeroTypingBlocks().forEach(({ nodes }) => {
+		nodes.forEach(({ node }) => {
+			node.textContent = '';
+		});
+	});
+
+	return aboutTypingToken;
+}
+
+function startAboutHeroTyping(token: number) {
+	const blocks = getAboutHeroTypingBlocks();
+
+	if (!blocks.length || prefersReducedMotion()) {
+		restoreAboutHeroText();
+		return;
+	}
+
+	let blockIndex = 0;
+
+	const typeBlock = () => {
+		if (token !== aboutTypingToken) {
+			return;
+		}
+
+		const currentBlock = blocks[blockIndex];
+
+		if (!currentBlock) {
+			clearAboutTypingGlow();
+			return;
+		}
+
+		blockIndex += 1;
+		setAboutTypingGlow(currentBlock.glowTarget, currentBlock.keepGlowActive ? 'add' : 'replace');
+		let nodeIndex = 0;
+
+		const typeNextNode = () => {
+			if (token !== aboutTypingToken) {
+				return;
+			}
+
+			const currentNode = currentBlock.nodes[nodeIndex];
+
+			if (!currentNode) {
+				window.setTimeout(typeBlock, currentBlock.pauseAfter);
+				return;
+			}
+
+			nodeIndex += 1;
+			let charIndex = 0;
+
+			const typeChar = () => {
+				if (token !== aboutTypingToken) {
+					return;
+				}
+
+				charIndex += 1;
+				currentNode.node.textContent = currentNode.text.slice(0, charIndex);
+
+				if (charIndex < currentNode.text.length) {
+					window.setTimeout(typeChar, currentNode.charDelay);
+					return;
+				}
+
+				window.setTimeout(typeNextNode, 68);
+			};
+
+			window.setTimeout(typeChar, currentNode.node.parentElement?.tagName === 'A' ? 54 : currentBlock.initialDelay);
+		};
+
+		typeNextNode();
+	};
+
+	typeBlock();
 }
 
 function updateNavIndicator() {
@@ -771,10 +1054,18 @@ function activateTab(tab: string, animate = true) {
 	const nextTab = isValidTab(tab) ? tab : DEFAULT_TAB;
 	const shouldAnimate = animate && !prefersReducedMotion();
 	const layout = document.querySelector<HTMLElement>('.layout');
-	const currentTab = (layout?.dataset.activeTab as TabKey | undefined) ?? DEFAULT_TAB;
-	const shouldTypeIdentity = currentTab === 'about' && nextTab !== 'about';
+	const shouldTypeAboutHero = nextTab === 'about' && !hasTypedAboutHero();
+	const shouldTypeIdentity = nextTab !== 'about' && !hasTypedIdentity();
+
+	if (shouldTypeAboutHero) {
+		markAboutHeroTyped();
+		prepareAboutHeroTyping();
+	} else {
+		restoreAboutHeroText();
+	}
 
 	if (shouldTypeIdentity) {
+		markIdentityTyped();
 		prepareIdentityTyping();
 	} else {
 		restoreIdentityText();
@@ -816,8 +1107,12 @@ function activateTab(tab: string, animate = true) {
 		initGalleryReveal();
 	}
 
+	if (shouldTypeAboutHero) {
+		window.setTimeout(() => startAboutHeroTyping(aboutTypingToken), shouldAnimate ? 120 : 0);
+	}
+
 	if (shouldTypeIdentity) {
-		window.setTimeout(() => startIdentityTyping(identityTypingToken), 120);
+		window.setTimeout(() => startIdentityTyping(identityTypingToken), shouldAnimate ? 120 : 0);
 	}
 }
 
@@ -1534,8 +1829,8 @@ export default function initPortfolioInteractions() {
 	document.documentElement.classList.add('theme-ready');
 
 	soundEnabled = localStorage.getItem(SOUND_ENABLED_KEY) !== 'false';
-
 	cacheIdentityText();
+
 	bindTabButtons();
 	bindMobileNav();
 	bindThemeButtons();
