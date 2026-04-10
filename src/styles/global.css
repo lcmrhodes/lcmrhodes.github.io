@@ -622,6 +622,10 @@ a {
 	white-space: nowrap;
 }
 
+.about-heading-chunk {
+	display: inline;
+}
+
 .about-hero .about-summary {
 	max-width: 40rem;
 	font-family: var(--font-display);
@@ -665,6 +669,26 @@ a.about-inline-link .about-inline-link-text {
 
 .about-inline-link.is-inline-hover-active {
 	z-index: 30;
+}
+
+.about-inline-link,
+.about-inline-link .about-inline-link-text {
+	transition:
+		filter 520ms cubic-bezier(0.16, 1, 0.3, 1),
+		text-shadow 620ms cubic-bezier(0.16, 1, 0.3, 1),
+		opacity 220ms ease;
+}
+
+.about-inline-link.is-type-glowing {
+	filter: none;
+}
+
+.about-inline-link.is-type-glowing .about-inline-link-text {
+	filter: brightness(1.22);
+	text-shadow:
+		0 0 0.26em color-mix(in srgb, var(--accent) 78%, transparent 22%),
+		0 0 0.78em color-mix(in srgb, var(--accent) 56%, transparent 44%),
+		0 0 1.3em color-mix(in srgb, white 36%, var(--accent) 64%);
 }
 
 .about-inline-link--pulse {
