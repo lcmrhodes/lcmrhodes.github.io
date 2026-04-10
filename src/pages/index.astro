@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import '../styles/global.css';
+import { galleryTiles } from '../data/gallery';
 
 const tabs = ['about', 'experience', 'projects'];
 
@@ -93,16 +94,7 @@ const educationExperienceItems = [
 	},
 ];
 
-const projectPlaceholders = [
-	{ kind: 'website', tone: 'teal', size: 'hero', label: '01' },
-	{ kind: 'image', tone: 'stone', size: 'tall', label: '02' },
-	{ kind: 'pdf', tone: 'ink', size: 'small', label: '03' },
-	{ kind: 'website', tone: 'sand', size: 'wide', label: '04' },
-	{ kind: 'image', tone: 'teal', size: 'small', label: '05' },
-	{ kind: 'pdf', tone: 'stone', size: 'tall', label: '06' },
-	{ kind: 'website', tone: 'ink', size: 'small', label: '07' },
-	{ kind: 'image', tone: 'sand', size: 'wide', label: '08' },
-];
+
 ---
 
 <Layout
@@ -551,29 +543,116 @@ const projectPlaceholders = [
 			<!-- Projects -->
 			<section class="content-section" data-section="projects" id="tab-projects">
 				<div class="content-section-inner project-gallery-shell">
-					<div class="project-placeholder-grid" aria-label="Projects gallery placeholders">
-						{projectPlaceholders.map((item) => (
-							<article
-								class:list={[
-									'project-placeholder-tile',
-									`project-placeholder-tile--${item.kind}`,
-									`project-placeholder-tile--${item.tone}`,
-									`project-placeholder-tile--${item.size}`,
-								]}
-								tabindex="0"
-							>
-								<div class="project-placeholder-surface">
-									<span class="project-placeholder-index">{item.label}</span>
-									<span class="project-placeholder-type">{item.kind}</span>
-								</div>
-								<div class="project-placeholder-hover" aria-hidden="true">
-									<p class="project-placeholder-hover-type">{item.kind} placeholder</p>
-									<p class="project-placeholder-hover-note">Layout only for now</p>
-								</div>
-							</article>
+					<ul class="project-gallery" role="list">
+						{galleryTiles.map((tile) => (
+							<li class={`gallery-tile gallery-tile--${tile.kind}`}>
+								{tile.kind === 'image' ? (
+									<button
+										type="button"
+										class="gallery-tile__action"
+										data-lightbox-src={tile.full}
+										data-lightbox-width={String(tile.fullWidth)}
+										data-lightbox-height={String(tile.fullHeight)}
+										data-lightbox-alt={tile.title}
+										data-lightbox-caption={tile.caption}
+										aria-label={`${tile.title} — open full image`}
+									>
+										<figure>
+											<img
+												src={tile.cover}
+												width={tile.coverWidth}
+												height={tile.coverHeight}
+												alt={tile.title}
+												loading="lazy"
+												decoding="async"
+											/>
+											<figcaption class="gallery-tile__overlay">
+												<span class="gallery-tile__eyebrow">{tile.eyebrow}</span>
+												<span class="gallery-tile__title">{tile.title}</span>
+												<span class="gallery-tile__caption">{tile.caption}</span>
+											</figcaption>
+										</figure>
+									</button>
+								) : (
+									<a
+										href={tile.href}
+										class="gallery-tile__action"
+										target={tile.kind === 'site' ? '_blank' : undefined}
+										rel={tile.kind === 'site' ? 'noreferrer' : undefined}
+										aria-label={`${tile.title} — ${tile.kind === 'site' ? 'open live site' : 'open PDF'}`}
+									>
+										<figure>
+											<img
+												src={tile.cover}
+												width={tile.coverWidth}
+												height={tile.coverHeight}
+												alt={tile.title}
+												loading="lazy"
+												decoding="async"
+											/>
+											<figcaption class="gallery-tile__overlay">
+												<span class="gallery-tile__eyebrow">{tile.eyebrow}</span>
+												<span class="gallery-tile__title">{tile.title}</span>
+												<span class="gallery-tile__caption">{tile.caption}</span>
+											</figcaption>
+										</figure>
+									</a>
+								)}
+							</li>
 						))}
-					</div>
+					</ul>
+
+					<dialog class="gallery-lightbox" id="gallery-lightbox" aria-label="Image viewer">
+						<button type="button" class="gallery-lightbox__close" aria-label="Close image viewer">&#x2715;</button>
+						<figure>
+							<img alt="" />
+							<figcaption></figcaption>
+						</figure>
+					</dialog>
 				</div>
+
+				<script>
+					const dialog = document.getElementById('gallery-lightbox') as HTMLDialogElement | null;
+					if (dialog) {
+						const lightboxImg = dialog.querySelector('img') as HTMLImageElement;
+						const lightboxCaption = dialog.querySelector('figcaption') as HTMLElement;
+						const closeBtn = dialog.querySelector('.gallery-lightbox__close') as HTMLButtonElement;
+
+						// Open on click of any lightbox trigger
+						document.querySelector('.project-gallery')?.addEventListener('click', (e) => {
+							const btn = (e.target as Element).closest('[data-lightbox-src]') as HTMLElement | null;
+							if (!btn) return;
+							const src = btn.dataset.lightboxSrc ?? '';
+							const w = Number(btn.dataset.lightboxWidth ?? 0);
+							const h = Number(btn.dataset.lightboxHeight ?? 0);
+							const alt = btn.dataset.lightboxAlt ?? '';
+							const caption = btn.dataset.lightboxCaption ?? '';
+							lightboxImg.src = src;
+							lightboxImg.width = w;
+							lightboxImg.height = h;
+							lightboxImg.alt = alt;
+							lightboxCaption.textContent = caption;
+							dialog.showModal();
+						});
+
+						// Close via button
+						closeBtn?.addEventListener('click', () => {
+							dialog.close();
+						});
+
+						// Close via backdrop click
+						dialog.addEventListener('click', (e) => {
+							if (e.target === dialog) dialog.close();
+						});
+
+						// Clear src on close to free the large PNG from memory
+						dialog.addEventListener('close', () => {
+							lightboxImg.src = '';
+							lightboxImg.alt = '';
+							lightboxCaption.textContent = '';
+						});
+					}
+				</script>
 			</section>
 
 		</main>

@@ -9,9 +9,14 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "build:gallery-assets": "node scripts/build-gallery-assets.mjs"
   },
   "dependencies": {
     "astro": "^6.1.1"
+  },
+  "devDependencies": {
+    "pdf-lib": "^1.17.1",
+    "sharp": "^0.34.5"
   }
 }
