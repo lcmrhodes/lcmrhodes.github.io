@@ -163,6 +163,7 @@ a {
 	justify-content: flex-start;
 	padding: 4.4rem 2.7rem 3.6rem 6.2rem;
 	background: transparent;
+	container-type: inline-size;
 	z-index: 10;
 	transition:
 		width 360ms cubic-bezier(0.645, 0.045, 0.355, 1),
@@ -426,8 +427,66 @@ a {
 	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--identity-control-gap);
+	position: relative;
 	padding-left: 0.25rem;
 	border-left: 1px solid var(--border);
+}
+
+.pillbox-overflow {
+	position: relative;
+	display: none;
+}
+
+.pillbox-overflow-menu {
+	position: absolute;
+	right: 0;
+	bottom: calc(100% + 0.6rem);
+	display: flex;
+	align-items: center;
+	gap: var(--identity-control-gap);
+	padding: 0.35rem;
+	border: 1px solid var(--border);
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--panel-strong) 94%, transparent);
+	backdrop-filter: blur(18px);
+	box-shadow: var(--shadow);
+	opacity: 0;
+	transform: translateY(6px);
+	pointer-events: none;
+	transition:
+		opacity 180ms ease,
+		transform 180ms ease;
+}
+
+.pillbox-overflow.is-open .pillbox-overflow-menu {
+	opacity: 1;
+	transform: translateY(0);
+	pointer-events: auto;
+}
+
+.pillbox-overflow-menu .pillbox-overflow-action--sound {
+	display: none;
+}
+
+@container (max-width: 24rem) {
+	.pillbox-overflow {
+		display: inline-flex;
+	}
+
+	.identity-controls > .weather-toggle-side,
+	.identity-controls > .theme-toggle-side {
+		display: none;
+	}
+}
+
+@container (max-width: 21.5rem) {
+	.identity-controls > .sound-toggle-side {
+		display: none;
+	}
+
+	.pillbox-overflow-menu .pillbox-overflow-action--sound {
+		display: inline-flex;
+	}
 }
 
 .identity-controls--mobile {
@@ -435,6 +494,8 @@ a {
 	margin-top: 0.5rem;
 	padding-left: 0;
 	border-left: none;
+	flex-wrap: nowrap;
+	gap: 0.28rem;
 }
 
 .sound-toggle-side,
@@ -1291,6 +1352,7 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 
 /* Two-column grid with vertical divider */
 .experience-columns {
+	position: relative; /* positioning context for the JS floating card */
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
 	/* Fill the content section height (100vh minus top + bottom padding) */
@@ -1368,8 +1430,7 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	justify-content: center;
 }
 
-/* Individual logo item — full width, flex column so logo + hover panel
-   align together rather than relying on the stack's align-items */
+/* Individual logo item */
 .experience-logo-item {
 	position: relative;
 	cursor: pointer;
@@ -1378,10 +1439,11 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start; /* education default */
+	transition: opacity 220ms ease;
 }
 
 .experience-col--professional .experience-logo-item {
-	align-items: flex-end; /* logos hug the divider */
+	align-items: flex-end;
 }
 
 /* Logo image */
@@ -1437,16 +1499,9 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	display: block;
 }
 
-/* Hover text panel — anchored to the top of the logo, expands
-   downward to fit content so nothing is clipped or unclickable */
+/* Inline hover panel — shown on non-hover devices (touch) stacked below logo.
+   On hover devices the JS floating card takes over; this is hidden via CSS. */
 .experience-logo-hover {
-	position: absolute;
-	top: 50%;
-	left: 0;
-	right: 0;
-	min-height: 100%;
-	transform: translateY(-50%);
-	z-index: 10;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -1456,6 +1511,44 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	border-radius: 0.75rem;
 	background: color-mix(in srgb, var(--bg-soft) 88%, transparent);
 	backdrop-filter: blur(14px);
+	margin-top: 0.75rem;
+}
+
+/* ── Floating experience card (JS-driven on hover devices) ─── */
+.experience-float-card {
+	position: absolute;
+	z-index: 20;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 0.22rem;
+	padding: 0.9rem 1rem;
+	width: clamp(200px, 20vw, 280px);
+	border: 1px solid var(--border);
+	border-radius: 0.75rem;
+	background: color-mix(in srgb, var(--bg-soft) 88%, transparent);
+	backdrop-filter: blur(14px);
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 220ms ease, transform 220ms ease;
+}
+
+/* Professional card pops right — starts slightly left (toward logo), slides right */
+.experience-float-card[data-col='professional'] {
+	text-align: left;
+	transform: translateX(-10px);
+}
+
+/* Education card pops left — starts slightly right (toward logo), slides left */
+.experience-float-card[data-col='education'] {
+	text-align: right;
+	transform: translateX(10px);
+}
+
+.experience-float-card.is-active {
+	opacity: 1;
+	pointer-events: auto;
+	transform: translateX(0);
 }
 
 .experience-brand-name,
@@ -1490,6 +1583,158 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 .experience-brand-copy {
 	font-size: 0.92rem;
 	color: var(--muted);
+}
+
+.experience-stack {
+	display: none;
+}
+
+.experience-stack-group {
+	display: grid;
+	gap: 1rem;
+}
+
+.experience-stack-list {
+	display: grid;
+	gap: 1rem;
+}
+
+.experience-stack-sticky {
+	position: sticky;
+	top: var(--experience-stack-sticky-top, 0.85rem);
+	z-index: 4;
+}
+
+.experience-stack-heading {
+	margin: 0;
+	display: inline-flex;
+	align-items: center;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--border);
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--bg-soft) 82%, var(--accent-soft) 18%);
+	backdrop-filter: blur(18px);
+	box-shadow: var(--shadow);
+	font-family: var(--font-display);
+	font-size: clamp(1.3rem, 4vw, 1.7rem);
+	line-height: 0.98;
+	font-weight: 500;
+	letter-spacing: 0.01em;
+}
+
+.experience-card {
+	display: grid;
+	gap: 0.8rem;
+	padding: 1.15rem 1.1rem 1.2rem;
+	border: 1px solid var(--border);
+	border-radius: 1.5rem;
+	background: color-mix(in srgb, var(--panel-strong) 92%, transparent);
+	backdrop-filter: blur(16px);
+	box-shadow: var(--shadow);
+}
+
+.experience-card-top {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.experience-card-meta {
+	display: grid;
+	gap: 0.18rem;
+}
+
+.experience-card-date,
+.experience-card-location,
+.experience-card-name,
+.experience-card-awarded,
+.experience-card-copy {
+	margin: 0;
+}
+
+.experience-card-date,
+.experience-card-location {
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	color: var(--muted);
+}
+
+.experience-card-logo {
+	flex: none;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	min-height: 2.8rem;
+	max-width: min(9rem, 34vw);
+}
+
+.experience-card-logo .experience-logo-img {
+	width: auto;
+	height: auto;
+	max-height: 2.7rem;
+	max-width: 100%;
+	object-fit: contain;
+	filter: saturate(0.92) contrast(1.02);
+}
+
+.experience-card-logo .experience-brand-logo--moru {
+	width: min(8rem, 100%);
+}
+
+.experience-card-logo .experience-brand-logo--phs {
+	width: min(6.5rem, 100%);
+}
+
+.experience-card-logo .experience-brand-logo--deliveroo {
+	width: min(7.25rem, 100%);
+}
+
+.experience-card-logo .experience-brand-logo--boots {
+	width: min(4.8rem, 100%);
+}
+
+.experience-card-logo .experience-brand-logo--oxford,
+.experience-card-logo .experience-brand-logo--ucl {
+	width: min(8.4rem, 100%);
+}
+
+.experience-card-role {
+	margin: 0;
+	font-family: var(--font-display);
+	font-size: clamp(1.45rem, 5vw, 2rem);
+	line-height: 0.98;
+	font-weight: 500;
+	letter-spacing: 0.01em;
+	color: var(--text);
+}
+
+.experience-card-name {
+	font-family: var(--font-mono);
+	font-size: 0.76rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--accent-strong);
+}
+
+.experience-card-awarded {
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.04em;
+	color: var(--muted);
+}
+
+.experience-card-copy {
+	font-size: 0.98rem;
+	color: var(--muted);
+}
+
+.experience-card-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.55rem;
 }
 
 .proof-cards {
@@ -1613,22 +1858,16 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 }
 
 @media (hover: hover) and (pointer: fine) {
+	/* Hide inline cards on hover devices — the JS floating card handles display */
 	.experience-logo-hover {
-		opacity: 0;
-		pointer-events: none;
-		transition: opacity 200ms ease;
+		display: none;
 	}
 
-	.experience-logo-item:hover .experience-logo-hover,
-	.experience-logo-item:focus-within .experience-logo-hover {
-		opacity: 1;
-		pointer-events: auto;
-	}
-
-	.experience-logo-item:hover .experience-logo-img,
-	.experience-logo-item:focus-within .experience-logo-img {
-		opacity: 0.15;
-		filter: blur(1px);
+	/* Dim non-active logos — driven by JS (.is-dimmed) and CSS :has() as a fallback */
+	.experience-logo-item.is-dimmed,
+	.experience-columns:has(.experience-logo-item:hover) .experience-logo-item:not(:hover):not(:focus-within),
+	.experience-columns:has(.experience-logo-item:focus-within) .experience-logo-item:not(:hover):not(:focus-within) {
+		opacity: 0.25;
 	}
 
 	.proof-card--logo .proof-card-overlay {
@@ -1927,7 +2166,8 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 		flex-wrap: nowrap;
 		align-items: center;
 		gap: 0.1rem;
-		width: auto;
+		width: fit-content;
+		align-self: flex-start;
 		max-width: calc(100% - var(--identity-content-shift));
 		padding: 0.4rem 0.48rem;
 	}
@@ -1953,6 +2193,17 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 
 	.content-section[data-section='experience'] .content-section-inner {
 		max-width: 100%;
+		height: auto;
+	}
+
+	.experience-columns {
+		display: none;
+	}
+
+	.experience-stack {
+		display: grid;
+		gap: 1.4rem;
+		padding-top: 0.2rem;
 	}
 
 	.project-placeholder-grid {
@@ -1970,37 +2221,6 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 		grid-column: span 3;
 	}
 
-	.experience-columns {
-		grid-template-columns: 1fr;
-		gap: 2rem;
-	}
-
-	.experience-col-divider {
-		width: 100%;
-		height: 1px;
-		align-self: auto;
-	}
-
-	.experience-col {
-		padding: 0;
-		align-items: flex-start;
-		text-align: left;
-	}
-
-	.experience-col-title,
-	.experience-col--professional .experience-col-title {
-		width: auto;
-		transform-origin: left top;
-	}
-
-	.experience-col--professional .experience-logo-stack,
-	.experience-col--education .experience-logo-stack {
-		align-items: flex-start;
-	}
-
-	.experience-col--professional .experience-logo-item {
-		align-items: flex-start;
-	}
 }
 
 @media (max-width: 799px) {
@@ -2015,6 +2235,7 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	.content-panel {
 		margin-left: 0;
 		padding-top: 57px;
+		transform: none;
 	}
 
 	.layout::after {
@@ -2091,8 +2312,63 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 		min-height: 11rem;
 	}
 
-	.experience-logo-stack {
-		gap: 2rem;
+	.content-section[data-section='experience'] .content-section-inner {
+		height: auto;
+		overflow-x: clip;
+	}
+
+	.experience-columns {
+		display: none;
+	}
+
+	.experience-stack {
+		display: grid;
+		gap: 1.35rem;
+		width: 100%;
+		justify-items: center;
+	}
+
+	.experience-stack-sticky {
+		top: calc(57px + 0.05rem);
+		width: min(100%, 21rem);
+		justify-self: center;
+	}
+
+	.experience-stack-heading {
+		padding: 0.68rem 0.95rem;
+		font-size: 1.3rem;
+	}
+
+	.experience-card {
+		width: min(100%, 21rem);
+		padding: 1rem;
+	}
+
+	.experience-card-top {
+		gap: 0.85rem;
+	}
+
+	.experience-card-logo {
+		max-width: min(8rem, 32vw);
+		min-height: 2.45rem;
+	}
+
+	.experience-card-logo .experience-logo-img {
+		max-height: 2.35rem;
+	}
+
+	.experience-card-copy {
+		font-size: 0.94rem;
+	}
+
+	.experience-card-location,
+	.experience-card-name {
+		display: none;
+	}
+
+	.identity-controls--mobile {
+		width: 100%;
+		justify-content: space-between;
 	}
 }
 

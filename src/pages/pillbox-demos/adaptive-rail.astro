@@ -1,0 +1,57 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PillboxDemoLayout from '../../components/PillboxDemoLayout.astro';
+import '../../styles/pillbox-demos.css';
+
+const viewports = [
+	{ label: 'Desktop', width: '1120px', className: 'preview-window--wide' },
+	{ label: 'Tablet', width: '760px', className: 'preview-window--medium' },
+	{ label: 'Phone', width: '390px', className: 'preview-window--narrow' },
+];
+---
+
+<Layout
+	title="Adaptive Rail Pillbox Demo | Luke Rhodes"
+	description="Responsive pillbox demo where one capsule reflows by priority."
+>
+	<PillboxDemoLayout
+		current="adaptive-rail"
+		kicker="Direction one"
+		title="Elastic wrap"
+		description="This is the smallest change. The pill stays as one object, but its spacing tightens and the items wrap more cleanly instead of forcing a rigid single row."
+		bestFor="Keeping the current visual almost intact."
+		tradeoff="Mobile still shows every action, so it remains the busiest option."
+	>
+		<section class="preview-grid">
+			{viewports.map((viewport) => (
+				<article class="preview-card">
+					<div class="preview-card-head">
+						<p class="preview-card-label">{viewport.label}</p>
+						<span class="preview-card-size">{viewport.width}</span>
+					</div>
+
+					<div class:list={['preview-window', viewport.className]}>
+						<div class="preview-app">
+							<p class="pillbox-stage-copy">Same pill, just more elastic as width gets tighter.</p>
+
+							<div class="pillbox-shell variant-elastic">
+								<div class="pillbox-group">
+									<button class="pillbox-control" type="button" aria-label="GitHub">GH</button>
+									<button class="pillbox-control" type="button" aria-label="LinkedIn">in</button>
+									<button class="pillbox-control pillbox-control--label" type="button" aria-label="Curriculum vitae">CV</button>
+									<button class="pillbox-control" type="button" aria-label="Email">@</button>
+								</div>
+								<div class="pillbox-divider" aria-hidden="true"></div>
+								<div class="pillbox-group">
+									<button class="pillbox-control" type="button" aria-label="Sound">snd</button>
+									<button class="pillbox-control" type="button" aria-label="Weather">wx</button>
+									<button class="pillbox-control is-active" type="button" aria-label="Theme">sun</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</article>
+			))}
+		</section>
+	</PillboxDemoLayout>
+</Layout>

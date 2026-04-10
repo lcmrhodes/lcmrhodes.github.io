@@ -1,0 +1,64 @@
+---
+interface DemoLink {
+	slug: string;
+	label: string;
+}
+
+interface Props {
+	title: string;
+	description: string;
+	current?: string;
+	kicker: string;
+	bestFor: string;
+	tradeoff: string;
+}
+
+const { title, description, current, kicker, bestFor, tradeoff } = Astro.props;
+
+const demoLinks: DemoLink[] = [
+	{ slug: 'adaptive-rail', label: 'Elastic wrap' },
+	{ slug: 'split-dock', label: 'Two-tier stack' },
+	{ slug: 'context-card', label: 'Priority collapse' },
+];
+---
+
+<div class="pillbox-demo-page">
+	<header class="pillbox-demo-topbar">
+		<a class="pillbox-demo-backlink" href="/pillbox-demos/">All pillbox demos</a>
+		<nav class="pillbox-demo-nav" aria-label="Pillbox demo variants">
+			{demoLinks.map((link) => (
+				<a
+					class:list={[
+						'pillbox-demo-nav-link',
+						{ 'pillbox-demo-nav-link--active': current === link.slug },
+					]}
+					href={`/pillbox-demos/${link.slug}/`}
+					aria-current={current === link.slug ? 'page' : 'false'}
+				>
+					{link.label}
+				</a>
+			))}
+		</nav>
+	</header>
+
+	<main class="pillbox-demo-main">
+		<section class="pillbox-demo-intro">
+			<p class="pillbox-demo-kicker">{kicker}</p>
+			<h1>{title}</h1>
+			<p class="pillbox-demo-description">{description}</p>
+
+			<div class="pillbox-demo-meta" role="list" aria-label="Design notes">
+				<article class="pillbox-demo-meta-card" role="listitem">
+					<span>Best for</span>
+					<p>{bestFor}</p>
+				</article>
+				<article class="pillbox-demo-meta-card" role="listitem">
+					<span>Tradeoff</span>
+					<p>{tradeoff}</p>
+				</article>
+			</div>
+		</section>
+
+		<slot />
+	</main>
+</div>
