@@ -1,0 +1,369 @@
+@import './global.css';
+
+.pillbox-demo-page {
+	min-height: 100vh;
+	padding: 1.25rem;
+	background:
+		radial-gradient(circle at top right, rgba(45, 127, 122, 0.1), transparent 26rem),
+		radial-gradient(circle at bottom left, rgba(177, 112, 86, 0.08), transparent 28rem),
+		var(--bg);
+}
+
+.pillbox-demo-topbar,
+.pillbox-demo-main {
+	width: min(980px, 100%);
+	margin: 0 auto;
+}
+
+.pillbox-demo-topbar {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.8rem;
+	margin-bottom: 1rem;
+}
+
+.pillbox-demo-backlink,
+.pillbox-demo-nav-link,
+.pillbox-demo-index-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.72rem 1rem;
+	border: 1px solid var(--border);
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--panel-strong) 90%, transparent);
+	backdrop-filter: blur(16px);
+	color: var(--text);
+	font-size: 0.88rem;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.pillbox-demo-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.pillbox-demo-nav-link--active {
+	background: var(--text);
+	color: var(--bg-soft);
+	border-color: color-mix(in srgb, var(--text) 82%, transparent);
+}
+
+.pillbox-demo-main {
+	display: grid;
+	gap: 1rem;
+}
+
+.pillbox-demo-intro,
+.pillbox-demo-index-card,
+.preview-card {
+	padding: 1.15rem;
+	border: 1px solid var(--border);
+	border-radius: 1.5rem;
+	background: color-mix(in srgb, var(--panel-strong) 92%, transparent);
+	backdrop-filter: blur(16px);
+	box-shadow: var(--shadow);
+}
+
+.pillbox-demo-kicker,
+.pillbox-demo-meta-card span,
+.preview-card-label,
+.pillbox-pill-note {
+	margin: 0;
+	font-family: var(--font-mono);
+	font-size: 0.72rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--accent-strong);
+}
+
+.pillbox-demo-intro h1,
+.pillbox-demo-index-card h2 {
+	margin: 0;
+	font-family: var(--font-display);
+	font-weight: 500;
+	line-height: 0.96;
+}
+
+.pillbox-demo-intro h1 {
+	font-size: clamp(2.2rem, 5vw, 3.7rem);
+}
+
+.pillbox-demo-index-card h2 {
+	font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+.pillbox-demo-description,
+.pillbox-demo-index-card p,
+.pillbox-demo-meta-card p,
+.pillbox-stage-copy {
+	margin: 0;
+	color: var(--muted);
+}
+
+.pillbox-demo-meta {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0.75rem;
+	margin-top: 1rem;
+}
+
+.pillbox-demo-meta-card {
+	padding: 0.85rem 0.95rem;
+	border: 1px solid color-mix(in srgb, var(--border) 92%, transparent);
+	border-radius: 1rem;
+	background: color-mix(in srgb, var(--bg-soft) 70%, transparent);
+}
+
+.pillbox-demo-meta-card p {
+	margin-top: 0.35rem;
+}
+
+.pillbox-demo-index-grid {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.pillbox-demo-index-card {
+	display: grid;
+	gap: 0.9rem;
+}
+
+.pillbox-demo-index-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+}
+
+.preview-grid {
+	display: grid;
+	gap: 1rem;
+}
+
+.preview-card-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	margin-bottom: 0.8rem;
+}
+
+.preview-card-size {
+	color: var(--text);
+	font-size: 0.88rem;
+	font-weight: 600;
+}
+
+.preview-window {
+	container-type: inline-size;
+	border: 1px solid color-mix(in srgb, var(--border) 88%, transparent);
+	border-radius: 1.45rem;
+	overflow: hidden;
+	background: color-mix(in srgb, var(--bg-soft) 78%, transparent);
+}
+
+.preview-window--wide {
+	width: min(100%, 920px);
+}
+
+.preview-window--medium {
+	width: min(100%, 640px);
+}
+
+.preview-window--narrow {
+	width: min(100%, 340px);
+}
+
+.preview-app {
+	min-height: 15rem;
+	padding: 1.3rem;
+	display: grid;
+	align-content: center;
+	justify-items: center;
+	gap: 0.9rem;
+	background:
+		radial-gradient(circle at top center, rgba(255, 255, 255, 0.24), transparent 48%),
+		linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent),
+		var(--bg-soft);
+}
+
+.preview-window--narrow .preview-app {
+	min-height: 17rem;
+}
+
+.pillbox-stage-copy {
+	max-width: 34rem;
+	font-size: 0.93rem;
+	text-align: center;
+}
+
+.pillbox-shell {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.38rem;
+	max-width: 100%;
+	padding: 0.42rem;
+	border: 1px solid var(--border);
+	border-radius: 999px;
+	background: color-mix(in srgb, var(--panel-strong) 92%, transparent);
+	backdrop-filter: blur(16px);
+	box-shadow: 0 18px 40px rgba(31, 36, 34, 0.07);
+}
+
+.pillbox-group {
+	display: flex;
+	align-items: center;
+	gap: 0.36rem;
+	min-width: 0;
+}
+
+.pillbox-divider {
+	width: 1px;
+	height: 1.9rem;
+	background: color-mix(in srgb, var(--border) 90%, transparent);
+}
+
+.pillbox-control {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.45rem;
+	height: 2.45rem;
+	padding: 0 0.78rem;
+	border: none;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--muted);
+	font: inherit;
+	font-size: 0.84rem;
+	font-weight: 700;
+	letter-spacing: -0.01em;
+	cursor: pointer;
+}
+
+.pillbox-control:hover {
+	background: color-mix(in srgb, var(--accent-soft) 70%, transparent);
+	color: var(--text);
+}
+
+.pillbox-control.is-active {
+	background: var(--text);
+	color: var(--bg-soft);
+}
+
+.pillbox-control--label {
+	min-width: 3rem;
+	font-size: 0.78rem;
+}
+
+.pillbox-control--more {
+	display: none;
+}
+
+.variant-elastic {
+	flex-wrap: wrap;
+	row-gap: 0.4rem;
+}
+
+.variant-elastic .pillbox-group {
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.variant-stack {
+	flex-wrap: nowrap;
+}
+
+.variant-collapse {
+	flex-wrap: nowrap;
+}
+
+@container (max-width: 40rem) {
+	.pillbox-control {
+		min-width: 2.25rem;
+		height: 2.25rem;
+		padding: 0 0.64rem;
+		font-size: 0.78rem;
+	}
+
+	.variant-stack {
+		flex-direction: column;
+		border-radius: 1.3rem;
+	}
+
+	.variant-stack .pillbox-divider {
+		width: calc(100% - 0.8rem);
+		height: 1px;
+	}
+}
+
+@container (max-width: 28rem) {
+	.variant-elastic {
+		border-radius: 1.35rem;
+	}
+
+	.variant-elastic .pillbox-divider {
+		display: none;
+	}
+
+	.variant-elastic .pillbox-group {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		width: 100%;
+	}
+
+	.variant-stack .pillbox-group {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		width: 100%;
+	}
+
+	.variant-stack .pillbox-control--label,
+	.variant-elastic .pillbox-control--label {
+		min-width: 0;
+		width: 100%;
+	}
+
+	.variant-collapse {
+		padding: 0.36rem;
+		gap: 0.28rem;
+	}
+
+	.variant-collapse .pillbox-divider {
+		display: none;
+	}
+
+	.variant-collapse .pillbox-group {
+		gap: 0.28rem;
+	}
+
+	.variant-collapse .pillbox-control--optional {
+		display: none;
+	}
+
+	.variant-collapse .pillbox-control--more {
+		display: inline-flex;
+	}
+}
+
+@media (max-width: 980px) {
+	.pillbox-demo-index-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 720px) {
+	.pillbox-demo-page {
+		padding: 1rem;
+	}
+
+	.pillbox-demo-meta {
+		grid-template-columns: 1fr;
+	}
+}

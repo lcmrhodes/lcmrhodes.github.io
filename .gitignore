@@ -25,3 +25,15 @@ pnpm-debug.log*
 
 # local browser automation artifacts
 .playwright-cli/
+output/playwright/experience-desktop.png
+output/playwright/experience-mobile-centered.png
+output/playwright/experience-mobile-fixed.png
+output/playwright/experience-mobile.png
+output/playwright/experience-narrow.png
+output/playwright/pillbox-mid-fixed.png
+output/playwright/pillbox-mid.png
+output/playwright/pillbox-tight-final.png
+output/playwright/pillbox-tight-fixed.png
+output/playwright/pillbox-tight.png
+output/playwright/pillbox-wide-fixed.png
+output/playwright/pillbox-wide.png

@@ -1325,6 +1325,74 @@ function bindWeatherButtons() {
 	});
 }
 
+function closePillboxOverflow() {
+	document.querySelectorAll<HTMLElement>('.pillbox-overflow').forEach((container) => {
+		container.classList.remove('is-open');
+
+		const toggle = container.querySelector<HTMLElement>('[data-pillbox-overflow-toggle]');
+		const menu = container.querySelector<HTMLElement>('[data-pillbox-overflow-menu]');
+
+		toggle?.setAttribute('aria-expanded', 'false');
+		menu?.setAttribute('aria-hidden', 'true');
+	});
+}
+
+function bindPillboxOverflow() {
+	const containers = Array.from(document.querySelectorAll<HTMLElement>('.pillbox-overflow'));
+
+	if (!containers.length) {
+		return;
+	}
+
+	containers.forEach((container) => {
+		const toggle = container.querySelector<HTMLElement>('[data-pillbox-overflow-toggle]');
+		const menu = container.querySelector<HTMLElement>('[data-pillbox-overflow-menu]');
+
+		if (!toggle || !menu) {
+			return;
+		}
+
+		toggle.addEventListener('click', (event) => {
+			event.stopPropagation();
+			const shouldOpen = !container.classList.contains('is-open');
+			closePillboxOverflow();
+			container.classList.toggle('is-open', shouldOpen);
+			toggle.setAttribute('aria-expanded', String(shouldOpen));
+			menu.setAttribute('aria-hidden', String(!shouldOpen));
+		});
+
+		menu.addEventListener('click', (event) => {
+			const target = event.target;
+
+			if (target instanceof HTMLElement && target.closest('button, a')) {
+				window.setTimeout(closePillboxOverflow, 0);
+			}
+		});
+	});
+
+	document.addEventListener('pointerdown', (event) => {
+		const target = event.target;
+
+		if (!(target instanceof Node)) {
+			return;
+		}
+
+		if (containers.some((container) => container.contains(target))) {
+			return;
+		}
+
+		closePillboxOverflow();
+	});
+
+	window.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') {
+			closePillboxOverflow();
+		}
+	});
+
+	window.addEventListener('resize', closePillboxOverflow);
+}
+
 function initWeather() {
 	const saved = localStorage.getItem(WEATHER_KEY) as WeatherMode | null;
 	const valid: WeatherMode[] = ['off', 'rain', 'clouds', 'snow', 'overcast'];
@@ -1339,6 +1407,119 @@ function initWeather() {
 	}
 
 	syncWeatherToggleLabels();
+}
+
+// ── Experience section floating card ─────────────────────────
+
+function initExperienceHover() {
+	if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+	const columns = document.querySelector<HTMLElement>('.experience-columns');
+	if (!columns) return;
+
+	// Single floating card anchored to the columns container
+	const floatCard = document.createElement('div');
+	floatCard.className = 'experience-float-card';
+	floatCard.setAttribute('aria-hidden', 'true');
+	columns.appendChild(floatCard);
+
+	// ── Hide with a short delay so the mouse can travel to the card ──
+	let hideTimer: number | null = null;
+
+	function scheduleHide() {
+		if (hideTimer !== null) return;
+		hideTimer = window.setTimeout(() => {
+			hideTimer = null;
+			setDimmed(null);
+			floatCard.classList.remove('is-active');
+		}, 120);
+	}
+
+	function cancelHide() {
+		if (hideTimer !== null) {
+			clearTimeout(hideTimer);
+			hideTimer = null;
+		}
+	}
+
+	// Keep card open while mouse is over it
+	floatCard.addEventListener('mouseenter', cancelHide);
+	floatCard.addEventListener('mouseleave', scheduleHide);
+
+	function positionCard(item: HTMLElement, isProf: boolean) {
+		const imgs = item.querySelectorAll<HTMLImageElement>('.experience-logo-img');
+		const logo = Array.from(imgs).find((img) => img.offsetWidth > 0);
+		if (!logo) return;
+
+		const colRect = columns!.getBoundingClientRect();
+		const logoRect = logo.getBoundingClientRect();
+		const GAP = 12;
+		// Minimum card width — matches CSS clamp lower bound
+		const MIN_CARD_W = 200;
+
+		const source = item.querySelector<HTMLElement>('.experience-logo-hover');
+		if (source) floatCard.innerHTML = source.innerHTML;
+
+		// Preferred direction: professional → right, education → left.
+		// Fall back to the other side if the preferred side lacks space
+		// (e.g. single-column layout where education logos are left-aligned).
+		const spaceRight = window.innerWidth - logoRect.right - GAP;
+		const spaceLeft = logoRect.left - GAP;
+		const preferRight = isProf;
+		const useRight = preferRight ? spaceRight >= MIN_CARD_W : spaceLeft < MIN_CARD_W;
+
+		floatCard.dataset.col = useRight ? 'professional' : 'education';
+
+		if (useRight) {
+			floatCard.style.left = `${logoRect.right - colRect.left + GAP}px`;
+			floatCard.style.right = 'auto';
+		} else {
+			floatCard.style.right = `${colRect.right - logoRect.left + GAP}px`;
+			floatCard.style.left = 'auto';
+		}
+
+		// Place card at logo's top initially; rAF centres it vertically
+		floatCard.style.top = `${logoRect.top - colRect.top}px`;
+		floatCard.classList.add('is-active');
+
+		requestAnimationFrame(() => {
+			const cardH = floatCard.offsetHeight;
+			const centeredTop = logoRect.top - colRect.top + logoRect.height / 2 - cardH / 2;
+			const maxTop = columns!.offsetHeight - cardH - 8;
+			floatCard.style.top = `${Math.max(0, Math.min(maxTop, centeredTop))}px`;
+		});
+	}
+
+	const items = Array.from(columns.querySelectorAll<HTMLElement>('.experience-logo-item'));
+
+	function setDimmed(activeItem: HTMLElement | null) {
+		items.forEach((it) => {
+			it.classList.toggle('is-dimmed', activeItem !== null && it !== activeItem);
+		});
+	}
+
+	items.forEach((item) => {
+		const isProf = item.closest('.experience-col--professional') !== null;
+
+		item.addEventListener('mouseenter', () => {
+			cancelHide();
+			setDimmed(item);
+			positionCard(item, isProf);
+		});
+
+		item.addEventListener('mouseleave', scheduleHide);
+
+		item.addEventListener('focusin', () => {
+			cancelHide();
+			setDimmed(item);
+			positionCard(item, isProf);
+		});
+
+		item.addEventListener('focusout', () => {
+			setDimmed(null);
+			floatCard.classList.remove('is-active');
+		});
+	});
 }
 
 export default function initPortfolioInteractions() {
@@ -1362,7 +1543,9 @@ export default function initPortfolioInteractions() {
 	bindButtonUiSounds();
 	bindIconLinkUiSounds();
 	bindWeatherButtons();
+	bindPillboxOverflow();
 	bindInlineHoverFocus();
+	initExperienceHover();
 	bindPulseHaloSound();
 	bindFragranceBloomSound();
 	bindWeddingSparkleEffect();
