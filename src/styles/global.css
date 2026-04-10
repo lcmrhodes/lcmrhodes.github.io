@@ -232,24 +232,56 @@ a {
 	object-fit: cover;
 	object-position: 52% 4%;
 	filter: saturate(0.96) contrast(1.02);
-	transition: opacity 220ms ease;
+	visibility: hidden;
+	z-index: 0;
 }
 
-.about-portrait-image--dark {
-	opacity: 0;
+.about-portrait-image--light {
+	visibility: visible;
+	z-index: 1;
 }
 
 :root[data-theme='dark'] .about-portrait-image--light {
-	opacity: 0;
+	visibility: hidden;
+	z-index: 0;
 }
 
 :root[data-theme='dark'] .about-portrait-image--dark {
-	opacity: 1;
+	visibility: visible;
+	z-index: 1;
+}
+
+.about-portrait-image--hover-light,
+.about-portrait-image--hover-dark {
+	visibility: hidden;
+	z-index: 2;
 }
 
 .layout[data-active-tab='about'] .about-portrait-placeholder {
 	opacity: 1;
 	transform: translateY(0);
+	pointer-events: auto;
+}
+
+.layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--light,
+.layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--dark {
+	visibility: hidden;
+	z-index: 0;
+}
+
+.layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--hover-light {
+	visibility: visible;
+	z-index: 3;
+}
+
+:root[data-theme='dark'] .layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--hover-light {
+	visibility: hidden;
+	z-index: 0;
+}
+
+:root[data-theme='dark'] .layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--hover-dark {
+	visibility: visible;
+	z-index: 3;
 }
 
 .identity-name {

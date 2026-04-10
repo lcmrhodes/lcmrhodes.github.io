@@ -54,35 +54,7 @@ export type ImageTile = {
 export type GalleryTile = SiteTile | PaperTile | ImageTile;
 
 export const galleryTiles: GalleryTile[] = [
-  // ── 1: WeddingNetwork — site (landscape screenshot)
-  {
-    kind: 'site',
-    id: 'wedding-network',
-    title: 'WeddingNetwork',
-    eyebrow: 'Website · 2026',
-    caption: 'Interactive invitation site that turns anonymised guest-network analysis into a constellation-style wedding experience.',
-    cover: '/images/projects/sites/wedding-network.webp',
-    coverWidth: 1440,
-    coverHeight: 900,
-    href: 'https://wedding-network.vercel.app',
-  },
-
-  // ── 2: Tolkien map — image (landscape, lightbox opens 4960×3507 full)
-  {
-    kind: 'image',
-    id: 'tolkien',
-    title: 'Tolkien World Map',
-    eyebrow: 'Illustration',
-    caption: 'Hand-crafted cartographic illustration of Tolkien\'s world.',
-    cover: '/images/gallery/tolkien_thumb.jpg',
-    coverWidth: 800,
-    coverHeight: 565,
-    full: '/images/gallery/tolkien_full.png',
-    fullWidth: 4960,
-    fullHeight: 3507,
-  },
-
-  // ── 3: ScentSense — site
+  // ── 1: ScentSense — site
   {
     kind: 'site',
     id: 'scentsense',
@@ -95,35 +67,20 @@ export const galleryTiles: GalleryTile[] = [
     href: 'https://myscenttaste.vercel.app',
   },
 
-  // ── 4: Gambling spatial analysis — preview paper (portrait)
+  // ── 2: WeddingNetwork — site (landscape screenshot)
   {
-    kind: 'paper',
-    id: 'gambling-spatial',
-    title: 'Reassessing Gambling Related Health Outcomes',
-    eyebrow: 'Paper · 3-page preview',
-    caption: '3-page preview of an Oxford paper on how spatial analysis can strengthen public-health evaluations of gambling harm.',
-    cover: '/images/projects/papers/gambling_spatial_cover.webp',
-    coverWidth: 1400,
-    coverHeight: 1982,
-    href: '/papers/gambling_spatial_analysis_preview.pdf',
+    kind: 'site',
+    id: 'wedding-network',
+    title: 'WeddingNetwork',
+    eyebrow: 'Website · 2026',
+    caption: 'Interactive invitation site that turns anonymised guest-network analysis into a constellation-style wedding experience.',
+    cover: '/images/projects/sites/wedding-network.webp',
+    coverWidth: 1440,
+    coverHeight: 900,
+    href: 'https://wedding-network.vercel.app',
   },
 
-  // ── 5: Moran's map — image (square)
-  {
-    kind: 'image',
-    id: 'morans-map',
-    title: "Moran's I Spatial Map",
-    eyebrow: 'Visualisation · 2024',
-    caption: "Spatial autocorrelation map produced during the gambling harm analysis.",
-    cover: '/images/gallery/morans_map.jpg',
-    coverWidth: 1200,
-    coverHeight: 1200,
-    full: '/images/gallery/morans_map.jpg',
-    fullWidth: 1200,
-    fullHeight: 1200,
-  },
-
-  // ── 6: Sepsis Flow — site
+  // ── 3: Sepsis Flow — site
   {
     kind: 'site',
     id: 'sepsis-flow',
@@ -134,6 +91,45 @@ export const galleryTiles: GalleryTile[] = [
     coverWidth: 1440,
     coverHeight: 900,
     href: 'https://sepsis-flow-web-app.onrender.com',
+  },
+
+  // ── 4: Invitation design
+  {
+    kind: 'paper',
+    id: 'invitation-template',
+    title: 'Luke & Krizia Invitation',
+    eyebrow: 'Design · 2026',
+    caption: 'Print invitation layout pairing wedding typography with a custom social-network visual motif.',
+    cover: '/images/projects/papers/invitation_template_cover.webp',
+    coverWidth: 1400,
+    coverHeight: 1009,
+    href: '/papers/invitation_template.pdf',
+  },
+
+  // ── 5: MSc dissertation preview
+  {
+    kind: 'paper',
+    id: 'oxford-dissertation',
+    title: 'A Two-Stage Machine Learning Framework',
+    eyebrow: 'Paper · MSc dissertation preview',
+    caption: '2-page preview of my Oxford MSc dissertation on early detection of severe febrile illness in young children.',
+    cover: '/images/projects/papers/oxford_dissertation_cover.webp',
+    coverWidth: 1400,
+    coverHeight: 1982,
+    href: '/papers/oxford_dissertation_preview.pdf',
+  },
+
+  // ── 6: Gambling spatial analysis — preview paper (portrait)
+  {
+    kind: 'paper',
+    id: 'gambling-spatial',
+    title: 'Reassessing Gambling Related Health Outcomes',
+    eyebrow: 'Paper · 3-page preview',
+    caption: '3-page preview of an Oxford paper on how spatial analysis can strengthen public-health evaluations of gambling harm.',
+    cover: '/images/projects/papers/gambling_spatial_cover.webp',
+    coverWidth: 1400,
+    coverHeight: 1982,
+    href: '/papers/gambling_spatial_analysis_preview.pdf',
   },
 
   // ── 7: Translational review — preview paper (portrait)
@@ -149,12 +145,42 @@ export const galleryTiles: GalleryTile[] = [
     href: '/papers/luke_rhodes_translational_review_preview.pdf',
   },
 
-  // ── 8: Bookmaker map — image (landscape)
+  // ── 8: Tolkien map — image (landscape, lightbox opens 4960×3507 full)
+  {
+    kind: 'image',
+    id: 'tolkien',
+    title: 'Tolkien World Map',
+    eyebrow: 'Illustration',
+    caption: 'Hand-crafted cartographic illustration of Tolkien\'s world.',
+    cover: '/images/gallery/tolkien_thumb.jpg',
+    coverWidth: 800,
+    coverHeight: 565,
+    full: '/images/gallery/tolkien_full.png',
+    fullWidth: 4960,
+    fullHeight: 3507,
+  },
+
+  // ── 9: Moran's map — image (square)
+  {
+    kind: 'image',
+    id: 'morans-map',
+    title: "Moran's I Spatial Map",
+    eyebrow: 'Visualisation · 2025',
+    caption: "Spatial autocorrelation map produced during the gambling harm analysis.",
+    cover: '/images/gallery/morans_map.jpg',
+    coverWidth: 1200,
+    coverHeight: 1200,
+    full: '/images/gallery/morans_map.jpg',
+    fullWidth: 1200,
+    fullHeight: 1200,
+  },
+
+  // ── 10: Bookmaker map — image (landscape)
   {
     kind: 'image',
     id: 'bookmaker-map',
     title: 'Bookmaker Density Map',
-    eyebrow: 'Visualisation · 2024',
+    eyebrow: 'Visualisation · 2025',
     caption: 'Geographic distribution of licensed bookmakers against deprivation indices.',
     cover: '/images/gallery/bookmaker_map.jpg',
     coverWidth: 1200,
@@ -164,7 +190,50 @@ export const galleryTiles: GalleryTile[] = [
     fullHeight: 658,
   },
 
-  // ── 9: Social network assignment — full paper (portrait)
+  // ── 11: Neighbour map — image (square)
+  {
+    kind: 'image',
+    id: 'neighbour-map',
+    title: 'Neighbourhood Map',
+    eyebrow: 'Visualisation · 2025',
+    caption: 'Spatial neighbours and adjacency structures for the gambling harm regression models.',
+    cover: '/images/gallery/neighbour_map.jpg',
+    coverWidth: 1200,
+    coverHeight: 1200,
+    full: '/images/gallery/neighbour_map.jpg',
+    fullWidth: 1200,
+    fullHeight: 1200,
+  },
+
+  // ── 12: Japan travel map — image (landscape)
+  {
+    kind: 'image',
+    id: 'design-principles-map',
+    title: 'Top Tripadvisor Locations in Japan',
+    eyebrow: 'Visualisation · 2025',
+    caption: 'Illustrated map of Japan designed to highlight a curated set of top Tripadvisor destinations across the country.',
+    cover: '/images/gallery/design_principles_map.jpg',
+    coverWidth: 1200,
+    coverHeight: 848,
+    full: '/images/gallery/design_principles_map.jpg',
+    fullWidth: 1200,
+    fullHeight: 848,
+  },
+
+  // ── 13: UCL dissertation preview
+  {
+    kind: 'paper',
+    id: 'ucl-dissertation',
+    title: 'Arts Engagement, Illness, and Medication Burden',
+    eyebrow: 'Paper · BSc dissertation preview',
+    caption: '2-page preview of my UCL undergraduate dissertation using ELSA data to study arts engagement, illness, and medication burden.',
+    cover: '/images/projects/papers/ucl_dissertation_cover.webp',
+    coverWidth: 1400,
+    coverHeight: 1979,
+    href: '/papers/ucl_dissertation_preview.pdf',
+  },
+
+  // ── 14: Social network assignment — full paper (portrait)
   {
     kind: 'paper',
     id: 'social-network',
@@ -177,22 +246,7 @@ export const galleryTiles: GalleryTile[] = [
     href: '/papers/social_network_assignment.pdf',
   },
 
-  // ── 10: Neighbour map — image (square)
-  {
-    kind: 'image',
-    id: 'neighbour-map',
-    title: 'Neighbourhood Map',
-    eyebrow: 'Visualisation · 2024',
-    caption: 'Spatial neighbours and adjacency structures for the gambling harm regression models.',
-    cover: '/images/gallery/neighbour_map.jpg',
-    coverWidth: 1200,
-    coverHeight: 1200,
-    full: '/images/gallery/neighbour_map.jpg',
-    fullWidth: 1200,
-    fullHeight: 1200,
-  },
-
-  // ── 11: Genetics essay — full paper (portrait)
+  // ── 15: Genetics essay — full paper (portrait)
   {
     kind: 'paper',
     id: 'genetics-essay',
@@ -205,22 +259,7 @@ export const galleryTiles: GalleryTile[] = [
     href: '/papers/genetics_essay.pdf',
   },
 
-  // ── 12: Design principles map — image (landscape)
-  {
-    kind: 'image',
-    id: 'design-principles-map',
-    title: 'Top Tripadvisor Locations in Japan',
-    eyebrow: 'Visualisation · 2024',
-    caption: 'Illustrated map of Japan designed to highlight a curated set of top Tripadvisor destinations across the country.',
-    cover: '/images/gallery/design_principles_map.jpg',
-    coverWidth: 1200,
-    coverHeight: 848,
-    full: '/images/gallery/design_principles_map.jpg',
-    fullWidth: 1200,
-    fullHeight: 848,
-  },
-
-  // ── 13: Oregon Dunes — full paper (portrait)
+  // ── 16: Oregon Dunes — full paper (portrait)
   {
     kind: 'paper',
     id: 'oregon-dunes',
@@ -231,18 +270,5 @@ export const galleryTiles: GalleryTile[] = [
     coverWidth: 1400,
     coverHeight: 1980,
     href: '/papers/oregon_dunes.pdf',
-  },
-
-  // ── 14: Invitation template — full paper (landscape)
-  {
-    kind: 'paper',
-    id: 'invitation-template',
-    title: 'Luke & Krizia Invitation',
-    eyebrow: 'Design · 2026',
-    caption: 'Print invitation layout pairing wedding typography with a custom social-network visual motif.',
-    cover: '/images/projects/papers/invitation_template_cover.webp',
-    coverWidth: 1400,
-    coverHeight: 1009,
-    href: '/papers/invitation_template.pdf',
   },
 ];
