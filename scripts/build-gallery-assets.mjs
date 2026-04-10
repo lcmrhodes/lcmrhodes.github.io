@@ -111,6 +111,8 @@ const previewPdfs = [
 ];
 
 const fullPdfCovers = [
+  { input: 'oxford_dissertation_preview.pdf', cover: 'oxford_dissertation_cover.webp' },
+  { input: 'ucl_dissertation_preview.pdf',    cover: 'ucl_dissertation_cover.webp' },
   { input: 'genetics_essay.pdf',           cover: 'genetics_essay_cover.webp' },
   { input: 'social_network_assignment.pdf', cover: 'social_network_cover.webp' },
   { input: 'invitation_template.pdf',       cover: 'invitation_template_cover.webp' },
