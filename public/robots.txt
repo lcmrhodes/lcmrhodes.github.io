@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+LLM-Info: https://lcmrhodes.github.io/llms.txt

@@ -25,6 +25,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 		<title>{title}</title>
 		<meta name="description" content={description} />
 		<link rel="canonical" href={canonical.toString()} />
+		<link rel="alternate" type="text/plain" href="/llms.txt" title="AI-readable portfolio guidance" />
 		<meta property="og:type" content="website" />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
