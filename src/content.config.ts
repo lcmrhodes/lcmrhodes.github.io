@@ -18,7 +18,6 @@ const projects = defineCollection({
 		role: z.string(),
 		highlights: z.array(z.string()),
 		disclaimer: z.string().optional(),
-		papers: z.array(z.object({ label: z.string(), url: z.string() })).optional(),
 	}),
 });
 

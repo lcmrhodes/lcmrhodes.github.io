@@ -3,8 +3,7 @@
  * ========================
  * Generates the static assets needed by the projects gallery:
  *
- *  1. Preview PDFs (first 3 pages) for the two large papers.
- *  2. First-page WebP cover images for all paper tiles, via:
+ *  1. First-page WebP cover images for all paper tiles, via:
  *       a) qlmanage  (macOS Quick Look — renders the first page to a high-res PNG)
  *       b) sharp     (resizes + converts to WebP)
  *
@@ -12,13 +11,12 @@
  *
  * Requirements:
  *   - macOS (uses `qlmanage`)
- *   - pdf-lib and sharp installed as devDependencies (`npm install`)
+ *   - sharp installed as a devDependency (`npm install`)
  */
 
-import { PDFDocument } from 'pdf-lib';
 import sharp from 'sharp';
-import { execSync, spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { readFileSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { resolve, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -31,26 +29,7 @@ const COVERS_OUT = join(ROOT, 'public', 'images', 'projects', 'papers');
 
 mkdirSync(COVERS_OUT, { recursive: true });
 
-// ─── 1. Generate 3-page preview PDFs ─────────────────────────────────────────
-
-async function buildPreviewPdf(inputName, outputName, pageCount = 3) {
-  const inputPath = join(PAPERS_DIR, inputName);
-  const outputPath = join(PAPERS_DIR, outputName);
-  console.log(`📄 Creating preview PDF: ${outputName} (first ${pageCount} pages)…`);
-  const srcBytes = readFileSync(inputPath);
-  const srcDoc = await PDFDocument.load(srcBytes);
-  const total = srcDoc.getPageCount();
-  const pages = Math.min(pageCount, total);
-  const newDoc = await PDFDocument.create();
-  const copied = await newDoc.copyPages(srcDoc, [...Array(pages).keys()]);
-  copied.forEach(p => newDoc.addPage(p));
-  const outBytes = await newDoc.save();
-  writeFileSync(outputPath, outBytes);
-  console.log(`   ✓ Saved ${outputPath}`);
-  return outputPath;
-}
-
-// ─── 2. Render first page of a PDF to WebP via qlmanage ──────────────────────
+// ─── 1. Render first page of a PDF to WebP via qlmanage ──────────────────────
 
 async function pdfToWebpCover(pdfPath, outputName, targetWidth = 1400) {
   const outPath = join(COVERS_OUT, outputName);
@@ -95,22 +74,11 @@ async function pdfToWebpCover(pdfPath, outputName, targetWidth = 1400) {
   }
 }
 
-// ─── 3. Main ─────────────────────────────────────────────────────────────────
+// ─── 2. Main ─────────────────────────────────────────────────────────────────
 
-const previewPdfs = [
-  {
-    input: 'gambling_spatial_analysis_luke.pdf',
-    output: 'gambling_spatial_analysis_preview.pdf',
-    cover: 'gambling_spatial_cover.webp',
-  },
-  {
-    input: 'luke_rhodes_translational_review.pdf',
-    output: 'luke_rhodes_translational_review_preview.pdf',
-    cover: 'translational_review_cover.webp',
-  },
-];
-
-const fullPdfCovers = [
+const paperCovers = [
+  { input: 'gambling_spatial_analysis_preview.pdf', cover: 'gambling_spatial_cover.webp' },
+  { input: 'luke_rhodes_translational_review_preview.pdf', cover: 'translational_review_cover.webp' },
   { input: 'oxford_dissertation_preview.pdf', cover: 'oxford_dissertation_cover.webp' },
   { input: 'ucl_dissertation_preview.pdf',    cover: 'ucl_dissertation_cover.webp' },
   { input: 'genetics_essay.pdf',           cover: 'genetics_essay_cover.webp' },
@@ -119,28 +87,16 @@ const fullPdfCovers = [
   { input: 'oregon_dunes.pdf',             cover: 'oregon_dunes_cover.webp' },
 ];
 
-// Step 1 + covers from preview PDFs
-for (const { input, output, cover } of previewPdfs) {
-  const previewPath = await buildPreviewPdf(input, output, 3);
-  await pdfToWebpCover(previewPath, cover);
-}
-
-// Covers from full PDFs
-for (const { input, cover } of fullPdfCovers) {
+for (const { input, cover } of paperCovers) {
   await pdfToWebpCover(join(PAPERS_DIR, input), cover);
 }
 
-// ─── 4. Emit a dimensions JSON sidecar for gallery.ts ────────────────────────
+// ─── 3. Print dimensions for gallery.ts reference ────────────────────────────
 
-console.log('\n📐 Reading dimensions of generated covers…');
-const dims = {};
-for (const { cover } of [...previewPdfs, ...fullPdfCovers]) {
+console.log('\n📐 Generated cover dimensions:');
+for (const { cover } of paperCovers) {
   const meta = await sharp(join(COVERS_OUT, cover)).metadata();
-  dims[cover] = { width: meta.width, height: meta.height };
   console.log(`   ${cover}: ${meta.width}×${meta.height}`);
 }
 
-const sidecarPath = join(COVERS_OUT, '_dims.json');
-writeFileSync(sidecarPath, JSON.stringify(dims, null, 2));
-console.log(`\n✅ Dimensions written to ${sidecarPath}`);
 console.log('\nDone! Next step: capture site screenshots via the MCP preview tool.\n');

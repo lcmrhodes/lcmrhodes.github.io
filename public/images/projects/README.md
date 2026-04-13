@@ -2,7 +2,7 @@
 
 This folder holds generated cover art and captured screenshots for the homepage projects masonry gallery.
 
-## Regenerate PDF previews and paper covers
+## Regenerate paper covers
 
 1. Install dependencies:
    `npm install`
@@ -11,17 +11,15 @@ This folder holds generated cover art and captured screenshots for the homepage 
 
 That script will:
 
-- create `public/papers/gambling_spatial_analysis_preview.pdf` from the first 3 pages of `public/papers/gambling_spatial_analysis_luke.pdf`
-- create `public/papers/luke_rhodes_translational_review_preview.pdf` from the first 3 pages of `public/papers/luke_rhodes_translational_review.pdf`
-- generate paper covers for the Oxford and UCL dissertation preview PDFs already in `public/papers/`
+- generate paper covers from the public PDFs already in `public/papers/`
+- use preview PDFs as the source for unpublished or research-only work
 - rasterise the first page of each paper PDF with `qlmanage`
 - resize and encode the paper cover images into `public/images/projects/papers/*.webp`
-- emit `public/images/projects/papers/_dims.json` as a size reference
 
 Requirements:
 
 - macOS, because the script uses `qlmanage`
-- `pdf-lib` and `sharp` installed from `package.json`
+- `sharp` installed from `package.json`
 
 ## Refresh live-site screenshots
 
