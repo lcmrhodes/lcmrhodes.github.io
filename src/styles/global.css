@@ -251,37 +251,10 @@ a {
 	z-index: 1;
 }
 
-.about-portrait-image--hover-light,
-.about-portrait-image--hover-dark {
-	visibility: hidden;
-	z-index: 2;
-}
-
 .layout[data-active-tab='about'] .about-portrait-placeholder {
 	opacity: 1;
 	transform: translateY(0);
 	pointer-events: auto;
-}
-
-.layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--light,
-.layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--dark {
-	visibility: hidden;
-	z-index: 0;
-}
-
-.layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--hover-light {
-	visibility: visible;
-	z-index: 3;
-}
-
-:root[data-theme='dark'] .layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--hover-light {
-	visibility: hidden;
-	z-index: 0;
-}
-
-:root[data-theme='dark'] .layout[data-active-tab='about'] .about-portrait-placeholder:hover .about-portrait-image--hover-dark {
-	visibility: visible;
-	z-index: 3;
 }
 
 .identity-name {
