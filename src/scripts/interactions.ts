@@ -8,6 +8,8 @@ const WEDDING_SPARKLE_SOUND_DELAY_MS = 130;
 const SOUND_ENABLED_KEY = 'sound-enabled';
 const THEME_KEY = 'theme';
 const WEATHER_KEY = 'weather';
+const THEME_OVERRIDE_KEY = 'portfolio-theme-override';
+const WEATHER_OVERRIDE_KEY = 'portfolio-weather-override';
 const AUTO_ENVIRONMENT_CACHE_KEY = 'portfolio-auto-environment';
 const AUTO_GEO_CACHE_KEY = 'portfolio-auto-geo';
 const ABOUT_HERO_TYPED_KEY = 'about-hero-typed';
@@ -36,7 +38,29 @@ type AutoEnvironment = {
 	weather: WeatherMode;
 	code?: number | null;
 	expires: number;
+	location?: {
+		src: string;
+		city?: string;
+	};
+	updatedAt?: number;
 };
+
+type EnvironmentDebugSnapshot = {
+	activeTheme: ThemeName;
+	activeWeather: WeatherMode;
+	manualThemeOverride: ThemeName | null;
+	manualWeatherOverride: WeatherMode | null;
+	autoEnvironment: AutoEnvironment | null;
+	geo: GeoLocationResult | null;
+	localHourTheme: ThemeName;
+};
+
+declare global {
+	interface Window {
+		portfolioEnvironmentDebug?: () => EnvironmentDebugSnapshot;
+		portfolioEnvironmentRefresh?: () => Promise<void>;
+	}
+}
 
 let galleryObserver: IntersectionObserver | null = null;
 let aboutTypingToken = 0;
@@ -87,12 +111,12 @@ function setStoredValue(key: string, value: string) {
 }
 
 function getManualThemeOverride() {
-	const saved = getStoredValue(THEME_KEY);
+	const saved = getStoredValue(THEME_OVERRIDE_KEY);
 	return isValidTheme(saved) ? saved : null;
 }
 
 function getManualWeatherOverride() {
-	const saved = getStoredValue(WEATHER_KEY);
+	const saved = getStoredValue(WEATHER_OVERRIDE_KEY);
 	return isValidWeather(saved) ? saved : null;
 }
 
@@ -671,20 +695,24 @@ function setTheme(nextTheme: ThemeName, options: { persist?: boolean } = {}) {
 
 	if (root.dataset.theme === nextTheme) {
 		if (persist) {
+			setStoredValue(THEME_OVERRIDE_KEY, nextTheme);
 			setStoredValue(THEME_KEY, nextTheme);
 		}
+		syncEnvironmentDiagnostics();
 		return;
 	}
 
 	root.classList.add('theme-switching');
 	root.dataset.theme = nextTheme;
 	if (persist) {
+		setStoredValue(THEME_OVERRIDE_KEY, nextTheme);
 		setStoredValue(THEME_KEY, nextTheme);
 	}
 	syncThemeToggleLabels();
 	// Refresh cloud colors when theme changes
 	if (weatherMode === 'clouds') createClouds('clouds');
 	else if (weatherMode === 'overcast') createClouds('overcast');
+	syncEnvironmentDiagnostics();
 
 	window.setTimeout(() => {
 		root.classList.remove('theme-switching');
@@ -1836,13 +1864,34 @@ function renderWeather(mode: WeatherMode) {
 	syncWeatherToggleLabels();
 }
 
+function syncEnvironmentDiagnostics(environment: AutoEnvironment | null = getCachedAutoEnvironment()) {
+	const root = document.documentElement;
+	root.dataset.environmentThemeSource = getManualThemeOverride() ? 'manual' : 'auto';
+	root.dataset.environmentWeatherSource = getManualWeatherOverride() ? 'manual' : 'auto';
+
+	if (environment?.code != null) {
+		root.dataset.weatherCode = String(environment.code);
+	} else {
+		delete root.dataset.weatherCode;
+	}
+
+	if (environment?.location?.src) {
+		root.dataset.geoSource = environment.location.src;
+	} else {
+		delete root.dataset.geoSource;
+	}
+}
+
 function setWeather(mode: WeatherMode, options: { persist?: boolean } = {}) {
 	const { persist = true } = options;
 	renderWeather(mode);
 
 	if (persist) {
+		setStoredValue(WEATHER_OVERRIDE_KEY, mode);
 		setStoredValue(WEATHER_KEY, mode);
 	}
+
+	syncEnvironmentDiagnostics();
 }
 
 function bindWeatherButtons() {
@@ -1929,6 +1978,7 @@ function initWeather() {
 	const manualWeather = getManualWeatherOverride();
 	const cachedAuto = getCachedAutoEnvironment();
 	renderWeather(manualWeather ?? cachedAuto?.weather ?? 'off');
+	syncEnvironmentDiagnostics(cachedAuto);
 }
 
 function getCachedAutoEnvironment() {
@@ -1959,6 +2009,18 @@ function setCachedAutoEnvironment(environment: AutoEnvironment) {
 	}
 }
 
+function getEnvironmentDebugSnapshot(): EnvironmentDebugSnapshot {
+	return {
+		activeTheme: getActiveTheme(),
+		activeWeather: weatherMode,
+		manualThemeOverride: getManualThemeOverride(),
+		manualWeatherOverride: getManualWeatherOverride(),
+		autoEnvironment: getCachedAutoEnvironment(),
+		geo: getCachedGeoLocation(),
+		localHourTheme: getBrowserTimeTheme(),
+	};
+}
+
 function mapWeatherCodeToMode(code: number | null | undefined): WeatherMode {
 	if (code == null) return 'off';
 	if (code === 0 || code === 1) return 'off';
@@ -1977,6 +2039,8 @@ function applyAutoEnvironment(environment: AutoEnvironment) {
 	if (!getManualWeatherOverride()) {
 		setWeather(environment.weather, { persist: false });
 	}
+
+	syncEnvironmentDiagnostics(environment);
 }
 
 function normaliseGeoLocation(candidate: Partial<GeoLocationResult> | null): GeoLocationResult | null {
@@ -2157,6 +2221,11 @@ async function fetchAutoEnvironment(force = false) {
 			weather: mapWeatherCodeToMode(code),
 			code,
 			expires: Date.now() + AUTO_ENVIRONMENT_CACHE_MS,
+			location: {
+				src: location.src,
+				city: location.city,
+			},
+			updatedAt: Date.now(),
 		};
 
 		setCachedAutoEnvironment(environment);
@@ -2171,6 +2240,9 @@ async function fetchAutoEnvironment(force = false) {
 }
 
 function initAutoEnvironment() {
+	window.portfolioEnvironmentDebug = getEnvironmentDebugSnapshot;
+	window.portfolioEnvironmentRefresh = () => fetchAutoEnvironment(true);
+
 	const cached = getCachedAutoEnvironment();
 
 	if (cached) {
