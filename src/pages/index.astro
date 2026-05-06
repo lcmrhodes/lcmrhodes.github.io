@@ -112,10 +112,10 @@ const educationExperienceItems = [
 				<p class="identity-tagline anim-entrance" data-delay="1">Data science, analytics, and real-world tools.</p>
 			</div>
 
-				<div class="about-portrait-placeholder">
-					<img class="about-portrait-image about-portrait-image--light" src="/images/luke-portrait.jpg" alt="Portrait of Luke Rhodes" loading="eager" decoding="sync" fetchpriority="high" />
-					<img class="about-portrait-image about-portrait-image--dark" src="/images/luke-portrait-dark.png" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high" />
-				</div>
+			<div class="about-portrait-placeholder">
+				<img class="about-portrait-image about-portrait-image--light" src="/images/luke-portrait.jpg" alt="Portrait of Luke Rhodes" loading="eager" decoding="sync" fetchpriority="high" />
+				<img class="about-portrait-image about-portrait-image--dark" src="/images/luke-portrait-dark.png" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high" />
+			</div>
 
 			<nav class="side-nav" aria-label="Site sections">
 				{tabs.map((tab) => (
@@ -157,15 +157,6 @@ const educationExperienceItems = [
 							<path d="M4.98 3.5A2.48 2.48 0 1 0 5 8.46 2.48 2.48 0 0 0 4.98 3.5zM3 9h4v12H3zM10 9h3.83v1.64h.05c.53-1.01 1.84-2.08 3.79-2.08 4.05 0 4.8 2.66 4.8 6.12V21h-4v-5.63c0-1.34-.02-3.07-1.87-3.07-1.88 0-2.17 1.47-2.17 2.97V21h-4z"></path>
 						</svg>
 						<span class="sr-only">LinkedIn</span>
-					</a>
-					<a class="identity-link-icon" href="/Luke_Rhodes_CV_2025.docx" aria-label="Download CV">
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-							<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
-							<path d="M14 2v5h5"></path>
-							<path d="M8.5 13h7"></path>
-							<path d="M8.5 17h5"></path>
-						</svg>
-						<span class="sr-only">Download CV</span>
 					</a>
 					<a class="identity-link-icon" href="mailto:lcmrhodes98@gmail.com" aria-label="Email Luke Rhodes">
 						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -328,33 +319,24 @@ const educationExperienceItems = [
 						<h2><span class="about-heading-chunk">Hi,</span><span class="about-heading-chunk"> I'm Luke.</span></h2>
 						<p class="about-summary">
 							<span class="about-summary-lead">
-								I turn information into products that make decisions easier.
+								<span class="about-summary-fragment">I build data tools for </span><a
+									href="https://sepsis-flow-web-app.onrender.com"
+									target="_blank"
+									rel="noreferrer"
+									class="about-inline-link about-inline-link--pulse"
+								><span class="about-inline-link-text">clinics</span><span class="about-inline-popout" aria-hidden="true">A decision-support tool for paediatric triage in rural Southeast Asia.</span></a><span class="about-summary-fragment">, for </span><a
+									href="https://myscenttaste.vercel.app"
+									class="about-inline-link about-inline-link--fragrance"
+								><span class="about-inline-link-text">taste</span><span class="about-inline-popout" aria-hidden="true">A fragrance profiler driven by dimensions of scent, not &ldquo;x users also bought y&rdquo;.</span></a><span class="about-summary-fragment">, and for </span><a
+									href="https://wedding-network.vercel.app"
+									target="_blank"
+									rel="noreferrer"
+									class="about-inline-link about-inline-link--wedding"
+								><span class="about-inline-link-text">curiosity</span><span class="about-inline-link__sparkles" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span><span class="about-inline-popout" aria-hidden="true">A network map I built into my own wedding invitations.</span></a><span class="about-summary-fragment">.</span>
 							</span>
 							<span class="about-summary-detail">
 								<span class="about-summary-chunk">
-									<span class="about-summary-fragment">From a </span><a
-										href="https://sepsis-flow-web-app.onrender.com"
-										target="_blank"
-										rel="noreferrer"
-										class="about-inline-link about-inline-link--pulse"
-									><span class="about-inline-link-text">clinical decision-support tool</span></a>
-								</span>
-								<span class="about-summary-chunk">
-									<span class="about-summary-fragment"> to a </span><a
-										href="https://myscenttaste.vercel.app"
-										class="about-inline-link about-inline-link--fragrance"
-									><span class="about-inline-link-text">taste-led fragrance profiling app</span></a><span class="about-summary-fragment">,</span>
-								</span>
-								<span class="about-summary-chunk">
-									<span class="about-summary-fragment"> and an </span><a
-										href="https://wedding-network.vercel.app"
-										target="_blank"
-										rel="noreferrer"
-										class="about-inline-link about-inline-link--wedding"
-									><span class="about-inline-link-text">interactive wedding network</span><span class="about-inline-link__sparkles" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></a><span class="about-summary-fragment"> built as part of my own invitations,</span>
-								</span>
-								<span class="about-summary-chunk">
-									<span class="about-summary-fragment"> I like making things that work well and look right.</span>
+									<span class="about-summary-fragment">Different problems, same instinct: find the structure underneath, then make something rigorous and well-made of it.</span>
 								</span>
 							</span>
 						</p>
@@ -690,15 +672,6 @@ const educationExperienceItems = [
 					<path d="M4.98 3.5A2.48 2.48 0 1 0 5 8.46 2.48 2.48 0 0 0 4.98 3.5zM3 9h4v12H3zM10 9h3.83v1.64h.05c.53-1.01 1.84-2.08 3.79-2.08 4.05 0 4.8 2.66 4.8 6.12V21h-4v-5.63c0-1.34-.02-3.07-1.87-3.07-1.88 0-2.17 1.47-2.17 2.97V21h-4z"></path>
 				</svg>
 				<span class="sr-only">LinkedIn</span>
-			</a>
-			<a class="identity-link-icon" href="/Luke_Rhodes_CV_2025.docx" aria-label="Download CV">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-					<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"></path>
-					<path d="M14 2v5h5"></path>
-					<path d="M8.5 13h7"></path>
-					<path d="M8.5 17h5"></path>
-				</svg>
-				<span class="sr-only">Download CV</span>
 			</a>
 			<a class="identity-link-icon" href="mailto:lcmrhodes98@gmail.com" aria-label="Email Luke Rhodes">
 				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

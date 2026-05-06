@@ -887,6 +887,63 @@ a.about-inline-link .about-inline-link-text {
 		0 0 0.2em rgba(17, 25, 24, 0.45);
 }
 
+body:not([data-typing-ready='true']) .identity-name,
+body:not([data-typing-ready='true']) .identity-tagline,
+body:not([data-typing-ready='true']) .about-hero h2,
+body:not([data-typing-ready='true']) .about-summary {
+	visibility: hidden;
+}
+
+.about-inline-popout {
+	position: absolute;
+	left: 50%;
+	top: calc(100% + 0.55em);
+	transform: translateX(calc(-50% + var(--popout-shift, 0px))) translateY(4px);
+	width: min(max-content, calc(100vw - 1.75rem));
+	max-width: min(22rem, calc(100vw - 1.75rem));
+	padding: 0.72em 0.92em;
+	border-radius: 0.75em;
+	border: 1px solid var(--border);
+	background: color-mix(in srgb, var(--panel-strong) 94%, transparent);
+	backdrop-filter: blur(16px);
+	box-shadow: 0 8px 28px rgba(31, 36, 34, 0.12);
+	font-family: var(--font-body);
+	font-size: 0.88rem;
+	font-weight: 400;
+	line-height: 1.44;
+	letter-spacing: 0;
+	color: var(--muted);
+	white-space: normal;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 200ms ease, transform 200ms ease;
+	z-index: 40;
+}
+
+.about-inline-popout::before {
+	content: '';
+	position: absolute;
+	bottom: 100%;
+	left: calc(50% - var(--popout-shift, 0px));
+	transform: translateX(-50%);
+	border: 6px solid transparent;
+	border-bottom-color: var(--border);
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.about-inline-link:hover .about-inline-popout,
+	.about-inline-link.is-inline-hover-active .about-inline-popout {
+		opacity: 1;
+		transform: translateX(calc(-50% + var(--popout-shift, 0px))) translateY(0);
+	}
+}
+
+.about-inline-link:focus-visible .about-inline-popout,
+.about-inline-link.is-inline-hover-active:focus-visible .about-inline-popout {
+	opacity: 1;
+	transform: translateX(calc(-50% + var(--popout-shift, 0px))) translateY(0);
+}
+
 body[data-inline-hover='true'] .identity-name,
 body[data-inline-hover='true'] .about-hero h2 {
 	opacity: 0.34;
@@ -897,7 +954,6 @@ body[data-inline-hover='true'] .side-nav-item {
 	opacity: 0.28;
 }
 
-body[data-inline-hover='true'] .about-summary-lead,
 body[data-inline-hover='true'] .about-summary-fragment {
 	opacity: 0.36;
 }

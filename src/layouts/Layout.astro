@@ -36,14 +36,38 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 		<meta name="twitter:description" content={description} />
 		<meta name="theme-color" content="#2d7f7a" />
 		<script is:inline>
-			const savedTheme = localStorage.getItem('theme');
+			const getBrowserTimeTheme = () => {
+				const hour = new Date().getHours();
+				return hour >= 7 && hour < 19 ? 'light' : 'dark';
+			};
+			let savedTheme = null;
+			let savedWeather = null;
+			let autoEnvironment = null;
+			try {
+				savedTheme = localStorage.getItem('theme');
+				savedWeather = localStorage.getItem('weather');
+				autoEnvironment = JSON.parse(localStorage.getItem('portfolio-auto-environment') || 'null');
+			} catch {}
 			if (savedTheme === 'dark' || savedTheme === 'light') {
 				document.documentElement.dataset.theme = savedTheme;
+			} else if (
+				autoEnvironment &&
+				autoEnvironment.expires > Date.now() &&
+				(autoEnvironment.theme === 'dark' || autoEnvironment.theme === 'light')
+			) {
+				document.documentElement.dataset.theme = autoEnvironment.theme;
+			} else {
+				document.documentElement.dataset.theme = getBrowserTimeTheme();
 			}
-			const savedWeather = localStorage.getItem('weather');
 			const validWeather = ['off', 'rain', 'clouds', 'snow', 'overcast'];
 			if (savedWeather && validWeather.includes(savedWeather)) {
 				document.documentElement.dataset.weather = savedWeather;
+			} else if (
+				autoEnvironment &&
+				autoEnvironment.expires > Date.now() &&
+				validWeather.includes(autoEnvironment.weather)
+			) {
+				document.documentElement.dataset.weather = autoEnvironment.weather;
 			} else {
 				document.documentElement.dataset.weather = 'off';
 			}

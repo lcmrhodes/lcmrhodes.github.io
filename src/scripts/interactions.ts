@@ -6,17 +6,37 @@ const PULSE_HALO_SOUND_DELAY_MS = 320;
 const FRAGRANCE_BLOOM_SOUND_DELAY_MS = 320;
 const WEDDING_SPARKLE_SOUND_DELAY_MS = 130;
 const SOUND_ENABLED_KEY = 'sound-enabled';
+const THEME_KEY = 'theme';
 const WEATHER_KEY = 'weather';
+const AUTO_ENVIRONMENT_CACHE_KEY = 'portfolio-auto-environment';
+const AUTO_GEO_CACHE_KEY = 'portfolio-auto-geo';
 const ABOUT_HERO_TYPED_KEY = 'about-hero-typed';
 const IDENTITY_TYPED_KEY = 'identity-typed';
 const ABOUT_HERO_LINE_PAUSE_MS = 1000;
 const ABOUT_HERO_CHUNK_PAUSE_MS = 500;
 const ABOUT_HERO_HEADING_SPLIT_PAUSE_MS = 280;
+const AUTO_ENVIRONMENT_CACHE_MS = 30 * 60 * 1000;
+const AUTO_GEO_CACHE_MS = 7 * 24 * 60 * 60 * 1000;
 
 type WeatherMode = 'off' | 'rain' | 'clouds' | 'snow' | 'overcast';
 
 type TabKey = (typeof TABS)[number];
 type ThemeName = 'light' | 'dark';
+
+type GeoLocationResult = {
+	lat: number;
+	lon: number;
+	src: string;
+	city?: string;
+	savedAt: number;
+};
+
+type AutoEnvironment = {
+	theme: ThemeName;
+	weather: WeatherMode;
+	code?: number | null;
+	expires: number;
+};
 
 let galleryObserver: IntersectionObserver | null = null;
 let aboutTypingToken = 0;
@@ -42,6 +62,45 @@ function getActiveTheme(): ThemeName {
 	return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
 }
 
+function isValidTheme(value: string | null): value is ThemeName {
+	return value === 'light' || value === 'dark';
+}
+
+function isValidWeather(value: string | null): value is WeatherMode {
+	return value === 'off' || value === 'rain' || value === 'clouds' || value === 'snow' || value === 'overcast';
+}
+
+function getStoredValue(key: string) {
+	try {
+		return localStorage.getItem(key);
+	} catch {
+		return null;
+	}
+}
+
+function setStoredValue(key: string, value: string) {
+	try {
+		localStorage.setItem(key, value);
+	} catch {
+		// Storage can be unavailable in private browsing or embedded previews.
+	}
+}
+
+function getManualThemeOverride() {
+	const saved = getStoredValue(THEME_KEY);
+	return isValidTheme(saved) ? saved : null;
+}
+
+function getManualWeatherOverride() {
+	const saved = getStoredValue(WEATHER_KEY);
+	return isValidWeather(saved) ? saved : null;
+}
+
+function getBrowserTimeTheme(): ThemeName {
+	const hour = new Date().getHours();
+	return hour >= 7 && hour < 19 ? 'light' : 'dark';
+}
+
 function syncSoundToggleLabels() {
 	document.body.dataset.soundEnabled = String(soundEnabled);
 
@@ -54,7 +113,7 @@ function syncSoundToggleLabels() {
 
 function setSoundEnabled(nextValue: boolean) {
 	soundEnabled = nextValue;
-	localStorage.setItem(SOUND_ENABLED_KEY, String(nextValue));
+	setStoredValue(SOUND_ENABLED_KEY, String(nextValue));
 	syncSoundToggleLabels();
 }
 
@@ -606,24 +665,30 @@ function syncThemeToggleLabels() {
 	});
 }
 
-function setTheme(nextTheme: ThemeName) {
+function setTheme(nextTheme: ThemeName, options: { persist?: boolean } = {}) {
+	const { persist = true } = options;
 	const root = document.documentElement;
 
 	if (root.dataset.theme === nextTheme) {
+		if (persist) {
+			setStoredValue(THEME_KEY, nextTheme);
+		}
 		return;
 	}
 
 	root.classList.add('theme-switching');
 	root.dataset.theme = nextTheme;
-	localStorage.setItem('theme', nextTheme);
+	if (persist) {
+		setStoredValue(THEME_KEY, nextTheme);
+	}
 	syncThemeToggleLabels();
 	// Refresh cloud colors when theme changes
 	if (weatherMode === 'clouds') createClouds('clouds');
 	else if (weatherMode === 'overcast') createClouds('overcast');
 
-window.setTimeout(() => {
-	root.classList.remove('theme-switching');
-}, 380);
+	window.setTimeout(() => {
+		root.classList.remove('theme-switching');
+	}, 380);
 }
 
 function getIdentityTextElements() {
@@ -690,7 +755,7 @@ function startIdentityTyping(token: number) {
 	const elements = getIdentityTextElements().map((element) => ({
 		element,
 		text: element.dataset.fullText ?? '',
-		charDelay: element.classList.contains('identity-name') ? 42 : 22,
+		charDelay: element.classList.contains('identity-name') ? 62 : 38,
 	}));
 
 	if (!elements.length || prefersReducedMotion()) {
@@ -723,17 +788,17 @@ function startIdentityTyping(token: number) {
 			current.element.textContent = current.text.slice(0, charIndex);
 
 			if (charIndex < current.text.length) {
-				window.setTimeout(typeChar, current.charDelay);
+				window.setTimeout(typeChar, getNaturalTypingDelay(current.text[charIndex - 1], current.charDelay));
 				return;
 			}
 
-			window.setTimeout(typeNextElement, 120);
+			window.setTimeout(typeNextElement, 220);
 		};
 
-		window.setTimeout(typeChar, 72);
+		window.setTimeout(typeChar, 88);
 	};
 
-	typeNextElement();
+	window.setTimeout(typeNextElement, 100);
 }
 
 type AboutHeroTypingNode = {
@@ -781,6 +846,9 @@ function markAboutHeroTyped() {
 function collectAboutHeroTypingNodes(root: HTMLElement, charDelay: number) {
 	const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
 		acceptNode(node) {
+			if ((node.parentElement as HTMLElement | null)?.closest('.about-inline-popout')) {
+				return NodeFilter.FILTER_REJECT;
+			}
 			const cachedValue = aboutHeroTextCache.get(node as Text) ?? '';
 			const value = node.textContent ?? '';
 			return cachedValue.trim().length > 0 || value.trim().length > 0
@@ -823,6 +891,26 @@ function createAboutHeroTypingBlock(
 	};
 }
 
+function getNaturalTypingDelay(char: string | undefined, baseDelay: number) {
+	if (!char) {
+		return baseDelay;
+	}
+
+	if (char === '.' || char === ',' || char === ':' || char === ';') {
+		return baseDelay + 170;
+	}
+
+	if (char === '!' || char === '?') {
+		return baseDelay + 220;
+	}
+
+	if (char === ' ') {
+		return Math.round(baseDelay * 0.72);
+	}
+
+	return baseDelay + Math.round(Math.random() * 18);
+}
+
 function clearAboutTypingGlow() {
 	document.querySelectorAll<HTMLElement>('.about-inline-link.is-type-glowing').forEach((link) => {
 		link.classList.remove('is-type-glowing');
@@ -851,19 +939,19 @@ function getAboutHeroTypingBlocks() {
 				blocks.push(
 					createAboutHeroTypingBlock(
 						chunk,
-						88,
+						112,
 						72,
 						index < headingChunks.length - 1 ? ABOUT_HERO_HEADING_SPLIT_PAUSE_MS : ABOUT_HERO_LINE_PAUSE_MS,
 					),
 				);
 			});
 		} else {
-			blocks.push(createAboutHeroTypingBlock(heading, 88, 72, ABOUT_HERO_LINE_PAUSE_MS));
+			blocks.push(createAboutHeroTypingBlock(heading, 112, 72, ABOUT_HERO_LINE_PAUSE_MS));
 		}
 	}
 
 	if (lead) {
-		blocks.push(createAboutHeroTypingBlock(lead, 34, 56, ABOUT_HERO_LINE_PAUSE_MS));
+		blocks.push(createAboutHeroTypingBlock(lead, 48, 56, ABOUT_HERO_LINE_PAUSE_MS));
 	}
 
 	if (detail) {
@@ -877,7 +965,7 @@ function getAboutHeroTypingBlocks() {
 				blocks.push(
 					createAboutHeroTypingBlock(
 						chunk,
-						36,
+						50,
 						60,
 						0,
 						glowTarget,
@@ -887,7 +975,7 @@ function getAboutHeroTypingBlocks() {
 			});
 		} else {
 			const links = Array.from(detail.querySelectorAll<HTMLElement>('.about-inline-link'));
-			blocks.push(createAboutHeroTypingBlock(detail, 36, 60, 0, links.at(-1) ?? null, true));
+			blocks.push(createAboutHeroTypingBlock(detail, 50, 60, 0, links.at(-1) ?? null, true));
 		}
 	}
 
@@ -968,20 +1056,20 @@ function startAboutHeroTyping(token: number) {
 				currentNode.node.textContent = currentNode.text.slice(0, charIndex);
 
 				if (charIndex < currentNode.text.length) {
-					window.setTimeout(typeChar, currentNode.charDelay);
+					window.setTimeout(typeChar, getNaturalTypingDelay(currentNode.text[charIndex - 1], currentNode.charDelay));
 					return;
 				}
 
-				window.setTimeout(typeNextNode, 68);
+				window.setTimeout(typeNextNode, currentNode.node.parentElement?.tagName === 'A' ? 130 : 82);
 			};
 
-			window.setTimeout(typeChar, currentNode.node.parentElement?.tagName === 'A' ? 54 : currentBlock.initialDelay);
+			window.setTimeout(typeChar, currentNode.node.parentElement?.tagName === 'A' ? 88 : currentBlock.initialDelay);
 		};
 
 		typeNextNode();
 	};
 
-	typeBlock();
+	window.setTimeout(typeBlock, 120);
 }
 
 function updateNavIndicator() {
@@ -1142,6 +1230,8 @@ function activateTab(tab: string, animate = true) {
 	} else {
 		restoreIdentityText();
 	}
+
+	document.body.dataset.typingReady = 'true';
 
 	if (layout) {
 		layout.dataset.activeTab = nextTab;
@@ -1429,6 +1519,7 @@ function bindWeddingSparkleEffect() {
 function setInlineHoverFocus(link: HTMLElement | null) {
 	if (activeInlineHoverLink && activeInlineHoverLink !== link) {
 		activeInlineHoverLink.classList.remove('is-inline-hover-active');
+		activeInlineHoverLink.style.removeProperty('--popout-shift');
 	}
 
 	activeInlineHoverLink = link;
@@ -1436,10 +1527,34 @@ function setInlineHoverFocus(link: HTMLElement | null) {
 	if (link) {
 		document.body.dataset.inlineHover = 'true';
 		link.classList.add('is-inline-hover-active');
+		positionInlinePopout(link);
 		return;
 	}
 
 	delete document.body.dataset.inlineHover;
+}
+
+function positionInlinePopout(link: HTMLElement) {
+	const popout = link.querySelector<HTMLElement>('.about-inline-popout');
+
+	if (!popout) {
+		return;
+	}
+
+	link.style.setProperty('--popout-shift', '0px');
+
+	window.requestAnimationFrame(() => {
+		const linkRect = link.getBoundingClientRect();
+		const popoutRect = popout.getBoundingClientRect();
+		const viewportPadding = 14;
+		const idealLeft = linkRect.left + linkRect.width / 2 - popoutRect.width / 2;
+		const idealRight = idealLeft + popoutRect.width;
+		const leftOverflow = Math.max(0, viewportPadding - idealLeft);
+		const rightOverflow = Math.max(0, idealRight - (window.innerWidth - viewportPadding));
+		const shift = leftOverflow - rightOverflow;
+
+		link.style.setProperty('--popout-shift', `${Math.round(shift)}px`);
+	});
 }
 
 function bindInlineHoverFocus() {
@@ -1455,6 +1570,20 @@ function bindInlineHoverFocus() {
 
 			setInlineHoverFocus(nextLink);
 		});
+
+		link.addEventListener('focusin', () => {
+			setInlineHoverFocus(link);
+		});
+
+		link.addEventListener('focusout', () => {
+			setInlineHoverFocus(null);
+		});
+	});
+
+	window.addEventListener('resize', () => {
+		if (activeInlineHoverLink) {
+			positionInlinePopout(activeInlineHoverLink);
+		}
 	});
 }
 
@@ -1692,10 +1821,9 @@ function syncWeatherToggleLabels() {
 	});
 }
 
-function setWeather(mode: WeatherMode) {
+function renderWeather(mode: WeatherMode) {
 	weatherMode = mode;
 	document.documentElement.dataset.weather = mode;
-	localStorage.setItem(WEATHER_KEY, mode);
 
 	stopWeatherCanvas();
 	clearClouds();
@@ -1706,6 +1834,15 @@ function setWeather(mode: WeatherMode) {
 	else if (mode === 'overcast') createClouds('overcast');
 
 	syncWeatherToggleLabels();
+}
+
+function setWeather(mode: WeatherMode, options: { persist?: boolean } = {}) {
+	const { persist = true } = options;
+	renderWeather(mode);
+
+	if (persist) {
+		setStoredValue(WEATHER_KEY, mode);
+	}
 }
 
 function bindWeatherButtons() {
@@ -1789,19 +1926,261 @@ function bindPillboxOverflow() {
 }
 
 function initWeather() {
-	const saved = localStorage.getItem(WEATHER_KEY) as WeatherMode | null;
-	const valid: WeatherMode[] = ['off', 'rain', 'clouds', 'snow', 'overcast'];
-	const initial = saved && valid.includes(saved) ? saved : 'off';
-	weatherMode = initial;
+	const manualWeather = getManualWeatherOverride();
+	const cachedAuto = getCachedAutoEnvironment();
+	renderWeather(manualWeather ?? cachedAuto?.weather ?? 'off');
+}
 
-	if (initial !== 'off') {
-		if (initial === 'rain') startRain();
-		else if (initial === 'snow') startSnow();
-		else if (initial === 'clouds') createClouds('clouds');
-		else if (initial === 'overcast') createClouds('overcast');
+function getCachedAutoEnvironment() {
+	try {
+		const cached = JSON.parse(localStorage.getItem(AUTO_ENVIRONMENT_CACHE_KEY) || 'null') as Partial<AutoEnvironment> | null;
+
+		if (
+			cached &&
+			typeof cached.expires === 'number' &&
+			cached.expires > Date.now() &&
+			isValidTheme(cached.theme ?? null) &&
+			isValidWeather(cached.weather ?? null)
+		) {
+			return cached as AutoEnvironment;
+		}
+	} catch {
+		return null;
 	}
 
-	syncWeatherToggleLabels();
+	return null;
+}
+
+function setCachedAutoEnvironment(environment: AutoEnvironment) {
+	try {
+		localStorage.setItem(AUTO_ENVIRONMENT_CACHE_KEY, JSON.stringify(environment));
+	} catch {
+		// Auto mode still applies for this session when storage is unavailable.
+	}
+}
+
+function mapWeatherCodeToMode(code: number | null | undefined): WeatherMode {
+	if (code == null) return 'off';
+	if (code === 0 || code === 1) return 'off';
+	if (code === 2) return 'clouds';
+	if (code === 3 || code === 45 || code === 48) return 'overcast';
+	if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82) || (code >= 95 && code <= 99)) return 'rain';
+	if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+	return 'off';
+}
+
+function applyAutoEnvironment(environment: AutoEnvironment) {
+	if (!getManualThemeOverride()) {
+		setTheme(environment.theme, { persist: false });
+	}
+
+	if (!getManualWeatherOverride()) {
+		setWeather(environment.weather, { persist: false });
+	}
+}
+
+function normaliseGeoLocation(candidate: Partial<GeoLocationResult> | null): GeoLocationResult | null {
+	const lat = Number(candidate?.lat);
+	const lon = Number(candidate?.lon);
+
+	if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+		return null;
+	}
+
+	return {
+		lat,
+		lon,
+		src: String(candidate?.src || 'unknown'),
+		city: candidate?.city,
+		savedAt: Number(candidate?.savedAt) || Date.now(),
+	};
+}
+
+function getCachedGeoLocation() {
+	try {
+		const cached = normaliseGeoLocation(JSON.parse(localStorage.getItem(AUTO_GEO_CACHE_KEY) || 'null'));
+
+		if (cached && Date.now() - cached.savedAt < AUTO_GEO_CACHE_MS) {
+			return cached;
+		}
+	} catch {
+		return null;
+	}
+
+	return null;
+}
+
+function saveGeoLocation(location: Omit<GeoLocationResult, 'savedAt'>) {
+	const value: GeoLocationResult = { ...location, savedAt: Date.now() };
+
+	try {
+		localStorage.setItem(AUTO_GEO_CACHE_KEY, JSON.stringify(value));
+	} catch {
+		// Keep using the in-memory result for this request.
+	}
+
+	return value;
+}
+
+function getBrowserGeoLocation() {
+	return new Promise<GeoLocationResult | null>((resolve) => {
+		if (!navigator.geolocation) {
+			resolve(null);
+			return;
+		}
+
+		navigator.geolocation.getCurrentPosition(
+			(pos) => {
+				resolve(saveGeoLocation({
+					lat: pos.coords.latitude,
+					lon: pos.coords.longitude,
+					src: 'browser',
+				}));
+			},
+			() => resolve(null),
+			{ timeout: 6000, maximumAge: 60 * 60 * 1000 },
+		);
+	});
+}
+
+async function getGrantedBrowserGeoLocation() {
+	if (!navigator.permissions) {
+		return null;
+	}
+
+	try {
+		const permission = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
+
+		if (permission.state !== 'granted') {
+			return null;
+		}
+
+		return getBrowserGeoLocation();
+	} catch {
+		return null;
+	}
+}
+
+async function getFreeIpGeoLocation() {
+	try {
+		const response = await fetch('https://freeipapi.com/api/json/');
+		if (!response.ok) return null;
+
+		const data = await response.json() as {
+			latitude?: number;
+			longitude?: number;
+			cityName?: string;
+		};
+
+		if (data.latitude == null || data.longitude == null) return null;
+
+		return saveGeoLocation({
+			lat: data.latitude,
+			lon: data.longitude,
+			src: 'freeipapi.com',
+			city: data.cityName,
+		});
+	} catch {
+		return null;
+	}
+}
+
+async function getGeoDbLocation() {
+	try {
+		const response = await fetch('https://geolocation-db.com/json/');
+		if (!response.ok) return null;
+
+		const data = await response.json() as {
+			latitude?: number | string;
+			longitude?: number | string;
+			city?: string;
+		};
+
+		if (data.latitude == null || data.longitude == null || data.latitude === 'Not found') return null;
+
+		return saveGeoLocation({
+			lat: Number(data.latitude),
+			lon: Number(data.longitude),
+			src: 'geolocation-db.com',
+			city: data.city,
+		});
+	} catch {
+		return null;
+	}
+}
+
+async function fetchAutoGeoLocation() {
+	return getCachedGeoLocation()
+		?? await getGrantedBrowserGeoLocation()
+		?? await getFreeIpGeoLocation()
+		?? await getGeoDbLocation();
+}
+
+async function fetchAutoEnvironment(force = false) {
+	const cached = force ? null : getCachedAutoEnvironment();
+
+	if (cached) {
+		applyAutoEnvironment(cached);
+		return;
+	}
+
+	const location = await fetchAutoGeoLocation();
+
+	if (!location) {
+		applyAutoEnvironment({
+			theme: getBrowserTimeTheme(),
+			weather: 'off',
+			expires: Date.now() + 10 * 60 * 1000,
+		});
+		return;
+	}
+
+	try {
+		const url = new URL('https://api.open-meteo.com/v1/forecast');
+		url.searchParams.set('latitude', String(location.lat));
+		url.searchParams.set('longitude', String(location.lon));
+		url.searchParams.set('current', 'weather_code,is_day');
+		url.searchParams.set('timezone', 'auto');
+
+		const response = await fetch(url.toString());
+		if (!response.ok) throw new Error(`Open-Meteo returned ${response.status}`);
+
+		const data = await response.json() as {
+			current?: {
+				is_day?: number;
+				weather_code?: number;
+			};
+		};
+		const code = data.current?.weather_code ?? null;
+		const environment: AutoEnvironment = {
+			theme: data.current?.is_day === 0 ? 'dark' : data.current?.is_day === 1 ? 'light' : getBrowserTimeTheme(),
+			weather: mapWeatherCodeToMode(code),
+			code,
+			expires: Date.now() + AUTO_ENVIRONMENT_CACHE_MS,
+		};
+
+		setCachedAutoEnvironment(environment);
+		applyAutoEnvironment(environment);
+	} catch {
+		applyAutoEnvironment({
+			theme: getBrowserTimeTheme(),
+			weather: 'off',
+			expires: Date.now() + 10 * 60 * 1000,
+		});
+	}
+}
+
+function initAutoEnvironment() {
+	const cached = getCachedAutoEnvironment();
+
+	if (cached) {
+		applyAutoEnvironment(cached);
+	}
+
+	void fetchAutoEnvironment();
+	window.setInterval(() => {
+		void fetchAutoEnvironment(true);
+	}, 30 * 60 * 1000);
 }
 
 // ── Experience section floating card ─────────────────────────
@@ -1928,7 +2307,7 @@ export default function initPortfolioInteractions() {
 	// Must come after the inline script in Layout.astro has run to prevent FOUC.
 	document.documentElement.classList.add('theme-ready');
 
-	soundEnabled = localStorage.getItem(SOUND_ENABLED_KEY) !== 'false';
+	soundEnabled = getStoredValue(SOUND_ENABLED_KEY) !== 'false';
 	cacheIdentityText();
 
 	bindTabButtons();
@@ -1949,6 +2328,7 @@ export default function initPortfolioInteractions() {
 	syncSoundToggleLabels();
 	initMouseGlow();
 	initWeather();
+	initAutoEnvironment();
 
 	const initialHash = window.location.hash.slice(1);
 	const initialTab = isValidTab(initialHash) ? initialHash : DEFAULT_TAB;
