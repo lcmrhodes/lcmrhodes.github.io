@@ -200,27 +200,36 @@ a {
 	position: absolute;
 	top: 4rem;
 	left: 7.2rem;
+	z-index: 1000;
 	width: clamp(12.8rem, 19vw, 16.8rem);
 	aspect-ratio: 1;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(16px);
+	pointer-events: none;
+	outline: none;
+	transition:
+		opacity 260ms ease,
+		transform 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.about-portrait-frame {
+	position: absolute;
+	inset: 0;
+	display: block;
 	overflow: hidden;
 	border-radius: 999px;
 	background: rgba(255, 255, 255, 0.9);
 	box-shadow:
 		0 20px 55px rgba(38, 46, 43, 0.08),
 		inset 0 0 0 1px rgba(255, 255, 255, 0.45);
-	opacity: 0;
-	transform: translateY(16px);
-	pointer-events: none;
-	transition:
-		opacity 260ms ease,
-		transform 360ms cubic-bezier(0.645, 0.045, 0.355, 1);
 }
 
-:root[data-theme='dark'] .about-portrait-placeholder {
+:root[data-theme='dark'] .about-portrait-frame {
 	background: rgba(255, 255, 255, 0.94);
 	box-shadow:
 		0 24px 60px rgba(0, 0, 0, 0.28),
-		inset 0 0 0 1px rgba(255, 255, 255, 0.24);
+			inset 0 0 0 1px rgba(255, 255, 255, 0.24);
 }
 
 .about-portrait-image {
@@ -233,7 +242,55 @@ a {
 	object-position: 52% 4%;
 	filter: saturate(0.96) contrast(1.02);
 	visibility: hidden;
-	z-index: 0;
+		z-index: 0;
+	}
+
+.about-portrait-weather-copy {
+	position: absolute;
+	left: 50%;
+	top: calc(100% + 0.75rem);
+	z-index: 1000;
+	width: min(18rem, 86vw);
+	padding: 0.78rem 0.92rem;
+	border: 1px solid var(--border);
+	border-radius: 0.8rem;
+	background: color-mix(in srgb, var(--panel-strong) 92%, transparent);
+	backdrop-filter: blur(16px);
+	box-shadow: var(--shadow);
+	color: var(--text);
+	font-size: 0.86rem;
+	line-height: 1.35;
+	text-align: center;
+	opacity: 0;
+	transform: translate(-50%, -0.35rem);
+	pointer-events: none;
+	transition:
+		opacity 180ms ease,
+		transform 220ms cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.about-portrait-weather-copy::before {
+	content: '';
+	position: absolute;
+	left: 50%;
+	top: -0.42rem;
+	width: 0.78rem;
+	height: 0.78rem;
+	border-left: 1px solid var(--border);
+	border-top: 1px solid var(--border);
+	background: inherit;
+	transform: translateX(-50%) rotate(45deg);
+}
+
+.about-portrait-placeholder:hover .about-portrait-weather-copy,
+.about-portrait-placeholder:focus-visible .about-portrait-weather-copy {
+	opacity: 1;
+	transform: translate(-50%, 0);
+}
+
+.about-portrait-placeholder:focus-visible .about-portrait-frame {
+	outline: 2px solid var(--accent);
+	outline-offset: 5px;
 }
 
 .about-portrait-image--light {
@@ -251,11 +308,12 @@ a {
 	z-index: 1;
 }
 
-.layout[data-active-tab='about'] .about-portrait-placeholder {
-	opacity: 1;
-	transform: translateY(0);
-	pointer-events: auto;
-}
+	.layout[data-active-tab='about'] .about-portrait-placeholder {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		pointer-events: auto;
+	}
 
 .identity-name {
 	margin: 0;
@@ -508,6 +566,19 @@ a {
 	font: inherit;
 	letter-spacing: normal;
 	text-align: center;
+}
+
+.identity-controls button.theme-toggle-side {
+	width: auto;
+	min-width: 3.65rem;
+	padding: 0 0.7rem;
+}
+
+.theme-toggle-label {
+	font-size: 0.72rem;
+	font-weight: 650;
+	line-height: 1;
+	letter-spacing: 0.02em;
 }
 
 .sound-toggle-side--mobile,
@@ -2173,10 +2244,43 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	right: 0;
 	z-index: 20;
 	padding: 1rem 1.25rem;
-	background: var(--bg);
-	border-bottom: 1px solid var(--border);
+	background: transparent;
+	border-bottom: none;
 	align-items: center;
 	justify-content: space-between;
+	isolation: isolate;
+}
+
+.mobile-header::before {
+	content: '';
+	position: absolute;
+	inset: 0 0 -1.75rem;
+	z-index: -1;
+	pointer-events: none;
+	background: linear-gradient(
+		to bottom,
+		var(--bg) 0%,
+		color-mix(in srgb, var(--bg) 96%, transparent) 34%,
+		color-mix(in srgb, var(--bg) 72%, transparent) 70%,
+		transparent 100%
+	);
+}
+
+.mobile-header--nav-open {
+	background: var(--bg);
+}
+
+.mobile-header--nav-open.mobile-header--name-hidden {
+	justify-content: space-between;
+}
+
+.mobile-header--nav-open::before {
+	inset: 0;
+	background: var(--bg);
+}
+
+.mobile-header--name-hidden {
+	justify-content: flex-end;
 }
 
 .mobile-name {
@@ -2184,6 +2288,21 @@ body[data-inline-hover='true'] .about-inline-link.is-inline-hover-active .about-
 	font-size: 1.35rem;
 	font-weight: 500;
 	letter-spacing: 0.01em;
+	transition:
+		opacity 160ms ease,
+		visibility 160ms ease;
+}
+
+.mobile-header--name-hidden .mobile-name {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.mobile-header--nav-open .mobile-name {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: auto;
 }
 
 .mobile-nav-toggle {
@@ -2567,6 +2686,7 @@ a:focus:not(:focus-visible) {
 	opacity: 1;
 }
 
+[data-weather='sunny'] #weather-clouds,
 [data-weather='clouds'] #weather-clouds,
 [data-weather='overcast'] #weather-clouds {
 	opacity: 1;
@@ -2579,6 +2699,29 @@ a:focus:not(:focus-visible) {
 }
 
 /* Sky gradients — light mode only, per weather state */
+:root:not([data-theme='dark'])[data-weather='sunny'] #weather-clouds::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background:
+		linear-gradient(to bottom, rgba(92, 174, 230, 0.26) 0%, rgba(142, 202, 235, 0.14) 28%, transparent 56%),
+		linear-gradient(145deg, rgba(255, 194, 96, 0.24) 0%, rgba(255, 151, 68, 0.1) 26%, transparent 54%);
+	pointer-events: none;
+}
+
+:root:not([data-theme='dark'])[data-weather='sunny'] #weather-clouds::after {
+	content: '';
+	position: absolute;
+	top: -36vh;
+	right: -16vw;
+	width: min(64vw, 720px);
+	aspect-ratio: 1;
+	background:
+		radial-gradient(circle at 48% 46%, rgba(255, 218, 128, 0.52) 0%, rgba(255, 168, 72, 0.3) 26%, rgba(230, 112, 46, 0.12) 46%, transparent 68%);
+	filter: blur(8px);
+	pointer-events: none;
+}
+
 :root:not([data-theme='dark'])[data-weather='rain'] #weather-clouds::before {
 	content: '';
 	position: absolute;
@@ -2651,6 +2794,8 @@ a:focus:not(:focus-visible) {
 
 /* Weather icon states */
 .weather-icon-off,
+.weather-icon-auto,
+.weather-icon-sunny,
 .weather-icon-rain,
 .weather-icon-clouds,
 .weather-icon-snow,
@@ -2659,6 +2804,8 @@ a:focus:not(:focus-visible) {
 }
 
 /* default: show off icon */
+.weather-icon-auto,
+.weather-icon-sunny,
 .weather-icon-rain,
 .weather-icon-clouds,
 .weather-icon-snow,
@@ -2667,19 +2814,36 @@ a:focus:not(:focus-visible) {
 }
 
 [data-weather='rain'] .weather-icon-off,
+[data-weather='sunny'] .weather-icon-off,
 [data-weather='clouds'] .weather-icon-off,
 [data-weather='snow'] .weather-icon-off,
 [data-weather='overcast'] .weather-icon-off {
 	opacity: 0;
 }
 
+[data-weather='sunny'] .weather-icon-sunny { opacity: 1; }
 [data-weather='rain'] .weather-icon-rain { opacity: 1; }
 [data-weather='clouds'] .weather-icon-clouds { opacity: 1; }
 [data-weather='snow'] .weather-icon-snow { opacity: 1; }
 [data-weather='overcast'] .weather-icon-overcast { opacity: 1; }
 
+[data-environment-weather-source='auto'] .weather-icon-off,
+[data-environment-weather-source='auto'] .weather-icon-sunny,
+[data-environment-weather-source='auto'] .weather-icon-rain,
+[data-environment-weather-source='auto'] .weather-icon-clouds,
+[data-environment-weather-source='auto'] .weather-icon-snow,
+[data-environment-weather-source='auto'] .weather-icon-overcast {
+	opacity: 0;
+}
+
+[data-environment-weather-source='auto'] .weather-icon-auto {
+	opacity: 1;
+}
+
 /* Tint weather icon when active */
+[data-environment-weather-source='auto'] .weather-toggle-side,
 [data-weather='rain'] .weather-toggle-side,
+[data-weather='sunny'] .weather-toggle-side,
 [data-weather='clouds'] .weather-toggle-side,
 [data-weather='snow'] .weather-toggle-side,
 [data-weather='overcast'] .weather-toggle-side {

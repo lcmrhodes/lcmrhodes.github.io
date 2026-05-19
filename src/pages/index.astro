@@ -128,10 +128,13 @@ const educationExperienceItems = [
 				<p class="identity-tagline anim-entrance" data-delay="1">Data science, analytics, and real-world tools.</p>
 			</div>
 
-			<div class="about-portrait-placeholder">
-				<img class="about-portrait-image about-portrait-image--light" src="/images/luke-portrait.jpg" alt="Portrait of Luke Rhodes" loading="eager" decoding="sync" fetchpriority="high" />
-				<img class="about-portrait-image about-portrait-image--dark" src="/images/luke-portrait-dark.png" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high" />
-			</div>
+				<div class="about-portrait-placeholder" data-weather-portrait tabindex="0" aria-describedby="weather-portrait-copy">
+					<span class="about-portrait-frame">
+						<img class="about-portrait-image about-portrait-image--light" src="/images/luke-portrait.jpg" alt="Portrait of Luke Rhodes" loading="eager" decoding="sync" fetchpriority="high" />
+						<img class="about-portrait-image about-portrait-image--dark" src="/images/luke-portrait-dark.png" alt="" aria-hidden="true" loading="eager" decoding="sync" fetchpriority="high" />
+					</span>
+					<span class="about-portrait-weather-copy" id="weather-portrait-copy" data-weather-portrait-copy></span>
+				</div>
 
 			<nav class="side-nav" aria-label="Site sections">
 				{tabs.map((tab) => (
@@ -194,8 +197,18 @@ const educationExperienceItems = [
 					</button>
 					<button class="weather-toggle-side" type="button" data-weather-toggle aria-label="Weather: off">
 						<svg class="weather-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-							<!-- off: cloud outline -->
-							<path class="weather-icon-off" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+								<!-- off: cloud outline -->
+								<path class="weather-icon-off" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+								<!-- auto: local weather pin -->
+								<g class="weather-icon-auto">
+									<path d="M12 21s6-5.18 6-11a6 6 0 0 0-12 0c0 5.82 6 11 6 11z"></path>
+									<circle cx="12" cy="10" r="2.4"></circle>
+								</g>
+								<!-- sunny: sun with rays -->
+								<g class="weather-icon-sunny">
+								<circle cx="12" cy="12" r="4"></circle>
+								<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+							</g>
 							<!-- rain: cloud + drops -->
 							<g class="weather-icon-rain">
 								<path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path>
@@ -226,23 +239,10 @@ const educationExperienceItems = [
 								<path d="M6 20h12" stroke-linecap="round"></path>
 							</g>
 						</svg>
-					</button>
-					<button class="theme-toggle-side" type="button" data-theme-toggle aria-label="Dark mode">
-						<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-							<circle class="theme-icon-sun" cx="12" cy="12" r="5"></circle>
-							<g class="theme-icon-rays">
-								<line x1="12" y1="1" x2="12" y2="3"></line>
-								<line x1="12" y1="21" x2="12" y2="23"></line>
-								<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-								<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-								<line x1="1" y1="12" x2="3" y2="12"></line>
-								<line x1="21" y1="12" x2="23" y2="12"></line>
-								<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-								<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-							</g>
-							<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-						</svg>
-					</button>
+						</button>
+						<button class="theme-toggle-side" type="button" data-theme-toggle aria-label="Dark mode">
+							<span class="theme-toggle-label" data-theme-toggle-label>Light</span>
+						</button>
 					<div class="pillbox-overflow">
 						<button
 							class="pillbox-overflow-toggle"
@@ -274,8 +274,16 @@ const educationExperienceItems = [
 								</svg>
 							</button>
 							<button class="weather-toggle-side pillbox-overflow-action" type="button" data-weather-toggle aria-label="Weather: off">
-								<svg class="weather-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-									<path class="weather-icon-off" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+									<svg class="weather-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+										<path class="weather-icon-off" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+										<g class="weather-icon-auto">
+											<path d="M12 21s6-5.18 6-11a6 6 0 0 0-12 0c0 5.82 6 11 6 11z"></path>
+											<circle cx="12" cy="10" r="2.4"></circle>
+										</g>
+										<g class="weather-icon-sunny">
+										<circle cx="12" cy="12" r="4"></circle>
+										<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+									</g>
 									<g class="weather-icon-rain">
 										<path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path>
 										<line x1="8" y1="19" x2="8" y2="21"></line>
@@ -302,23 +310,10 @@ const educationExperienceItems = [
 										<path d="M6 20h12" stroke-linecap="round"></path>
 									</g>
 								</svg>
-							</button>
-							<button class="theme-toggle-side pillbox-overflow-action" type="button" data-theme-toggle aria-label="Dark mode">
-								<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-									<circle class="theme-icon-sun" cx="12" cy="12" r="5"></circle>
-									<g class="theme-icon-rays">
-										<line x1="12" y1="1" x2="12" y2="3"></line>
-										<line x1="12" y1="21" x2="12" y2="23"></line>
-										<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-										<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-										<line x1="1" y1="12" x2="3" y2="12"></line>
-										<line x1="21" y1="12" x2="23" y2="12"></line>
-										<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-										<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-									</g>
-									<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-								</svg>
-							</button>
+								</button>
+								<button class="theme-toggle-side pillbox-overflow-action" type="button" data-theme-toggle aria-label="Dark mode">
+									<span class="theme-toggle-label" data-theme-toggle-label>Light</span>
+								</button>
 						</div>
 					</div>
 				</div>
@@ -661,7 +656,7 @@ const educationExperienceItems = [
 	</div>
 
 	<!-- Mobile top bar (shown only on small screens) -->
-	<header class="mobile-header">
+	<header class="mobile-header mobile-header--name-hidden">
 		<span class="mobile-name">Luke Rhodes</span>
 		<button class="mobile-nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav">
 			<span class="mobile-nav-toggle-bar"></span>
@@ -710,8 +705,16 @@ const educationExperienceItems = [
 				</svg>
 			</button>
 			<button class="weather-toggle-side weather-toggle-side--mobile" type="button" data-weather-toggle aria-label="Weather: off">
-				<svg class="weather-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-					<path class="weather-icon-off" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+					<svg class="weather-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+						<path class="weather-icon-off" d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path>
+						<g class="weather-icon-auto">
+							<path d="M12 21s6-5.18 6-11a6 6 0 0 0-12 0c0 5.82 6 11 6 11z"></path>
+							<circle cx="12" cy="10" r="2.4"></circle>
+						</g>
+						<g class="weather-icon-sunny">
+						<circle cx="12" cy="12" r="4"></circle>
+						<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+					</g>
 					<g class="weather-icon-rain">
 						<path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"></path>
 						<line x1="8" y1="19" x2="8" y2="21"></line>
@@ -738,23 +741,10 @@ const educationExperienceItems = [
 						<path d="M6 20h12" stroke-linecap="round"></path>
 					</g>
 				</svg>
-			</button>
-			<button class="theme-toggle-side theme-toggle-side--mobile" type="button" data-theme-toggle aria-label="Dark mode">
-				<svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-					<circle class="theme-icon-sun" cx="12" cy="12" r="5"></circle>
-					<g class="theme-icon-rays">
-						<line x1="12" y1="1" x2="12" y2="3"></line>
-						<line x1="12" y1="21" x2="12" y2="23"></line>
-						<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-						<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-						<line x1="1" y1="12" x2="3" y2="12"></line>
-						<line x1="21" y1="12" x2="23" y2="12"></line>
-						<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-						<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-					</g>
-					<path class="theme-icon-moon" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-				</svg>
-			</button>
+				</button>
+				<button class="theme-toggle-side theme-toggle-side--mobile" type="button" data-theme-toggle aria-label="Dark mode">
+					<span class="theme-toggle-label" data-theme-toggle-label>Light</span>
+				</button>
 		</div>
 	</nav>
 

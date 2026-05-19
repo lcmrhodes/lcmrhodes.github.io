@@ -8,9 +8,9 @@ const WEDDING_SPARKLE_SOUND_DELAY_MS = 130;
 const PROJECT_CARD_HOVER_SOUND_INTERVAL_MS = 220;
 const SOUND_ENABLED_KEY = 'sound-enabled';
 const THEME_KEY = 'theme';
-const WEATHER_KEY = 'weather';
 const THEME_OVERRIDE_KEY = 'portfolio-theme-override';
-const WEATHER_OVERRIDE_KEY = 'portfolio-weather-override';
+const LEGACY_WEATHER_KEY = 'weather';
+const LEGACY_WEATHER_OVERRIDE_KEY = 'portfolio-weather-override';
 const AUTO_ENVIRONMENT_CACHE_KEY = 'portfolio-auto-environment';
 const AUTO_GEO_CACHE_KEY = 'portfolio-auto-geo';
 const ABOUT_HERO_TYPED_KEY = 'about-hero-typed';
@@ -21,7 +21,25 @@ const ABOUT_HERO_HEADING_SPLIT_PAUSE_MS = 140;
 const AUTO_ENVIRONMENT_CACHE_MS = 30 * 60 * 1000;
 const AUTO_GEO_CACHE_MS = 7 * 24 * 60 * 60 * 1000;
 
-type WeatherMode = 'off' | 'rain' | 'clouds' | 'snow' | 'overcast';
+type WeatherMode = 'off' | 'sunny' | 'rain' | 'clouds' | 'snow' | 'overcast';
+
+const WEATHER_HOVER_COPY: Record<WeatherMode, string> = {
+	off: "Did you know... I've built a weather feature into this page! Navigate to the control panel to try it.",
+	sunny: 'Looks sunny in {location} right now!',
+	rain: 'Looks a little rainy in {location} right now...',
+	clouds: 'Looks cloudy in {location} right now...',
+	snow: 'Looks snowy in {location} right now!',
+	overcast: 'Looks a bit overcast in {location} right now...',
+};
+
+const WEATHER_HOVER_MANUAL_ADJECTIVE: Record<WeatherMode, string> = {
+	off: 'calm',
+	sunny: 'sunny',
+	rain: 'rainy',
+	clouds: 'cloudy',
+	snow: 'snowy',
+	overcast: 'overcast',
+};
 
 type TabKey = (typeof TABS)[number];
 type ThemeName = 'light' | 'dark';
@@ -72,6 +90,7 @@ let lastProjectCardHoverToneAt = 0;
 let soundEnabled = true;
 let activeInlineHoverLink: HTMLElement | null = null;
 let inlineFloatingPopout: HTMLElement | null = null;
+let manualWeatherOverride: WeatherMode | null = null;
 let weatherMode: WeatherMode = 'off';
 let weatherRafId: number | null = null;
 const aboutHeroTextCache = new WeakMap<Text, string>();
@@ -93,7 +112,7 @@ function isValidTheme(value: string | null): value is ThemeName {
 }
 
 function isValidWeather(value: string | null): value is WeatherMode {
-	return value === 'off' || value === 'rain' || value === 'clouds' || value === 'snow' || value === 'overcast';
+	return value === 'off' || value === 'sunny' || value === 'rain' || value === 'clouds' || value === 'snow' || value === 'overcast';
 }
 
 function getStoredValue(key: string) {
@@ -112,14 +131,26 @@ function setStoredValue(key: string, value: string) {
 	}
 }
 
+function removeStoredValue(key: string) {
+	try {
+		localStorage.removeItem(key);
+	} catch {
+		// Storage can be unavailable in private browsing or embedded previews.
+	}
+}
+
 function getManualThemeOverride() {
 	const saved = getStoredValue(THEME_OVERRIDE_KEY);
 	return isValidTheme(saved) ? saved : null;
 }
 
 function getManualWeatherOverride() {
-	const saved = getStoredValue(WEATHER_OVERRIDE_KEY);
-	return isValidWeather(saved) ? saved : null;
+	return manualWeatherOverride;
+}
+
+function clearStoredWeatherOverride() {
+	removeStoredValue(LEGACY_WEATHER_OVERRIDE_KEY);
+	removeStoredValue(LEGACY_WEATHER_KEY);
 }
 
 function getBrowserTimeTheme(): ThemeName {
@@ -665,11 +696,14 @@ function randomizeWeddingSparkles(link: HTMLElement) {
 }
 
 function syncThemeToggleLabels() {
-	const nextLabel = getActiveTheme() === 'dark' ? 'Light mode' : 'Dark mode';
+	const isDark = getActiveTheme() === 'dark';
+	const nextLabel = isDark ? 'Light mode' : 'Dark mode';
+	const visibleLabel = isDark ? 'Dark' : 'Light';
 
 	document.querySelectorAll<HTMLElement>('[data-theme-toggle]').forEach((button) => {
 		button.setAttribute('aria-label', nextLabel);
-		button.setAttribute('aria-pressed', String(getActiveTheme() === 'dark'));
+		button.setAttribute('aria-pressed', String(isDark));
+		button.querySelector<HTMLElement>('[data-theme-toggle-label]')?.replaceChildren(visibleLabel);
 	});
 }
 
@@ -1104,12 +1138,14 @@ function updateNavIndicator() {
 function closeMobileNav() {
 	const mobileNav = document.getElementById('mobile-nav');
 	const mobileToggle = document.querySelector<HTMLElement>('.mobile-nav-toggle');
+	const mobileHeader = document.querySelector<HTMLElement>('.mobile-header');
 
 	if (!mobileNav || !mobileToggle) {
 		return;
 	}
 
 	mobileNav.classList.remove('open');
+	mobileHeader?.classList.remove('mobile-header--nav-open');
 	mobileNav.setAttribute('aria-hidden', 'true');
 	mobileToggle.setAttribute('aria-expanded', 'false');
 }
@@ -1117,12 +1153,14 @@ function closeMobileNav() {
 function setMobileNavOpen(isOpen: boolean) {
 	const mobileNav = document.getElementById('mobile-nav');
 	const mobileToggle = document.querySelector<HTMLElement>('.mobile-nav-toggle');
+	const mobileHeader = document.querySelector<HTMLElement>('.mobile-header');
 
 	if (!mobileNav || !mobileToggle) {
 		return;
 	}
 
 	mobileNav.classList.toggle('open', isOpen);
+	mobileHeader?.classList.toggle('mobile-header--nav-open', isOpen);
 	mobileNav.setAttribute('aria-hidden', String(!isOpen));
 	mobileToggle.setAttribute('aria-expanded', String(isOpen));
 }
@@ -1161,6 +1199,12 @@ function initMouseGlow() {
 	});
 }
 
+function syncMobileHeaderForTab(activeTab: TabKey) {
+	document
+		.querySelector<HTMLElement>('.mobile-header')
+		?.classList.toggle('mobile-header--name-hidden', activeTab === DEFAULT_TAB);
+}
+
 function activateTab(tab: string, animate = true) {
 	const nextTab = isValidTab(tab) ? tab : DEFAULT_TAB;
 	const shouldAnimate = animate && !prefersReducedMotion();
@@ -1187,6 +1231,8 @@ function activateTab(tab: string, animate = true) {
 	if (layout) {
 		layout.dataset.activeTab = nextTab;
 	}
+
+	syncMobileHeaderForTab(nextTab);
 
 	document.querySelectorAll<HTMLElement>('.side-nav-item, .mobile-nav-item').forEach((button) => {
 		const isActive = button.dataset.tab === nextTab;
@@ -1245,6 +1291,22 @@ function bindMobileNav() {
 		const mobileNav = document.getElementById('mobile-nav');
 		const isOpen = mobileNav?.classList.contains('open') ?? false;
 		setMobileNavOpen(!isOpen);
+	});
+
+	document.addEventListener('click', (event) => {
+		const target = event.target;
+		const mobileNav = document.getElementById('mobile-nav');
+		const mobileHeader = document.querySelector<HTMLElement>('.mobile-header');
+
+		if (!(target instanceof Node) || !mobileNav?.classList.contains('open')) {
+			return;
+		}
+
+		if (mobileNav.contains(target) || mobileHeader?.contains(target)) {
+			return;
+		}
+
+		closeMobileNav();
 	});
 
 	window.addEventListener('keydown', (event) => {
@@ -1842,15 +1904,52 @@ function createClouds(mode: 'clouds' | 'overcast') {
 function syncWeatherToggleLabels() {
 	const labels: Record<WeatherMode, string> = {
 		off: 'Weather: off',
+		sunny: 'Weather: sunny',
 		rain: 'Weather: rain',
 		clouds: 'Weather: clouds',
 		snow: 'Weather: snow',
 		overcast: 'Weather: overcast',
 	};
+	const label = getManualWeatherOverride()
+		? labels[weatherMode]
+		: `Weather: auto (${labels[weatherMode].replace('Weather: ', '')})`;
 
 	document.querySelectorAll<HTMLElement>('[data-weather-toggle]').forEach((btn) => {
-		btn.setAttribute('aria-label', labels[weatherMode]);
+		btn.setAttribute('aria-label', label);
 	});
+}
+
+function getWeatherHoverLocation(environment: AutoEnvironment | null) {
+	return environment?.location?.city || getCachedGeoLocation()?.city || 'your area';
+}
+
+function getWeatherHoverText(mode: WeatherMode, environment: AutoEnvironment | null = getCachedAutoEnvironment()) {
+	const location = getWeatherHoverLocation(environment);
+
+	if (getManualWeatherOverride()) {
+		const autoWeather = environment?.weather ?? 'off';
+		const adjective = WEATHER_HOVER_MANUAL_ADJECTIVE[autoWeather];
+		return `Glad to see you've changed the weather here. Was a bit too ${adjective} in ${location} today anyway...`;
+	}
+
+	if (mode === 'off') {
+		return WEATHER_HOVER_COPY.off;
+	}
+
+	return WEATHER_HOVER_COPY[mode].replace('{location}', location);
+}
+
+function syncWeatherPortraitCopy(environment: AutoEnvironment | null = getCachedAutoEnvironment()) {
+	const copy = document.querySelector<HTMLElement>('[data-weather-portrait-copy]');
+	const portrait = document.querySelector<HTMLElement>('[data-weather-portrait]');
+
+	if (!copy || !portrait) {
+		return;
+	}
+
+	const text = getWeatherHoverText(weatherMode, environment);
+	copy.textContent = text;
+	portrait.setAttribute('aria-label', text);
 }
 
 function renderWeather(mode: WeatherMode) {
@@ -1866,6 +1965,7 @@ function renderWeather(mode: WeatherMode) {
 	else if (mode === 'overcast') createClouds('overcast');
 
 	syncWeatherToggleLabels();
+	syncWeatherPortraitCopy();
 }
 
 function syncEnvironmentDiagnostics(environment: AutoEnvironment | null = getCachedAutoEnvironment()) {
@@ -1884,6 +1984,8 @@ function syncEnvironmentDiagnostics(environment: AutoEnvironment | null = getCac
 	} else {
 		delete root.dataset.geoSource;
 	}
+
+	syncWeatherPortraitCopy(environment);
 }
 
 function setWeather(mode: WeatherMode, options: { persist?: boolean } = {}) {
@@ -1891,20 +1993,42 @@ function setWeather(mode: WeatherMode, options: { persist?: boolean } = {}) {
 	renderWeather(mode);
 
 	if (persist) {
-		setStoredValue(WEATHER_OVERRIDE_KEY, mode);
-		setStoredValue(WEATHER_KEY, mode);
+		manualWeatherOverride = mode;
+		clearStoredWeatherOverride();
+		syncWeatherToggleLabels();
 	}
 
 	syncEnvironmentDiagnostics();
 }
 
+function setAutoWeather() {
+	manualWeatherOverride = null;
+	const cachedAuto = getCachedAutoEnvironment();
+	renderWeather(cachedAuto?.weather ?? 'off');
+	syncEnvironmentDiagnostics(cachedAuto);
+	void fetchAutoEnvironment(true);
+}
+
 function bindWeatherButtons() {
-	const cycle: WeatherMode[] = ['off', 'rain', 'clouds', 'snow', 'overcast'];
+	const manualCycle: WeatherMode[] = ['sunny', 'rain', 'clouds', 'snow', 'overcast'];
 
 	document.querySelectorAll<HTMLElement>('[data-weather-toggle]').forEach((btn) => {
 		btn.addEventListener('click', () => {
-			const current = cycle.indexOf(weatherMode);
-			const next = cycle[(current + 1) % cycle.length];
+			const manualWeather = getManualWeatherOverride();
+
+			if (!manualWeather) {
+				setWeather(manualCycle[0]);
+				return;
+			}
+
+			const current = manualCycle.indexOf(manualWeather);
+
+			if (current === manualCycle.length - 1) {
+				setAutoWeather();
+				return;
+			}
+
+			const next = manualCycle[current + 1] ?? manualCycle[0];
 			setWeather(next);
 		});
 	});
@@ -1979,6 +2103,7 @@ function bindPillboxOverflow() {
 }
 
 function initWeather() {
+	clearStoredWeatherOverride();
 	const manualWeather = getManualWeatherOverride();
 	const cachedAuto = getCachedAutoEnvironment();
 	renderWeather(manualWeather ?? cachedAuto?.weather ?? 'off');
@@ -1996,6 +2121,14 @@ function getCachedAutoEnvironment() {
 			isValidTheme(cached.theme ?? null) &&
 			isValidWeather(cached.weather ?? null)
 		) {
+			if (
+				cached.weather === 'off' &&
+				(cached.code === 0 || cached.code === 1) &&
+				cached.theme === 'light'
+			) {
+				cached.weather = 'sunny';
+			}
+
 			return cached as AutoEnvironment;
 		}
 	} catch {
@@ -2025,9 +2158,9 @@ function getEnvironmentDebugSnapshot(): EnvironmentDebugSnapshot {
 	};
 }
 
-function mapWeatherCodeToMode(code: number | null | undefined): WeatherMode {
+function mapWeatherCodeToMode(code: number | null | undefined, isDay: number | null | undefined): WeatherMode {
 	if (code == null) return 'off';
-	if (code === 0 || code === 1) return 'off';
+	if (code === 0 || code === 1) return isDay === 1 ? 'sunny' : 'off';
 	if (code === 2) return 'clouds';
 	if (code === 3 || code === 45 || code === 48) return 'overcast';
 	if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82) || (code >= 95 && code <= 99)) return 'rain';
@@ -2222,7 +2355,7 @@ async function fetchAutoEnvironment(force = false) {
 		const code = data.current?.weather_code ?? null;
 		const environment: AutoEnvironment = {
 			theme: data.current?.is_day === 0 ? 'dark' : data.current?.is_day === 1 ? 'light' : getBrowserTimeTheme(),
-			weather: mapWeatherCodeToMode(code),
+			weather: mapWeatherCodeToMode(code, data.current?.is_day),
 			code,
 			expires: Date.now() + AUTO_ENVIRONMENT_CACHE_MS,
 			location: {

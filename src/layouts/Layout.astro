@@ -41,11 +41,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 				return hour >= 7 && hour < 19 ? 'light' : 'dark';
 			};
 			let savedThemeOverride = null;
-			let savedWeatherOverride = null;
 			let autoEnvironment = null;
 			try {
 				savedThemeOverride = localStorage.getItem('portfolio-theme-override');
-				savedWeatherOverride = localStorage.getItem('portfolio-weather-override');
+				localStorage.removeItem('portfolio-weather-override');
+				localStorage.removeItem('weather');
 				autoEnvironment = JSON.parse(localStorage.getItem('portfolio-auto-environment') || 'null');
 			} catch {}
 			if (savedThemeOverride === 'dark' || savedThemeOverride === 'light') {
@@ -59,10 +59,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 			} else {
 				document.documentElement.dataset.theme = getBrowserTimeTheme();
 			}
-			const validWeather = ['off', 'rain', 'clouds', 'snow', 'overcast'];
-			if (savedWeatherOverride && validWeather.includes(savedWeatherOverride)) {
-				document.documentElement.dataset.weather = savedWeatherOverride;
-			} else if (
+			const validWeather = ['off', 'sunny', 'rain', 'clouds', 'snow', 'overcast'];
+			if (
 				autoEnvironment &&
 				autoEnvironment.expires > Date.now() &&
 				validWeather.includes(autoEnvironment.weather)
