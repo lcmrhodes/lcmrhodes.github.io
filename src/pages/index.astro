@@ -2,8 +2,24 @@
 import Layout from '../layouts/Layout.astro';
 import '../styles/global.css';
 import { galleryTiles } from '../data/gallery';
+import type { GalleryTile } from '../data/gallery';
 
 const tabs = ['about', 'experience', 'projects'];
+
+const projectGalleryColumns = galleryTiles.reduce<GalleryTile[][]>(
+	(columns, tile) => {
+		const column = columns.reduce((shortest, current) => (
+			current.reduce((total, item) => total + item.coverHeight / item.coverWidth, 0) <
+			shortest.reduce((total, item) => total + item.coverHeight / item.coverWidth, 0)
+				? current
+				: shortest
+		));
+
+		column.push(tile);
+		return columns;
+	},
+	[[], [], []],
+);
 
 const professionalExperienceItems = [
 	{
@@ -336,7 +352,7 @@ const educationExperienceItems = [
 							</span>
 							<span class="about-summary-detail">
 								<span class="about-summary-chunk">
-									<span class="about-summary-fragment">Different problems, same instinct: find the structure underneath, then make something rigorous and well-made of it.</span>
+									<span class="about-summary-fragment">I turn messy systems into clear, useful tools.</span>
 								</span>
 							</span>
 						</p>
@@ -525,64 +541,68 @@ const educationExperienceItems = [
 			<!-- Projects -->
 			<section class="content-section" data-section="projects" id="tab-projects">
 				<div class="content-section-inner project-gallery-shell">
-					<ul class="project-gallery" role="list">
-						{galleryTiles.map((tile) => (
-							<li class={`gallery-tile gallery-tile--${tile.kind}`}>
-								{tile.kind === 'image' ? (
-									<button
-										type="button"
-										class="gallery-tile__action"
-										data-lightbox-src={tile.full}
-										data-lightbox-width={String(tile.fullWidth)}
-										data-lightbox-height={String(tile.fullHeight)}
-										data-lightbox-alt={tile.title}
-										data-lightbox-caption={tile.caption}
-										aria-label={`${tile.title} — open full image`}
-									>
-										<figure>
-											<img
-												src={tile.cover}
-												width={tile.coverWidth}
-												height={tile.coverHeight}
-												alt={tile.title}
-												loading="lazy"
-												decoding="async"
-											/>
-											<figcaption class="gallery-tile__overlay">
-												<span class="gallery-tile__eyebrow">{tile.eyebrow}</span>
-												<span class="gallery-tile__title">{tile.title}</span>
-												<span class="gallery-tile__caption">{tile.caption}</span>
-											</figcaption>
-										</figure>
-									</button>
-								) : (
-									<a
-										href={tile.href}
-										class="gallery-tile__action"
-										target={tile.kind === 'site' ? '_blank' : undefined}
-										rel={tile.kind === 'site' ? 'noreferrer' : undefined}
-										aria-label={`${tile.title} — ${tile.kind === 'site' ? 'open live site' : 'open PDF'}`}
-									>
-										<figure>
-											<img
-												src={tile.cover}
-												width={tile.coverWidth}
-												height={tile.coverHeight}
-												alt={tile.title}
-												loading="lazy"
-												decoding="async"
-											/>
-											<figcaption class="gallery-tile__overlay">
-												<span class="gallery-tile__eyebrow">{tile.eyebrow}</span>
-												<span class="gallery-tile__title">{tile.title}</span>
-												<span class="gallery-tile__caption">{tile.caption}</span>
-											</figcaption>
-										</figure>
-									</a>
-								)}
-							</li>
+					<div class="project-gallery" role="list">
+						{projectGalleryColumns.map((column) => (
+							<div class="project-gallery-column" role="presentation">
+								{column.map((tile) => (
+									<div class={`gallery-tile gallery-tile--${tile.kind}`} role="listitem">
+										{tile.kind === 'image' ? (
+											<button
+												type="button"
+												class="gallery-tile__action"
+												data-lightbox-src={tile.full}
+												data-lightbox-width={String(tile.fullWidth)}
+												data-lightbox-height={String(tile.fullHeight)}
+												data-lightbox-alt={tile.title}
+												data-lightbox-caption={tile.caption}
+												aria-label={`${tile.title} — open full image`}
+											>
+												<figure>
+													<img
+														src={tile.cover}
+														width={tile.coverWidth}
+														height={tile.coverHeight}
+														alt={tile.title}
+														loading="lazy"
+														decoding="async"
+													/>
+													<figcaption class="gallery-tile__overlay">
+														<span class="gallery-tile__eyebrow">{tile.eyebrow}</span>
+														<span class="gallery-tile__title">{tile.title}</span>
+														<span class="gallery-tile__caption">{tile.caption}</span>
+													</figcaption>
+												</figure>
+											</button>
+										) : (
+											<a
+												href={tile.href}
+												class="gallery-tile__action"
+												target={tile.kind === 'site' ? '_blank' : undefined}
+												rel={tile.kind === 'site' ? 'noreferrer' : undefined}
+												aria-label={`${tile.title} — ${tile.kind === 'site' ? 'open live site' : 'open PDF'}`}
+											>
+												<figure>
+													<img
+														src={tile.cover}
+														width={tile.coverWidth}
+														height={tile.coverHeight}
+														alt={tile.title}
+														loading="lazy"
+														decoding="async"
+													/>
+													<figcaption class="gallery-tile__overlay">
+														<span class="gallery-tile__eyebrow">{tile.eyebrow}</span>
+														<span class="gallery-tile__title">{tile.title}</span>
+														<span class="gallery-tile__caption">{tile.caption}</span>
+													</figcaption>
+												</figure>
+											</a>
+										)}
+									</div>
+								))}
+							</div>
 						))}
-					</ul>
+					</div>
 
 					<dialog class="gallery-lightbox" id="gallery-lightbox" aria-label="Image viewer">
 						<button type="button" class="gallery-lightbox__close" aria-label="Close image viewer">&#x2715;</button>

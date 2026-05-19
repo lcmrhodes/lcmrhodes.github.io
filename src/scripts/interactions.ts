@@ -5,6 +5,7 @@ const FINE_POINTER_QUERY = '(pointer: fine)';
 const PULSE_HALO_SOUND_DELAY_MS = 320;
 const FRAGRANCE_BLOOM_SOUND_DELAY_MS = 320;
 const WEDDING_SPARKLE_SOUND_DELAY_MS = 130;
+const PROJECT_CARD_HOVER_SOUND_INTERVAL_MS = 220;
 const SOUND_ENABLED_KEY = 'sound-enabled';
 const THEME_KEY = 'theme';
 const WEATHER_KEY = 'weather';
@@ -14,9 +15,9 @@ const AUTO_ENVIRONMENT_CACHE_KEY = 'portfolio-auto-environment';
 const AUTO_GEO_CACHE_KEY = 'portfolio-auto-geo';
 const ABOUT_HERO_TYPED_KEY = 'about-hero-typed';
 const IDENTITY_TYPED_KEY = 'identity-typed';
-const ABOUT_HERO_LINE_PAUSE_MS = 1000;
-const ABOUT_HERO_CHUNK_PAUSE_MS = 500;
-const ABOUT_HERO_HEADING_SPLIT_PAUSE_MS = 280;
+const ABOUT_HERO_LINE_PAUSE_MS = 420;
+const ABOUT_HERO_CHUNK_PAUSE_MS = 220;
+const ABOUT_HERO_HEADING_SPLIT_PAUSE_MS = 140;
 const AUTO_ENVIRONMENT_CACHE_MS = 30 * 60 * 1000;
 const AUTO_GEO_CACHE_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -62,14 +63,15 @@ declare global {
 	}
 }
 
-let galleryObserver: IntersectionObserver | null = null;
 let aboutTypingToken = 0;
 let identityTypingToken = 0;
 let audioContext: AudioContext | null = null;
 const pulseHoverTimeouts = new WeakMap<HTMLElement, number>();
 const hoveredButtons = new WeakSet<HTMLElement>();
+let lastProjectCardHoverToneAt = 0;
 let soundEnabled = true;
 let activeInlineHoverLink: HTMLElement | null = null;
+let inlineFloatingPopout: HTMLElement | null = null;
 let weatherMode: WeatherMode = 'off';
 let weatherRafId: number | null = null;
 const aboutHeroTextCache = new WeakMap<Text, string>();
@@ -396,24 +398,24 @@ function playButtonHoverTone() {
 	const gainB = ctx.createGain();
 
 	filter.type = 'lowpass';
-	filter.frequency.setValueAtTime(1800, now);
-	filter.Q.setValueAtTime(0.8, now);
+	filter.frequency.setValueAtTime(1320, now);
+	filter.Q.setValueAtTime(0.42, now);
 
 	master.gain.setValueAtTime(0.0001, now);
-	master.gain.exponentialRampToValueAtTime(0.0042, now + 0.012);
-	master.gain.exponentialRampToValueAtTime(0.0016, now + 0.05);
-	master.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+	master.gain.linearRampToValueAtTime(0.0024, now + 0.026);
+	master.gain.exponentialRampToValueAtTime(0.0012, now + 0.076);
+	master.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
 
 	oscA.type = 'sine';
-	oscA.frequency.setValueAtTime(940, now);
-	oscA.frequency.linearRampToValueAtTime(840, now + 0.09);
+	oscA.frequency.setValueAtTime(760, now);
+	oscA.frequency.linearRampToValueAtTime(710, now + 0.14);
 
-	oscB.type = 'triangle';
-	oscB.frequency.setValueAtTime(1410, now);
-	oscB.frequency.linearRampToValueAtTime(1260, now + 0.09);
+	oscB.type = 'sine';
+	oscB.frequency.setValueAtTime(1140, now);
+	oscB.frequency.linearRampToValueAtTime(1030, now + 0.14);
 
 	gainA.gain.setValueAtTime(1, now);
-	gainB.gain.setValueAtTime(0.1, now);
+	gainB.gain.setValueAtTime(0.06, now);
 
 	oscA.connect(gainA);
 	oscB.connect(gainB);
@@ -424,8 +426,8 @@ function playButtonHoverTone() {
 
 	oscA.start(now);
 	oscB.start(now);
-	oscA.stop(now + 0.1);
-	oscB.stop(now + 0.1);
+	oscA.stop(now + 0.15);
+	oscB.stop(now + 0.15);
 }
 
 function playProjectCardHoverTone() {
@@ -435,69 +437,51 @@ function playProjectCardHoverTone() {
 		return;
 	}
 
+	const elapsed = window.performance.now() - lastProjectCardHoverToneAt;
+	if (elapsed < PROJECT_CARD_HOVER_SOUND_INTERVAL_MS) {
+		return;
+	}
+	lastProjectCardHoverToneAt = window.performance.now();
+
 	const now = ctx.currentTime;
 	const master = ctx.createGain();
-	const bandpass = ctx.createBiquadFilter();
 	const lowpass = ctx.createBiquadFilter();
 	const oscA = ctx.createOscillator();
 	const oscB = ctx.createOscillator();
 	const gainA = ctx.createGain();
 	const gainB = ctx.createGain();
-	const noiseSource = ctx.createBufferSource();
-	const noiseFilter = ctx.createBiquadFilter();
-	const noiseGain = ctx.createGain();
-
-	bandpass.type = 'bandpass';
-	bandpass.frequency.setValueAtTime(460, now);
-	bandpass.Q.setValueAtTime(1.15, now);
 
 	lowpass.type = 'lowpass';
-	lowpass.frequency.setValueAtTime(1650, now);
-	lowpass.Q.setValueAtTime(0.55, now);
+	lowpass.frequency.setValueAtTime(980, now);
+	lowpass.Q.setValueAtTime(0.36, now);
 
 	master.gain.setValueAtTime(0.0001, now);
-	master.gain.exponentialRampToValueAtTime(0.0068, now + 0.01);
-	master.gain.exponentialRampToValueAtTime(0.0028, now + 0.048);
-	master.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+	master.gain.linearRampToValueAtTime(0.0026, now + 0.028);
+	master.gain.exponentialRampToValueAtTime(0.0013, now + 0.09);
+	master.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
 
-	oscA.type = 'triangle';
-	oscA.frequency.setValueAtTime(392, now);
-	oscA.frequency.exponentialRampToValueAtTime(330, now + 0.11);
+	oscA.type = 'sine';
+	oscA.frequency.setValueAtTime(360, now);
+	oscA.frequency.exponentialRampToValueAtTime(318, now + 0.17);
 
 	oscB.type = 'sine';
-	oscB.frequency.setValueAtTime(588, now);
-	oscB.frequency.exponentialRampToValueAtTime(522, now + 0.08);
+	oscB.frequency.setValueAtTime(540, now);
+	oscB.frequency.exponentialRampToValueAtTime(486, now + 0.14);
 
 	gainA.gain.setValueAtTime(1, now);
-	gainB.gain.setValueAtTime(0.18, now);
-
-	noiseSource.buffer = createNoiseBuffer(ctx, 0.08);
-	noiseFilter.type = 'highpass';
-	noiseFilter.frequency.setValueAtTime(1500, now);
-	noiseFilter.Q.setValueAtTime(0.75, now);
-
-	noiseGain.gain.setValueAtTime(0.0001, now);
-	noiseGain.gain.exponentialRampToValueAtTime(0.00085, now + 0.006);
-	noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
+	gainB.gain.setValueAtTime(0.1, now);
 
 	oscA.connect(gainA);
 	oscB.connect(gainB);
-	gainA.connect(bandpass);
-	gainB.connect(bandpass);
-	bandpass.connect(lowpass);
+	gainA.connect(lowpass);
+	gainB.connect(lowpass);
 	lowpass.connect(master);
 	master.connect(ctx.destination);
 
-	noiseSource.connect(noiseFilter);
-	noiseFilter.connect(noiseGain);
-	noiseGain.connect(master);
-
 	oscA.start(now);
 	oscB.start(now);
-	noiseSource.start(now);
-	oscA.stop(now + 0.12);
-	oscB.stop(now + 0.12);
-	noiseSource.stop(now + 0.08);
+	oscA.stop(now + 0.18);
+	oscB.stop(now + 0.18);
 }
 
 function playButtonClickTone() {
@@ -925,18 +909,18 @@ function getNaturalTypingDelay(char: string | undefined, baseDelay: number) {
 	}
 
 	if (char === '.' || char === ',' || char === ':' || char === ';') {
-		return baseDelay + 170;
+		return baseDelay + 70;
 	}
 
 	if (char === '!' || char === '?') {
-		return baseDelay + 220;
+		return baseDelay + 95;
 	}
 
 	if (char === ' ') {
-		return Math.round(baseDelay * 0.72);
+		return Math.round(baseDelay * 0.64);
 	}
 
-	return baseDelay + Math.round(Math.random() * 18);
+	return baseDelay + Math.round(Math.random() * 8);
 }
 
 function clearAboutTypingGlow() {
@@ -967,19 +951,19 @@ function getAboutHeroTypingBlocks() {
 				blocks.push(
 					createAboutHeroTypingBlock(
 						chunk,
-						112,
-						72,
+						58,
+						36,
 						index < headingChunks.length - 1 ? ABOUT_HERO_HEADING_SPLIT_PAUSE_MS : ABOUT_HERO_LINE_PAUSE_MS,
 					),
 				);
 			});
 		} else {
-			blocks.push(createAboutHeroTypingBlock(heading, 112, 72, ABOUT_HERO_LINE_PAUSE_MS));
+			blocks.push(createAboutHeroTypingBlock(heading, 58, 36, ABOUT_HERO_LINE_PAUSE_MS));
 		}
 	}
 
 	if (lead) {
-		blocks.push(createAboutHeroTypingBlock(lead, 48, 56, ABOUT_HERO_LINE_PAUSE_MS));
+		blocks.push(createAboutHeroTypingBlock(lead, 24, 28, ABOUT_HERO_LINE_PAUSE_MS));
 	}
 
 	if (detail) {
@@ -993,8 +977,8 @@ function getAboutHeroTypingBlocks() {
 				blocks.push(
 					createAboutHeroTypingBlock(
 						chunk,
-						50,
-						60,
+						25,
+						30,
 						0,
 						glowTarget,
 						true,
@@ -1003,7 +987,7 @@ function getAboutHeroTypingBlocks() {
 			});
 		} else {
 			const links = Array.from(detail.querySelectorAll<HTMLElement>('.about-inline-link'));
-			blocks.push(createAboutHeroTypingBlock(detail, 50, 60, 0, links.at(-1) ?? null, true));
+			blocks.push(createAboutHeroTypingBlock(detail, 25, 30, 0, links.at(-1) ?? null, true));
 		}
 	}
 
@@ -1088,16 +1072,16 @@ function startAboutHeroTyping(token: number) {
 					return;
 				}
 
-				window.setTimeout(typeNextNode, currentNode.node.parentElement?.tagName === 'A' ? 130 : 82);
+				window.setTimeout(typeNextNode, currentNode.node.parentElement?.tagName === 'A' ? 64 : 40);
 			};
 
-			window.setTimeout(typeChar, currentNode.node.parentElement?.tagName === 'A' ? 88 : currentBlock.initialDelay);
+			window.setTimeout(typeChar, currentNode.node.parentElement?.tagName === 'A' ? 44 : currentBlock.initialDelay);
 		};
 
 		typeNextNode();
 	};
 
-	window.setTimeout(typeBlock, 120);
+	window.setTimeout(typeBlock, 60);
 }
 
 function updateNavIndicator() {
@@ -1141,67 +1125,6 @@ function setMobileNavOpen(isOpen: boolean) {
 	mobileNav.classList.toggle('open', isOpen);
 	mobileNav.setAttribute('aria-hidden', String(!isOpen));
 	mobileToggle.setAttribute('aria-expanded', String(isOpen));
-}
-
-function initGalleryReveal() {
-	const gallerySection = document.querySelector<HTMLElement>('.content-section[data-section="gallery"]');
-	const scrollContainer = document.querySelector<HTMLElement>('.gallery-scroll');
-
-	if (!gallerySection || !scrollContainer) {
-		return;
-	}
-
-	const items = Array.from(scrollContainer.querySelectorAll<HTMLElement>('.gallery-item'));
-
-	if (prefersReducedMotion()) {
-		galleryObserver?.disconnect();
-		galleryObserver = null;
-		items.forEach((item) => {
-			item.classList.remove('reveal-hidden');
-			item.classList.add('reveal-visible');
-		});
-		scrollContainer.dataset.revealReady = 'true';
-		return;
-	}
-
-	if (!gallerySection.classList.contains('active') || scrollContainer.dataset.revealReady === 'true') {
-		return;
-	}
-
-	galleryObserver?.disconnect();
-
-	items.forEach((item, index) => {
-		item.style.setProperty('--reveal-delay', `${Math.min(index, 5) * 70}ms`);
-
-		if (!item.classList.contains('reveal-visible')) {
-			item.classList.add('reveal-hidden');
-		}
-	});
-
-	galleryObserver = new IntersectionObserver(
-		(entries) => {
-			entries.forEach((entry) => {
-				if (!entry.isIntersecting) {
-					return;
-				}
-
-				entry.target.classList.remove('reveal-hidden');
-				entry.target.classList.add('reveal-visible');
-				galleryObserver?.unobserve(entry.target);
-			});
-		},
-		{
-			root: scrollContainer,
-			threshold: 0.15,
-			rootMargin: '0px 0px 0px -50px',
-		},
-	);
-
-	items
-		.filter((item) => !item.classList.contains('reveal-visible'))
-		.forEach((item) => galleryObserver?.observe(item));
-
-	scrollContainer.dataset.revealReady = 'true';
 }
 
 function initMouseGlow() {
@@ -1292,10 +1215,6 @@ function activateTab(tab: string, animate = true) {
 
 	history.replaceState(null, '', `#${nextTab}`);
 	updateNavIndicator();
-
-	if (nextTab === 'gallery') {
-		initGalleryReveal();
-	}
 
 	if (shouldTypeAboutHero) {
 		window.setTimeout(() => startAboutHeroTyping(aboutTypingToken), shouldAnimate ? 120 : 0);
@@ -1548,6 +1467,9 @@ function setInlineHoverFocus(link: HTMLElement | null) {
 	if (activeInlineHoverLink && activeInlineHoverLink !== link) {
 		activeInlineHoverLink.classList.remove('is-inline-hover-active');
 		activeInlineHoverLink.style.removeProperty('--popout-shift');
+		activeInlineHoverLink.style.removeProperty('--popout-anchor-x');
+		activeInlineHoverLink.style.removeProperty('--popout-anchor-y');
+		activeInlineHoverLink.querySelector<HTMLElement>('.about-inline-popout')?.setAttribute('aria-hidden', 'true');
 	}
 
 	activeInlineHoverLink = link;
@@ -1555,43 +1477,91 @@ function setInlineHoverFocus(link: HTMLElement | null) {
 	if (link) {
 		document.body.dataset.inlineHover = 'true';
 		link.classList.add('is-inline-hover-active');
+		link.querySelector<HTMLElement>('.about-inline-popout')?.setAttribute('aria-hidden', 'true');
 		positionInlinePopout(link);
 		return;
 	}
 
 	delete document.body.dataset.inlineHover;
+	hideInlineFloatingPopout();
 }
 
-function positionInlinePopout(link: HTMLElement) {
-	const popout = link.querySelector<HTMLElement>('.about-inline-popout');
+function getInlineFloatingPopout() {
+	if (inlineFloatingPopout) {
+		return inlineFloatingPopout;
+	}
 
-	if (!popout) {
+	inlineFloatingPopout = document.createElement('span');
+	inlineFloatingPopout.className = 'about-inline-floating-popout';
+	inlineFloatingPopout.setAttribute('aria-hidden', 'true');
+	document.body.append(inlineFloatingPopout);
+	return inlineFloatingPopout;
+}
+
+function hideInlineFloatingPopout() {
+	if (!inlineFloatingPopout) {
 		return;
 	}
 
-	link.style.setProperty('--popout-shift', '0px');
+	inlineFloatingPopout.classList.remove('is-active');
+	inlineFloatingPopout.setAttribute('aria-hidden', 'true');
+}
+
+function positionInlinePopout(link: HTMLElement) {
+	const sourcePopout = link.querySelector<HTMLElement>('.about-inline-popout');
+
+	if (!sourcePopout) {
+		return;
+	}
+
+	const popout = getInlineFloatingPopout();
+	popout.textContent = sourcePopout.textContent ?? '';
+	popout.setAttribute('aria-hidden', 'false');
+
+	const linkRect = link.getBoundingClientRect();
+	const anchorX = linkRect.left + linkRect.width / 2 + window.scrollX;
+	const anchorY = linkRect.bottom + 8 + window.scrollY;
+
+	popout.style.setProperty('--popout-anchor-x', `${Math.round(anchorX)}px`);
+	popout.style.setProperty('--popout-anchor-y', `${Math.round(anchorY)}px`);
+	popout.style.setProperty('--popout-shift', '0px');
+	popout.classList.add('is-active');
 
 	window.requestAnimationFrame(() => {
-		const linkRect = link.getBoundingClientRect();
+		const nextLinkRect = link.getBoundingClientRect();
 		const popoutRect = popout.getBoundingClientRect();
 		const viewportPadding = 14;
-		const idealLeft = linkRect.left + linkRect.width / 2 - popoutRect.width / 2;
+		const nextAnchorX = nextLinkRect.left + nextLinkRect.width / 2 + window.scrollX;
+		const nextAnchorY = nextLinkRect.bottom + 8 + window.scrollY;
+		const idealLeft = nextLinkRect.left + nextLinkRect.width / 2 - popoutRect.width / 2;
 		const idealRight = idealLeft + popoutRect.width;
 		const leftOverflow = Math.max(0, viewportPadding - idealLeft);
 		const rightOverflow = Math.max(0, idealRight - (window.innerWidth - viewportPadding));
 		const shift = leftOverflow - rightOverflow;
 
-		link.style.setProperty('--popout-shift', `${Math.round(shift)}px`);
+		popout.style.setProperty('--popout-anchor-x', `${Math.round(nextAnchorX)}px`);
+		popout.style.setProperty('--popout-anchor-y', `${Math.round(nextAnchorY)}px`);
+		popout.style.setProperty('--popout-shift', `${Math.round(shift)}px`);
 	});
 }
 
 function bindInlineHoverFocus() {
+	const supportsFinePointer = window.matchMedia(FINE_POINTER_QUERY).matches;
+
 	document.querySelectorAll<HTMLElement>('.about-inline-link').forEach((link) => {
 		link.addEventListener('mouseenter', () => {
+			if (!supportsFinePointer) {
+				return;
+			}
+
 			setInlineHoverFocus(link);
 		});
 
 		link.addEventListener('mouseleave', (event) => {
+			if (!supportsFinePointer) {
+				return;
+			}
+
 			const relatedTarget = event.relatedTarget;
 			const nextLink =
 				relatedTarget instanceof HTMLElement ? relatedTarget.closest<HTMLElement>('.about-inline-link') : null;
@@ -1606,9 +1576,43 @@ function bindInlineHoverFocus() {
 		link.addEventListener('focusout', () => {
 			setInlineHoverFocus(null);
 		});
+
+		link.addEventListener('click', (event) => {
+			if (supportsFinePointer || activeInlineHoverLink === link) {
+				return;
+			}
+
+			event.preventDefault();
+			setInlineHoverFocus(link);
+		});
+	});
+
+	document.addEventListener('pointerdown', (event) => {
+		if (!activeInlineHoverLink) {
+			return;
+		}
+
+		const target = event.target;
+		if (target instanceof HTMLElement && target.closest('.about-inline-link')) {
+			return;
+		}
+
+		setInlineHoverFocus(null);
+	});
+
+	window.addEventListener('keydown', (event) => {
+		if (event.key === 'Escape') {
+			setInlineHoverFocus(null);
+		}
 	});
 
 	window.addEventListener('resize', () => {
+		if (activeInlineHoverLink) {
+			positionInlinePopout(activeInlineHoverLink);
+		}
+	});
+
+	document.getElementById('content-panel')?.addEventListener('scroll', () => {
 		if (activeInlineHoverLink) {
 			positionInlinePopout(activeInlineHoverLink);
 		}
