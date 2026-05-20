@@ -203,6 +203,7 @@ a {
 	z-index: 1000;
 	width: clamp(12.8rem, 19vw, 16.8rem);
 	aspect-ratio: 1;
+	border-radius: 50%;
 	opacity: 0;
 	visibility: hidden;
 	transform: translateY(16px);
@@ -2860,5 +2861,53 @@ a:focus:not(:focus-visible) {
 
 	100% {
 		transform: scale(1);
+	}
+}
+
+/* Adjustments for shorter viewport heights on desktop/tablet views */
+@media (max-height: 820px) and (min-width: 800px) {
+	.identity-panel {
+		padding-top: 2rem;
+		padding-bottom: 2rem;
+	}
+
+	.identity-top {
+		top: 2.2rem;
+	}
+
+	.about-portrait-placeholder {
+		top: 2rem;
+		width: clamp(10rem, 15vw, 13.5rem);
+	}
+
+	.side-nav {
+		margin-top: auto;
+		margin-bottom: 2rem;
+	}
+}
+
+@media (max-height: 700px) and (min-width: 800px) {
+	.identity-panel {
+		padding-top: 1.5rem;
+		padding-bottom: 1.5rem;
+	}
+
+	.identity-top {
+		top: 1.7rem;
+	}
+
+	.about-portrait-placeholder {
+		top: 1.5rem;
+		width: clamp(9rem, 13vw, 11rem);
+	}
+
+	.side-nav {
+		margin-top: auto;
+		margin-bottom: 1rem;
+	}
+
+	.side-nav-item {
+		padding: 0.45rem 0 0.45rem 0.35rem;
+		font-size: clamp(1.1rem, 1.4vw, 1.3rem);
 	}
 }
